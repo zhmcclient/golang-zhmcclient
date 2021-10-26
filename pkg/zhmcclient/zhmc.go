@@ -20,8 +20,11 @@ import (
 type ZhmcAPI interface {
 	CpcAPI
 	LparAPI
+	NicAPI
+	AdapterAPI
 	JobAPI
 
+	// TODO, interface for caches
 	GetCPCs() ([]CPC)
 	GetLPARs(cpcName string) ([]LPAR)
 	GetAdapters(cpcName string) ([]Adapter)
@@ -29,14 +32,17 @@ type ZhmcAPI interface {
 }
 
 type ZhmcManager struct {
-	client      *Client
-	cpcManager  CpcAPI
-	lparManager LparAPI
-	jobManager  JobAPI
-	cpcs        []CPC
-	lpars       []LPAR
-	adpaters    []Adapter
-	nics        []NIC
+	client         *Client
+	cpcManager     CpcAPI
+	lparManager    LparAPI
+	adapterManager AdapterAPI
+	nicManager     NicAPI
+	jobManager     JobAPI
+	// TODO model to cache objects...
+	cpcs           []CPC
+	lpars          []LPAR
+	adpaters       []Adapter
+	nics           []NIC
 }
 
 func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
@@ -49,10 +55,12 @@ func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
 
 func NewManagerFromClient(client *Client) ZhmcAPI {
 	return &ZhmcManager{
-		client:      client,
-		cpcManager:  NewCpcManager(client),
-		lparManager: NewLparManager(client),
-		jobManager:  NewJobManager(client),
+		client:         client,
+		cpcManager:     NewCpcManager(client),
+		lparManager:    NewLparManager(client),
+		adapterManager: NewAdapterManager(client),
+		nicManager:     NewNicManager(client),
+		jobManager:     NewJobManager(client),
 	}
 }
 
@@ -77,23 +85,6 @@ func (m *ZhmcManager)GetNics(cpcName string, lparName string) ([]NIC) {
 func (m *ZhmcManager) ListCPCs() ([]CPC, error) {
 	return m.cpcManager.ListCPCs()
 }
-func (m *ZhmcManager) ListAdapters(cpcID string) ([]Adapter, error) {
-	return m.cpcManager.ListAdapters(cpcID)
-}
-func (m *ZhmcManager) CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error) {
-	return m.cpcManager.CreateAdapter(cpcID, adaptor)
-}
-func (m *ZhmcManager) DeleteAdapter(lparID string) error {
-	return m.cpcManager.DeleteAdapter(lparID)
-}
-
-// JOB
-func (m *ZhmcManager)QueryJob(jobID string) (*Job, error) {
-	return m.jobManager.QueryJob(jobID)
-}
-func (m *ZhmcManager)DeleteJob(jobID string) error {
-	return m.jobManager.DeleteJob(jobID)
-}
 
 // LPAR
 func (m *ZhmcManager) ListLPARs(cpcID string) ([]LPAR, error) {
@@ -111,15 +102,36 @@ func (m *ZhmcManager) StopLPAR(lparID string) (string, error) {
 func (m *ZhmcManager) MountIsoImage(lparID string, isoFile string, insFile string) error {
 	return m.lparManager.MountIsoImage(lparID, isoFile, insFile)
 }
+
+// Adapter
+func (m *ZhmcManager) ListAdapters(cpcID string) ([]Adapter, error) {
+	return m.adapterManager.ListAdapters(cpcID)
+}
+func (m *ZhmcManager) CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error) {
+	return m.adapterManager.CreateAdapter(cpcID, adaptor)
+}
+func (m *ZhmcManager) DeleteAdapter(lparID string) error {
+	return m.adapterManager.DeleteAdapter(lparID)
+}
+
+// NIC
 func (m *ZhmcManager) ListNics(lparID string) ([]string, error) {
-	return m.lparManager.ListNics(lparID)
+	return m.nicManager.ListNics(lparID)
 }
 func (m *ZhmcManager) CreateNic(lparID string, nic *NIC) (*NIC, error) {
-	return m.lparManager.CreateNic(lparID, nic)
+	return m.nicManager.CreateNic(lparID, nic)
 }
 func (m *ZhmcManager) DeleteNic(lparID string, nicID string) error {
-	return m.lparManager.DeleteNic(lparID, nicID)
+	return m.nicManager.DeleteNic(lparID, nicID)
 }
 func (m *ZhmcManager) GetNic(lparID string, nicID string) (*NIC, error) {
-	return m.lparManager.GetNic(lparID, nicID)
+	return m.nicManager.GetNic(lparID, nicID)
+}
+
+// JOB
+func (m *ZhmcManager)QueryJob(jobID string) (*Job, error) {
+	return m.jobManager.QueryJob(jobID)
+}
+func (m *ZhmcManager)DeleteJob(jobID string) error {
+	return m.jobManager.DeleteJob(jobID)
 }
