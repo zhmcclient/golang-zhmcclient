@@ -19,28 +19,6 @@ import (
 //go:generate counterfeiter -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
 	ListCPCs() ([]CPC, error)
-
-	ListAdapters(cpcID string) ([]Adapter, error)
-	CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error)
-	DeleteAdapter(cpcID string) error
-}
-
-/**
-* Sample
-* {
-* 	"name":
-*   "description":
-*   "port-description":
-*   "maximum-transmission-unit-size":
-*   "object-uri":"/api/adapters/542b9406-d033-11e5-9f39-020000000338", retured when creating
-* }
-*/
-type Adapter struct {
-	uri                         string
-	Name 						string  // Required
-	Description 				string
-	PortDescription             string
-	MaximumTransmissionUnitSize int
 }
 
 /**
@@ -82,29 +60,4 @@ func NewCpcManager(client *Client) CpcAPI {
 */
 func (m *CpcManager) ListCPCs() ([]CPC, error) {
 	return nil, nil
-}
-
-/**
-* GET /api/cpcs/{cpc-id}/adapters
-*/
-func (m *CpcManager) ListAdapters(cpcID string) ([]Adapter, error) {
-	return nil, nil
-}
-
-/**
-* POST /api/cpcs/{cpc-id}/adapters
-* Return: 201 and "object-uri"
-*     or: 400, 403, 404, 409, 503
-*/
-func (m *CpcManager) CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error) {
-	return nil, nil
-}
-
-/**
-* DELETE /api/adapters/{adapter-id}
-* Return: 204
-*     or: 400, 403, 404, 409, 503
-*/
-func (m *CpcManager) DeleteAdapter(cpcID string) error {
-	return nil
 }
