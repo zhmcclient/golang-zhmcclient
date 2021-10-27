@@ -11,10 +11,6 @@
 
 package zhmcclient
 
-import (
-
-)
-
 // JobAPI defines an interface for issuing Job requests to ZHMC
 //go:generate counterfeiter -o fakes/job.go --fake-name JobAPI . JobAPI
 type JobAPI interface {
@@ -23,11 +19,12 @@ type JobAPI interface {
 }
 
 type JobStatus string
+
 const (
-	Running JobStatus = "running"
-	CancelPending = "cancel-pending"
-	Canceled = "canceled"
-	Complete = "complete"
+	Running       JobStatus = "running"
+	CancelPending           = "cancel-pending"
+	Canceled                = "canceled"
+	Complete                = "complete"
 )
 
 type Job struct {
@@ -52,7 +49,7 @@ func NewJobManager(client *Client) JobAPI {
 * GET /api/jobs/{job-id}
 * Return: 200 and job status
 *     or: 400, 404
-*/
+ */
 func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 	return nil, nil
 }
@@ -61,7 +58,7 @@ func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 * DELETE /api/jobs/{job-id}
 * Return: 204
 *     or: 400, 404, 409
-*/
+ */
 func (m *JobManager) DeleteJob(jobID string) error {
 	return nil
 }
