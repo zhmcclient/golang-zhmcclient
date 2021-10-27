@@ -20,6 +20,7 @@ type LparAPI interface {
 	StopLPAR(lparID string) (string, error)
 
 	MountIsoImage(lparID string, isoFile string, insFile string) error
+	UnmountIsoImage(lparID string) error
 }
 
 /**
@@ -33,11 +34,11 @@ type LPAR struct {
 }
 
 type LparManager struct {
-	client *Client
+	client ClientAPI
 	lpars  []LPAR
 }
 
-func NewLparManager(client *Client) LparAPI {
+func NewLparManager(client ClientAPI) *LparManager {
 	return &LparManager{
 		client: client,
 		lpars:  nil,
@@ -81,5 +82,12 @@ func (m *LparManager) StopLPAR(lparID string) (string, error) {
 *     or: 400, 403, 404, 409, 503
  */
 func (m *LparManager) MountIsoImage(lparID string, isoFile string, insFile string) error {
+	return nil
+}
+
+/**
+* POST /api/partitions/{partition-id}/operations/unmount-iso-image
+ */
+func (m *LparManager) UnmountIsoImage(lparID string) error {
 	return nil
 }

@@ -38,11 +38,11 @@ type Adapter struct {
 }
 
 type AdapterManager struct {
-	client   *Client
+	client   ClientAPI
 	adapters []Adapter
 }
 
-func NewAdapterManager(client *Client) AdapterAPI {
+func NewAdapterManager(client ClientAPI) *AdapterManager {
 	return &AdapterManager{
 		client:   client,
 		adapters: nil,

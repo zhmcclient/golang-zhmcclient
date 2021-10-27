@@ -28,7 +28,7 @@ type ZhmcAPI interface {
 }
 
 type ZhmcManager struct {
-	client         *Client
+	client         ClientAPI
 	cpcManager     CpcAPI
 	lparManager    LparAPI
 	adapterManager AdapterAPI
@@ -49,7 +49,7 @@ func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
 	return nil
 }
 
-func NewManagerFromClient(client *Client) ZhmcAPI {
+func NewManagerFromClient(client ClientAPI) ZhmcAPI {
 	return &ZhmcManager{
 		client:         client,
 		cpcManager:     NewCpcManager(client),
@@ -97,6 +97,9 @@ func (m *ZhmcManager) StopLPAR(lparID string) (string, error) {
 }
 func (m *ZhmcManager) MountIsoImage(lparID string, isoFile string, insFile string) error {
 	return m.lparManager.MountIsoImage(lparID, isoFile, insFile)
+}
+func (m *ZhmcManager) UnmountIsoImage(lparID string) error {
+	return nil
 }
 
 // Adapter

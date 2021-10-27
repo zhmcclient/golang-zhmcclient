@@ -11,6 +11,13 @@
 
 package zhmcclient
 
+import (
+	"encoding/json"
+	"errors"
+	"net/http"
+	"path"
+)
+
 // CpcAPI defines an interface for issuing CPC requests to ZHMC
 //go:generate counterfeiter -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
@@ -29,20 +36,20 @@ type CpcAPI interface {
 * }
  */
 type CPC struct {
-	uri                 string
-	Name                string
-	Status              string
-	HasAcceptableStatus string
-	DpmEnabled          bool
-	SeVersion           string
+	URI                 string `json:"object-uri"`
+	Name                string `json:"name"`
+	Status              string `json:"status"`
+	HasAcceptableStatus string `json:"has-unacceptable-status"`
+	DpmEnabled          bool   `json:"dpm-enabled"`
+	SeVersion           string `json:"se-version"`
 }
 
 type CpcManager struct {
-	client *Client
+	client ClientAPI
 	cpcs   []CPC
 }
 
-func NewCpcManager(client *Client) CpcAPI {
+func NewCpcManager(client ClientAPI) *CpcManager {
 	return &CpcManager{
 		client: client,
 		cpcs:   nil,
@@ -55,5 +62,20 @@ func NewCpcManager(client *Client) CpcAPI {
 *     or: 400
  */
 func (m *CpcManager) ListCPCs() ([]CPC, error) {
-	return nil, nil
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/cpcs")
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUri, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		err = json.Unmarshal(responseBody, &m.cpcs)
+		if err != nil {
+			return nil, err
+		}
+		return m.cpcs, nil
+	}
+
+	return nil, errors.New("ListCPCs -- Unknown Error")
 }
