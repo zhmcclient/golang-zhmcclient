@@ -29,6 +29,24 @@ import (
 	"net/url"
 )
 
+// ClientAPI defines an interface for issuing client requests to ZHMC
+//go:generate counterfeiter -o fakes/client.go --fake-name ClientAPI . ClientAPI
+type ClientAPI interface {
+	GetEndpointURL() *url.URL
+	TraceOn(outputStream io.Writer)
+	TraceOff()
+	SetCertVerify(isVerify bool)
+	Logon() error
+	Logoff() error
+	IsLogon(verify bool) bool
+	ExecuteRequest(requestType string, url string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error)
+}
+
+// HTTP Client interface required for unit tests
+type HTTPClient interface {
+	Do(request *http.Request) (*http.Response, error)
+}
+
 const (
 	SESSION_HEADER_NAME = "X-API-Session"
 )
@@ -65,7 +83,7 @@ type Client struct {
 	traceOutput    io.Writer
 }
 
-func NewClient(endpoint string, opts *Options) (*Client, error) {
+func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: DialTimeout,
@@ -78,7 +96,7 @@ func NewClient(endpoint string, opts *Options) (*Client, error) {
 		Transport: netTransport,
 	}
 
-	endpointurl, err := getEndpointURL(endpoint)
+	endpointurl, err := getEndpointURLFromString(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +127,12 @@ func NewClient(endpoint string, opts *Options) (*Client, error) {
 }
 
 // TODO, validate the endpoint
-func getEndpointURL(endpoint string) (*url.URL, error) {
+func getEndpointURLFromString(endpoint string) (*url.URL, error) {
 	return url.Parse(endpoint)
+}
+
+func (c *Client) GetEndpointURL() *url.URL {
+	return c.endpointURL
 }
 
 func (c *Client) TraceOn(outputStream io.Writer) {
@@ -151,7 +173,7 @@ func (c *Client) Logon() error {
 		return nil
 	}
 
-	return errors.New("Logon error")
+	return errors.New("Logon -- Unknown Error")
 }
 
 func (c *Client) Logoff() error {

@@ -13,6 +13,12 @@ make sample-build
 make sample-build-docker
 ```
 
+## Unit Test
+```
+cd ./pkg/zhmcclient
+go test
+```
+
 ## Sample Usage
 ```
 import (
@@ -25,9 +31,9 @@ func main() {
 		Username:   "name",
 		Password:   "psw",
 		VerifyCert: false,
-		Trace:		false,
+		Trace:      false,
 	}
-    client, _ := zhmcclient.NewClient(endpoint, creds)
+	client, _ := zhmcclient.NewClient(endpoint, creds)
 	if client != nil {
 		hmcManager := zhmcclient.NewManagerFromClient(client)
 		hmcManager.ListCPCs()

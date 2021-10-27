@@ -231,6 +231,17 @@ type ZhmcAPI struct {
 		result1 string
 		result2 error
 	}
+	UnmountIsoImageStub        func(string) error
+	unmountIsoImageMutex       sync.RWMutex
+	unmountIsoImageArgsForCall []struct {
+		arg1 string
+	}
+	unmountIsoImageReturns struct {
+		result1 error
+	}
+	unmountIsoImageReturnsOnCall map[int]struct {
+		result1 error
+	}
 	UpdateLparPropertiesStub        func(string, map[string]string) (*zhmcclient.LPAR, error)
 	updateLparPropertiesMutex       sync.RWMutex
 	updateLparPropertiesArgsForCall []struct {
@@ -1368,6 +1379,67 @@ func (fake *ZhmcAPI) StopLPARReturnsOnCall(i int, result1 string, result2 error)
 	}{result1, result2}
 }
 
+func (fake *ZhmcAPI) UnmountIsoImage(arg1 string) error {
+	fake.unmountIsoImageMutex.Lock()
+	ret, specificReturn := fake.unmountIsoImageReturnsOnCall[len(fake.unmountIsoImageArgsForCall)]
+	fake.unmountIsoImageArgsForCall = append(fake.unmountIsoImageArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.UnmountIsoImageStub
+	fakeReturns := fake.unmountIsoImageReturns
+	fake.recordInvocation("UnmountIsoImage", []interface{}{arg1})
+	fake.unmountIsoImageMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *ZhmcAPI) UnmountIsoImageCallCount() int {
+	fake.unmountIsoImageMutex.RLock()
+	defer fake.unmountIsoImageMutex.RUnlock()
+	return len(fake.unmountIsoImageArgsForCall)
+}
+
+func (fake *ZhmcAPI) UnmountIsoImageCalls(stub func(string) error) {
+	fake.unmountIsoImageMutex.Lock()
+	defer fake.unmountIsoImageMutex.Unlock()
+	fake.UnmountIsoImageStub = stub
+}
+
+func (fake *ZhmcAPI) UnmountIsoImageArgsForCall(i int) string {
+	fake.unmountIsoImageMutex.RLock()
+	defer fake.unmountIsoImageMutex.RUnlock()
+	argsForCall := fake.unmountIsoImageArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) UnmountIsoImageReturns(result1 error) {
+	fake.unmountIsoImageMutex.Lock()
+	defer fake.unmountIsoImageMutex.Unlock()
+	fake.UnmountIsoImageStub = nil
+	fake.unmountIsoImageReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *ZhmcAPI) UnmountIsoImageReturnsOnCall(i int, result1 error) {
+	fake.unmountIsoImageMutex.Lock()
+	defer fake.unmountIsoImageMutex.Unlock()
+	fake.UnmountIsoImageStub = nil
+	if fake.unmountIsoImageReturnsOnCall == nil {
+		fake.unmountIsoImageReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.unmountIsoImageReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *ZhmcAPI) UpdateLparProperties(arg1 string, arg2 map[string]string) (*zhmcclient.LPAR, error) {
 	fake.updateLparPropertiesMutex.Lock()
 	ret, specificReturn := fake.updateLparPropertiesReturnsOnCall[len(fake.updateLparPropertiesArgsForCall)]
@@ -1472,6 +1544,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.startLPARMutex.RUnlock()
 	fake.stopLPARMutex.RLock()
 	defer fake.stopLPARMutex.RUnlock()
+	fake.unmountIsoImageMutex.RLock()
+	defer fake.unmountIsoImageMutex.RUnlock()
 	fake.updateLparPropertiesMutex.RLock()
 	defer fake.updateLparPropertiesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

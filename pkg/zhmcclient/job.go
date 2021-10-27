@@ -36,10 +36,10 @@ type Job struct {
 }
 
 type JobManager struct {
-	client *Client
+	client ClientAPI
 }
 
-func NewJobManager(client *Client) JobAPI {
+func NewJobManager(client ClientAPI) *JobManager {
 	return &JobManager{
 		client: client,
 	}

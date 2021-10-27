@@ -48,11 +48,11 @@ type NIC struct {
 }
 
 type NicManager struct {
-	client *Client
+	client ClientAPI
 	nics   []NIC
 }
 
-func NewNicManager(client *Client) NicAPI {
+func NewNicManager(client ClientAPI) *NicManager {
 	return &NicManager{
 		client: client,
 		nics:   nil,
