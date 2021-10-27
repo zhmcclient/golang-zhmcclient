@@ -11,10 +11,6 @@
 
 package zhmcclient
 
-import (
-
-)
-
 // ZhmcAPI defines an interface for issuing requests to ZHMC
 //go:generate counterfeiter -o fakes/zhmc.go --fake-name ZhmcAPI . ZhmcAPI
 type ZhmcAPI interface {
@@ -25,10 +21,10 @@ type ZhmcAPI interface {
 	JobAPI
 
 	// TODO, interface for caches
-	GetCPCs() ([]CPC)
-	GetLPARs(cpcName string) ([]LPAR)
-	GetAdapters(cpcName string) ([]Adapter)
-	GetNics(cpcName string, lparName string) ([]NIC)
+	GetCPCs() []CPC
+	GetLPARs(cpcName string) []LPAR
+	GetAdapters(cpcName string) []Adapter
+	GetNics(cpcName string, lparName string) []NIC
 }
 
 type ZhmcManager struct {
@@ -39,10 +35,10 @@ type ZhmcManager struct {
 	nicManager     NicAPI
 	jobManager     JobAPI
 	// TODO model to cache objects...
-	cpcs           []CPC
-	lpars          []LPAR
-	adpaters       []Adapter
-	nics           []NIC
+	cpcs     []CPC
+	lpars    []LPAR
+	adpaters []Adapter
+	nics     []NIC
 }
 
 func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
@@ -65,19 +61,19 @@ func NewManagerFromClient(client *Client) ZhmcAPI {
 }
 
 // ZHMC
-func (m *ZhmcManager) GetCPCs() ([]CPC) {
+func (m *ZhmcManager) GetCPCs() []CPC {
 	return nil
 }
 
-func (m *ZhmcManager) GetLPARs(cpcName string) ([]LPAR) {
+func (m *ZhmcManager) GetLPARs(cpcName string) []LPAR {
 	return nil
 }
 
-func (m *ZhmcManager) GetAdapters(cpcName string) ([]Adapter) {
+func (m *ZhmcManager) GetAdapters(cpcName string) []Adapter {
 	return nil
 }
 
-func (m *ZhmcManager)GetNics(cpcName string, lparName string) ([]NIC) {
+func (m *ZhmcManager) GetNics(cpcName string, lparName string) []NIC {
 	return nil
 }
 
@@ -129,9 +125,9 @@ func (m *ZhmcManager) GetNic(lparID string, nicID string) (*NIC, error) {
 }
 
 // JOB
-func (m *ZhmcManager)QueryJob(jobID string) (*Job, error) {
+func (m *ZhmcManager) QueryJob(jobID string) (*Job, error) {
 	return m.jobManager.QueryJob(jobID)
 }
-func (m *ZhmcManager)DeleteJob(jobID string) error {
+func (m *ZhmcManager) DeleteJob(jobID string) error {
 	return m.jobManager.DeleteJob(jobID)
 }

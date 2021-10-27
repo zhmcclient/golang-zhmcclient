@@ -11,10 +11,6 @@
 
 package zhmcclient
 
-import (
-
-)
-
 // NicAPI defines an interface for issuing NIC requests to ZHMC
 //go:generate counterfeiter -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
@@ -56,24 +52,23 @@ type NicManager struct {
 	nics   []NIC
 }
 
-
 func NewNicManager(client *Client) NicAPI {
 	return &NicManager{
 		client: client,
-		nics:  nil,
+		nics:   nil,
 	}
 }
 
 /**
 * get_property('nic-uris') from LPAR
-*/
+ */
 func (m *NicManager) ListNics(lparID string) ([]string, error) {
 	return nil, nil
 }
 
 /**
 * POST /api/partitions/{partition-id}/nics
-*/
+ */
 func (m *NicManager) CreateNic(lparID string, nic *NIC) (*NIC, error) {
 	return nil, nil
 }
@@ -82,14 +77,14 @@ func (m *NicManager) CreateNic(lparID string, nic *NIC) (*NIC, error) {
 * DELETE /api/partitions/{partition-id}/nics/{nic-id}
 * Return: 204
 *     or: 400, 403, 404, 409, 503
-*/
+ */
 func (m *NicManager) DeleteNic(lparID string, nicID string) error {
 	return nil
 }
 
 /**
 * GET /api/partitions/{partition-id}/nics/{nic-id}
-*/
+ */
 func (m *NicManager) GetNic(lparID string, nicID string) (*NIC, error) {
 	return nil, nil
 }

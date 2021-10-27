@@ -11,10 +11,6 @@
 
 package zhmcclient
 
-import (
-
-)
-
 // CpcAPI defines an interface for issuing CPC requests to ZHMC
 //go:generate counterfeiter -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
@@ -31,7 +27,7 @@ type CpcAPI interface {
 *    "se-version": "2.13.1"
 *    "status": "not-operating"
 * }
-*/
+ */
 type CPC struct {
 	uri                 string
 	Name                string
@@ -57,7 +53,7 @@ func NewCpcManager(client *Client) CpcAPI {
 * GET /api/cpcs
 * Return: 200 and CPCs array
 *     or: 400
-*/
+ */
 func (m *CpcManager) ListCPCs() ([]CPC, error) {
 	return nil, nil
 }

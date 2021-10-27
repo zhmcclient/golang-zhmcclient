@@ -11,10 +11,6 @@
 
 package zhmcclient
 
-import (
-
-)
-
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
 //go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
@@ -32,18 +28,18 @@ type AdapterAPI interface {
 *   "maximum-transmission-unit-size":
 *   "object-uri":"/api/adapters/542b9406-d033-11e5-9f39-020000000338", retured when creating
 * }
-*/
+ */
 type Adapter struct {
 	uri                         string
-	Name 						string  // Required
-	Description 				string
+	Name                        string // Required
+	Description                 string
 	PortDescription             string
 	MaximumTransmissionUnitSize int
 }
 
 type AdapterManager struct {
-	client    *Client
-	adapters  []Adapter
+	client   *Client
+	adapters []Adapter
 }
 
 func NewAdapterManager(client *Client) AdapterAPI {
@@ -55,7 +51,7 @@ func NewAdapterManager(client *Client) AdapterAPI {
 
 /**
 * GET /api/cpcs/{cpc-id}/adapters
-*/
+ */
 func (m *AdapterManager) ListAdapters(cpcID string) ([]Adapter, error) {
 	return nil, nil
 }
@@ -64,7 +60,7 @@ func (m *AdapterManager) ListAdapters(cpcID string) ([]Adapter, error) {
 * POST /api/cpcs/{cpc-id}/adapters
 * Return: 201 and "object-uri"
 *     or: 400, 403, 404, 409, 503
-*/
+ */
 func (m *AdapterManager) CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error) {
 	return nil, nil
 }
@@ -73,7 +69,7 @@ func (m *AdapterManager) CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter
 * DELETE /api/adapters/{adapter-id}
 * Return: 204
 *     or: 400, 403, 404, 409, 503
-*/
+ */
 func (m *AdapterManager) DeleteAdapter(cpcID string) error {
 	return nil
 }

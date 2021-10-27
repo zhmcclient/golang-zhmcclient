@@ -13,12 +13,17 @@ package zhmcclient
 
 import (
 	"runtime"
+	"time"
 )
 
 // Global constants.
 const (
-	libraryName    			= "zhmcclient"
-	libraryVersion 			= "v0.1"
-	libraryUserAgentPrefix 	= "ZHMC (" + runtime.GOOS + "; " + runtime.GOARCH + ") "
-	libraryUserAgent       	= libraryUserAgentPrefix + libraryName + "/" + libraryVersion
+	libraryName            = "zhmcclient"
+	libraryVersion         = "v0.1"
+	libraryUserAgentPrefix = "ZHMC (" + runtime.GOOS + "; " + runtime.GOARCH + ") "
+	libraryUserAgent       = libraryUserAgentPrefix + libraryName + "/" + libraryVersion
+
+	HttpClientTimeout = 10 * time.Second
+	HandshakeTimeout  = 5 * time.Second
+	DialTimeout       = 5 * time.Second
 )

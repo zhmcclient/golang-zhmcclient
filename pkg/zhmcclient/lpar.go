@@ -11,10 +11,6 @@
 
 package zhmcclient
 
-import (
-
-)
-
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
 //go:generate counterfeiter -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
@@ -27,13 +23,13 @@ type LparAPI interface {
 }
 
 /**
-*/
+ */
 type LPAR struct {
-	uri       string
-	cpc       *CPC
-	Name      string
-	Status    string
-	Type      string
+	uri    string
+	cpc    *CPC
+	Name   string
+	Status string
+	Type   string
 }
 
 type LparManager struct {
@@ -52,7 +48,7 @@ func NewLparManager(client *Client) LparAPI {
 * GET /api/cpcs/{cpc-id}/partitions
 * Return: 200 and LPARs array
 *     or: 400, 404, 409
-*/
+ */
 func (m *LparManager) ListLPARs(cpcID string) ([]LPAR, error) {
 	return nil, nil
 }
@@ -64,8 +60,8 @@ func (m *LparManager) UpdateLparProperties(lparID string, props map[string]strin
 /**
 * POST /api/partitions/{partition-id}/operations/start
 * Return: 202 and job-uri
-*     or: 400, 403, 404, 503, 
-*/
+*     or: 400, 403, 404, 503,
+ */
 func (m *LparManager) StartLPAR(lparID string) (string, error) {
 	return "nil", nil
 }
@@ -73,17 +69,17 @@ func (m *LparManager) StartLPAR(lparID string) (string, error) {
 /**
 * POST /api/partitions/{partition-id}/operations/stop
 * Return: 202 and job-uri
-*     or: 400, 403, 404, 503, 
-*/
+*     or: 400, 403, 404, 503,
+ */
 func (m *LparManager) StopLPAR(lparID string) (string, error) {
 	return "nil", nil
 }
 
 /**
 * POST /api/partitions/{partition-id}/operations/mount-iso-image
-* Return: 204 
+* Return: 204
 *     or: 400, 403, 404, 409, 503
-*/
+ */
 func (m *LparManager) MountIsoImage(lparID string, isoFile string, insFile string) error {
 	return nil
 }
