@@ -10,11 +10,11 @@ import (
 )
 
 type ClientAPI struct {
-	ExecuteRequestStub        func(string, string, interface{}) (int, []byte, error)
+	ExecuteRequestStub        func(string, *url.URL, interface{}) (int, []byte, error)
 	executeRequestMutex       sync.RWMutex
 	executeRequestArgsForCall []struct {
 		arg1 string
-		arg2 string
+		arg2 *url.URL
 		arg3 interface{}
 	}
 	executeRequestReturns struct {
@@ -86,12 +86,12 @@ type ClientAPI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 string, arg3 interface{}) (int, []byte, error) {
+func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 *url.URL, arg3 interface{}) (int, []byte, error) {
 	fake.executeRequestMutex.Lock()
 	ret, specificReturn := fake.executeRequestReturnsOnCall[len(fake.executeRequestArgsForCall)]
 	fake.executeRequestArgsForCall = append(fake.executeRequestArgsForCall, struct {
 		arg1 string
-		arg2 string
+		arg2 *url.URL
 		arg3 interface{}
 	}{arg1, arg2, arg3})
 	stub := fake.ExecuteRequestStub
@@ -113,13 +113,13 @@ func (fake *ClientAPI) ExecuteRequestCallCount() int {
 	return len(fake.executeRequestArgsForCall)
 }
 
-func (fake *ClientAPI) ExecuteRequestCalls(stub func(string, string, interface{}) (int, []byte, error)) {
+func (fake *ClientAPI) ExecuteRequestCalls(stub func(string, *url.URL, interface{}) (int, []byte, error)) {
 	fake.executeRequestMutex.Lock()
 	defer fake.executeRequestMutex.Unlock()
 	fake.ExecuteRequestStub = stub
 }
 
-func (fake *ClientAPI) ExecuteRequestArgsForCall(i int) (string, string, interface{}) {
+func (fake *ClientAPI) ExecuteRequestArgsForCall(i int) (string, *url.URL, interface{}) {
 	fake.executeRequestMutex.RLock()
 	defer fake.executeRequestMutex.RUnlock()
 	argsForCall := fake.executeRequestArgsForCall[i]

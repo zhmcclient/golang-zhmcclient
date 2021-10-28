@@ -8,6 +8,17 @@ import (
 )
 
 type ZhmcAPI struct {
+	CancelJobStub        func(string) error
+	cancelJobMutex       sync.RWMutex
+	cancelJobArgsForCall []struct {
+		arg1 string
+	}
+	cancelJobReturns struct {
+		result1 error
+	}
+	cancelJobReturnsOnCall map[int]struct {
+		result1 error
+	}
 	CreateAdapterStub        func(string, *zhmcclient.Adapter) (*zhmcclient.Adapter, error)
 	createAdapterMutex       sync.RWMutex
 	createAdapterArgsForCall []struct {
@@ -141,9 +152,10 @@ type ZhmcAPI struct {
 		result1 []zhmcclient.Adapter
 		result2 error
 	}
-	ListCPCsStub        func() ([]zhmcclient.CPC, error)
+	ListCPCsStub        func(map[string]string) ([]zhmcclient.CPC, error)
 	listCPCsMutex       sync.RWMutex
 	listCPCsArgsForCall []struct {
+		arg1 map[string]string
 	}
 	listCPCsReturns struct {
 		result1 []zhmcclient.CPC
@@ -153,10 +165,11 @@ type ZhmcAPI struct {
 		result1 []zhmcclient.CPC
 		result2 error
 	}
-	ListLPARsStub        func(string) ([]zhmcclient.LPAR, error)
+	ListLPARsStub        func(string, map[string]string) ([]zhmcclient.LPAR, error)
 	listLPARsMutex       sync.RWMutex
 	listLPARsArgsForCall []struct {
 		arg1 string
+		arg2 map[string]string
 	}
 	listLPARsReturns struct {
 		result1 []zhmcclient.LPAR
@@ -258,6 +271,67 @@ type ZhmcAPI struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *ZhmcAPI) CancelJob(arg1 string) error {
+	fake.cancelJobMutex.Lock()
+	ret, specificReturn := fake.cancelJobReturnsOnCall[len(fake.cancelJobArgsForCall)]
+	fake.cancelJobArgsForCall = append(fake.cancelJobArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.CancelJobStub
+	fakeReturns := fake.cancelJobReturns
+	fake.recordInvocation("CancelJob", []interface{}{arg1})
+	fake.cancelJobMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *ZhmcAPI) CancelJobCallCount() int {
+	fake.cancelJobMutex.RLock()
+	defer fake.cancelJobMutex.RUnlock()
+	return len(fake.cancelJobArgsForCall)
+}
+
+func (fake *ZhmcAPI) CancelJobCalls(stub func(string) error) {
+	fake.cancelJobMutex.Lock()
+	defer fake.cancelJobMutex.Unlock()
+	fake.CancelJobStub = stub
+}
+
+func (fake *ZhmcAPI) CancelJobArgsForCall(i int) string {
+	fake.cancelJobMutex.RLock()
+	defer fake.cancelJobMutex.RUnlock()
+	argsForCall := fake.cancelJobArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) CancelJobReturns(result1 error) {
+	fake.cancelJobMutex.Lock()
+	defer fake.cancelJobMutex.Unlock()
+	fake.CancelJobStub = nil
+	fake.cancelJobReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *ZhmcAPI) CancelJobReturnsOnCall(i int, result1 error) {
+	fake.cancelJobMutex.Lock()
+	defer fake.cancelJobMutex.Unlock()
+	fake.CancelJobStub = nil
+	if fake.cancelJobReturnsOnCall == nil {
+		fake.cancelJobReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.cancelJobReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *ZhmcAPI) CreateAdapter(arg1 string, arg2 *zhmcclient.Adapter) (*zhmcclient.Adapter, error) {
@@ -940,17 +1014,18 @@ func (fake *ZhmcAPI) ListAdaptersReturnsOnCall(i int, result1 []zhmcclient.Adapt
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) ListCPCs() ([]zhmcclient.CPC, error) {
+func (fake *ZhmcAPI) ListCPCs(arg1 map[string]string) ([]zhmcclient.CPC, error) {
 	fake.listCPCsMutex.Lock()
 	ret, specificReturn := fake.listCPCsReturnsOnCall[len(fake.listCPCsArgsForCall)]
 	fake.listCPCsArgsForCall = append(fake.listCPCsArgsForCall, struct {
-	}{})
+		arg1 map[string]string
+	}{arg1})
 	stub := fake.ListCPCsStub
 	fakeReturns := fake.listCPCsReturns
-	fake.recordInvocation("ListCPCs", []interface{}{})
+	fake.recordInvocation("ListCPCs", []interface{}{arg1})
 	fake.listCPCsMutex.Unlock()
 	if stub != nil {
-		return stub()
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -964,10 +1039,17 @@ func (fake *ZhmcAPI) ListCPCsCallCount() int {
 	return len(fake.listCPCsArgsForCall)
 }
 
-func (fake *ZhmcAPI) ListCPCsCalls(stub func() ([]zhmcclient.CPC, error)) {
+func (fake *ZhmcAPI) ListCPCsCalls(stub func(map[string]string) ([]zhmcclient.CPC, error)) {
 	fake.listCPCsMutex.Lock()
 	defer fake.listCPCsMutex.Unlock()
 	fake.ListCPCsStub = stub
+}
+
+func (fake *ZhmcAPI) ListCPCsArgsForCall(i int) map[string]string {
+	fake.listCPCsMutex.RLock()
+	defer fake.listCPCsMutex.RUnlock()
+	argsForCall := fake.listCPCsArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *ZhmcAPI) ListCPCsReturns(result1 []zhmcclient.CPC, result2 error) {
@@ -996,18 +1078,19 @@ func (fake *ZhmcAPI) ListCPCsReturnsOnCall(i int, result1 []zhmcclient.CPC, resu
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) ListLPARs(arg1 string) ([]zhmcclient.LPAR, error) {
+func (fake *ZhmcAPI) ListLPARs(arg1 string, arg2 map[string]string) ([]zhmcclient.LPAR, error) {
 	fake.listLPARsMutex.Lock()
 	ret, specificReturn := fake.listLPARsReturnsOnCall[len(fake.listLPARsArgsForCall)]
 	fake.listLPARsArgsForCall = append(fake.listLPARsArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 map[string]string
+	}{arg1, arg2})
 	stub := fake.ListLPARsStub
 	fakeReturns := fake.listLPARsReturns
-	fake.recordInvocation("ListLPARs", []interface{}{arg1})
+	fake.recordInvocation("ListLPARs", []interface{}{arg1, arg2})
 	fake.listLPARsMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -1021,17 +1104,17 @@ func (fake *ZhmcAPI) ListLPARsCallCount() int {
 	return len(fake.listLPARsArgsForCall)
 }
 
-func (fake *ZhmcAPI) ListLPARsCalls(stub func(string) ([]zhmcclient.LPAR, error)) {
+func (fake *ZhmcAPI) ListLPARsCalls(stub func(string, map[string]string) ([]zhmcclient.LPAR, error)) {
 	fake.listLPARsMutex.Lock()
 	defer fake.listLPARsMutex.Unlock()
 	fake.ListLPARsStub = stub
 }
 
-func (fake *ZhmcAPI) ListLPARsArgsForCall(i int) string {
+func (fake *ZhmcAPI) ListLPARsArgsForCall(i int) (string, map[string]string) {
 	fake.listLPARsMutex.RLock()
 	defer fake.listLPARsMutex.RUnlock()
 	argsForCall := fake.listLPARsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *ZhmcAPI) ListLPARsReturns(result1 []zhmcclient.LPAR, result2 error) {
@@ -1508,6 +1591,8 @@ func (fake *ZhmcAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 *zhmcclien
 func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.cancelJobMutex.RLock()
+	defer fake.cancelJobMutex.RUnlock()
 	fake.createAdapterMutex.RLock()
 	defer fake.createAdapterMutex.RUnlock()
 	fake.createNicMutex.RLock()

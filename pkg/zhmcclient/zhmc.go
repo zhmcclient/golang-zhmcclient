@@ -78,13 +78,13 @@ func (m *ZhmcManager) GetNics(cpcName string, lparName string) []NIC {
 }
 
 // CPC
-func (m *ZhmcManager) ListCPCs() ([]CPC, error) {
-	return m.cpcManager.ListCPCs()
+func (m *ZhmcManager) ListCPCs(query map[string]string) ([]CPC, error) {
+	return m.cpcManager.ListCPCs(query)
 }
 
 // LPAR
-func (m *ZhmcManager) ListLPARs(cpcID string) ([]LPAR, error) {
-	return m.lparManager.ListLPARs(cpcID)
+func (m *ZhmcManager) ListLPARs(cpcID string, query map[string]string) ([]LPAR, error) {
+	return m.lparManager.ListLPARs(cpcID, query)
 }
 func (m *ZhmcManager) UpdateLparProperties(lparID string, props map[string]string) (*LPAR, error) {
 	return m.lparManager.UpdateLparProperties(lparID, props)
@@ -133,4 +133,7 @@ func (m *ZhmcManager) QueryJob(jobID string) (*Job, error) {
 }
 func (m *ZhmcManager) DeleteJob(jobID string) error {
 	return m.jobManager.DeleteJob(jobID)
+}
+func (m *ZhmcManager) CancelJob(jobID string) error {
+	return m.jobManager.CancelJob(jobID)
 }

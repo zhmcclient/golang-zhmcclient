@@ -16,6 +16,7 @@ package zhmcclient
 type JobAPI interface {
 	QueryJob(jobID string) (*Job, error)
 	DeleteJob(jobID string) error
+	CancelJob(jobID string) error
 }
 
 type JobStatus string
@@ -60,5 +61,14 @@ func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 *     or: 400, 404, 409
  */
 func (m *JobManager) DeleteJob(jobID string) error {
+	return nil
+}
+
+/**
+* POST /api/jobs/{job-id}/operations/cancel
+* Return: 204
+*     or: 400, 404, 409
+ */
+func (m *JobManager) CancelJob(jobID string) error {
 	return nil
 }

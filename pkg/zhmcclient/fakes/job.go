@@ -8,6 +8,17 @@ import (
 )
 
 type JobAPI struct {
+	CancelJobStub        func(string) error
+	cancelJobMutex       sync.RWMutex
+	cancelJobArgsForCall []struct {
+		arg1 string
+	}
+	cancelJobReturns struct {
+		result1 error
+	}
+	cancelJobReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DeleteJobStub        func(string) error
 	deleteJobMutex       sync.RWMutex
 	deleteJobArgsForCall []struct {
@@ -34,6 +45,67 @@ type JobAPI struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *JobAPI) CancelJob(arg1 string) error {
+	fake.cancelJobMutex.Lock()
+	ret, specificReturn := fake.cancelJobReturnsOnCall[len(fake.cancelJobArgsForCall)]
+	fake.cancelJobArgsForCall = append(fake.cancelJobArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.CancelJobStub
+	fakeReturns := fake.cancelJobReturns
+	fake.recordInvocation("CancelJob", []interface{}{arg1})
+	fake.cancelJobMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *JobAPI) CancelJobCallCount() int {
+	fake.cancelJobMutex.RLock()
+	defer fake.cancelJobMutex.RUnlock()
+	return len(fake.cancelJobArgsForCall)
+}
+
+func (fake *JobAPI) CancelJobCalls(stub func(string) error) {
+	fake.cancelJobMutex.Lock()
+	defer fake.cancelJobMutex.Unlock()
+	fake.CancelJobStub = stub
+}
+
+func (fake *JobAPI) CancelJobArgsForCall(i int) string {
+	fake.cancelJobMutex.RLock()
+	defer fake.cancelJobMutex.RUnlock()
+	argsForCall := fake.cancelJobArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *JobAPI) CancelJobReturns(result1 error) {
+	fake.cancelJobMutex.Lock()
+	defer fake.cancelJobMutex.Unlock()
+	fake.CancelJobStub = nil
+	fake.cancelJobReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *JobAPI) CancelJobReturnsOnCall(i int, result1 error) {
+	fake.cancelJobMutex.Lock()
+	defer fake.cancelJobMutex.Unlock()
+	fake.CancelJobStub = nil
+	if fake.cancelJobReturnsOnCall == nil {
+		fake.cancelJobReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.cancelJobReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *JobAPI) DeleteJob(arg1 string) error {
@@ -164,6 +236,8 @@ func (fake *JobAPI) QueryJobReturnsOnCall(i int, result1 *zhmcclient.Job, result
 func (fake *JobAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.cancelJobMutex.RLock()
+	defer fake.cancelJobMutex.RUnlock()
 	fake.deleteJobMutex.RLock()
 	defer fake.deleteJobMutex.RUnlock()
 	fake.queryJobMutex.RLock()

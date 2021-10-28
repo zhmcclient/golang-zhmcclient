@@ -13,6 +13,7 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -29,7 +30,7 @@ var _ = Describe("CPC", func() {
 			fakeClient *fakes.ClientAPI
 
 			cpcs  []CPC
-			uri   *url.URL
+			url   *url.URL
 			bytes []byte
 		)
 
@@ -56,19 +57,52 @@ var _ = Describe("CPC", func() {
 				},
 			}
 
-			uri, _ = url.Parse("https://127.0.0.1")
+			url, _ = url.Parse("https://127.0.0.1:443")
 			bytes, _ = json.Marshal(cpcs)
 		})
 
 		Context("When list cpcs and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(uri)
+				fakeClient.GetEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
-				rets, err := manager.ListCPCs()
+				rets, err := manager.ListCPCs(nil)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
 				Expect(rets[0]).To(Equal(cpcs[0]))
+			})
+		})
+
+		Context("When list cpcs and returns error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, errors.New("error"))
+				rets, err := manager.ListCPCs(nil)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When list cpcs and unmarshal error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
+				rets, err := manager.ListCPCs(nil)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When list cpcs and returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
+				rets, err := manager.ListCPCs(nil)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
 			})
 		})
 	})
