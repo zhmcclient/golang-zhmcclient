@@ -134,7 +134,7 @@ func (m *LparManager) StartLPAR(lparID string) (string, error) {
 		return "", err
 	}
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
 		return "", err
 	}
@@ -168,7 +168,7 @@ func (m *LparManager) StopLPAR(lparID string) (string, error) {
 		return "", err
 	}
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
 		return "", err
 	}

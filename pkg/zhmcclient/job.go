@@ -11,6 +11,12 @@
 
 package zhmcclient
 
+import (
+	"encoding/json"
+	"net/http"
+	"path"
+)
+
 // JobAPI defines an interface for issuing Job requests to ZHMC
 //go:generate counterfeiter -o fakes/job.go --fake-name JobAPI . JobAPI
 type JobAPI interface {
@@ -22,18 +28,18 @@ type JobAPI interface {
 type JobStatus string
 
 const (
-	Running       JobStatus = "running"
-	CancelPending           = "cancel-pending"
-	Canceled                = "canceled"
-	Complete                = "complete"
+	JOB_STATUS_RUNNING        JobStatus = "running"
+	JOB_STATUS_CANCEL_PENDING           = "cancel-pending"
+	JOB_STATUS_CANCELED                 = "canceled"
+	JOB_STATUS_COMPLETE                 = "complete"
 )
 
 type Job struct {
 	URI           string
-	Status        JobStatus
-	JobStatusCode int
-	JobReasonCode int
-	//JobResults    object
+	Status        JobStatus `json:"status"`
+	JobStatusCode int       `json:"job-status-code"`
+	JobReasonCode int       `json:"job-reason-code"`
+	JobResults    []byte    `json:"job-results"`
 }
 
 type JobManager struct {
@@ -52,7 +58,27 @@ func NewJobManager(client ClientAPI) *JobManager {
 *     or: 400, 404
  */
 func (m *JobManager) QueryJob(jobID string) (*Job, error) {
-	return nil, nil
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/jobs", jobID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		myjob := Job{}
+		err = json.Unmarshal(responseBody, &myjob)
+		if err != nil {
+			return nil, err
+		}
+		return &myjob, nil
+	}
+
+	return nil, GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
@@ -61,7 +87,22 @@ func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 *     or: 400, 404, 409
  */
 func (m *JobManager) DeleteJob(jobID string) error {
-	return nil
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/jobs", jobID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
@@ -70,5 +111,20 @@ func (m *JobManager) DeleteJob(jobID string) error {
 *     or: 400, 404, 409
  */
 func (m *JobManager) CancelJob(jobID string) error {
-	return nil
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/jobs", jobID, "operations/cancel")
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }
