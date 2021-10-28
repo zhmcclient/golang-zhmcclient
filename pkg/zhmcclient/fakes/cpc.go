@@ -8,9 +8,10 @@ import (
 )
 
 type CpcAPI struct {
-	ListCPCsStub        func() ([]zhmcclient.CPC, error)
+	ListCPCsStub        func(map[string]string) ([]zhmcclient.CPC, error)
 	listCPCsMutex       sync.RWMutex
 	listCPCsArgsForCall []struct {
+		arg1 map[string]string
 	}
 	listCPCsReturns struct {
 		result1 []zhmcclient.CPC
@@ -24,17 +25,18 @@ type CpcAPI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *CpcAPI) ListCPCs() ([]zhmcclient.CPC, error) {
+func (fake *CpcAPI) ListCPCs(arg1 map[string]string) ([]zhmcclient.CPC, error) {
 	fake.listCPCsMutex.Lock()
 	ret, specificReturn := fake.listCPCsReturnsOnCall[len(fake.listCPCsArgsForCall)]
 	fake.listCPCsArgsForCall = append(fake.listCPCsArgsForCall, struct {
-	}{})
+		arg1 map[string]string
+	}{arg1})
 	stub := fake.ListCPCsStub
 	fakeReturns := fake.listCPCsReturns
-	fake.recordInvocation("ListCPCs", []interface{}{})
+	fake.recordInvocation("ListCPCs", []interface{}{arg1})
 	fake.listCPCsMutex.Unlock()
 	if stub != nil {
-		return stub()
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -48,10 +50,17 @@ func (fake *CpcAPI) ListCPCsCallCount() int {
 	return len(fake.listCPCsArgsForCall)
 }
 
-func (fake *CpcAPI) ListCPCsCalls(stub func() ([]zhmcclient.CPC, error)) {
+func (fake *CpcAPI) ListCPCsCalls(stub func(map[string]string) ([]zhmcclient.CPC, error)) {
 	fake.listCPCsMutex.Lock()
 	defer fake.listCPCsMutex.Unlock()
 	fake.ListCPCsStub = stub
+}
+
+func (fake *CpcAPI) ListCPCsArgsForCall(i int) map[string]string {
+	fake.listCPCsMutex.RLock()
+	defer fake.listCPCsMutex.RUnlock()
+	argsForCall := fake.listCPCsArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *CpcAPI) ListCPCsReturns(result1 []zhmcclient.CPC, result2 error) {

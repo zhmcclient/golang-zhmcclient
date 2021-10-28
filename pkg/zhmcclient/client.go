@@ -39,7 +39,7 @@ type ClientAPI interface {
 	Logon() error
 	Logoff() error
 	IsLogon(verify bool) bool
-	ExecuteRequest(requestType string, url string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error)
+	ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error)
 }
 
 // HTTP Client interface required for unit tests
@@ -215,12 +215,12 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
 }
 
-func (c *Client) ExecuteRequest(requestType string, url string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
-	return c.executeMethod(requestType, url, requestData)
+func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
+	return c.executeMethod(requestType, url.String(), requestData)
 }
 
 // TODO, 1. Retry, 2. Logon when 401/403
-func (c *Client) executeMethod(requestType string, url string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
+func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
 	var requestBody []byte
 
 	if requestData != nil {
@@ -230,7 +230,7 @@ func (c *Client) executeMethod(requestType string, url string, requestData inter
 		}
 	}
 
-	request, err := http.NewRequest(requestType, url, bytes.NewBuffer(requestBody))
+	request, err := http.NewRequest(requestType, urlStr, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return -1, nil, err
 	}

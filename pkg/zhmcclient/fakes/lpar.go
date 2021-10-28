@@ -8,10 +8,11 @@ import (
 )
 
 type LparAPI struct {
-	ListLPARsStub        func(string) ([]zhmcclient.LPAR, error)
+	ListLPARsStub        func(string, map[string]string) ([]zhmcclient.LPAR, error)
 	listLPARsMutex       sync.RWMutex
 	listLPARsArgsForCall []struct {
 		arg1 string
+		arg2 map[string]string
 	}
 	listLPARsReturns struct {
 		result1 []zhmcclient.LPAR
@@ -89,18 +90,19 @@ type LparAPI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *LparAPI) ListLPARs(arg1 string) ([]zhmcclient.LPAR, error) {
+func (fake *LparAPI) ListLPARs(arg1 string, arg2 map[string]string) ([]zhmcclient.LPAR, error) {
 	fake.listLPARsMutex.Lock()
 	ret, specificReturn := fake.listLPARsReturnsOnCall[len(fake.listLPARsArgsForCall)]
 	fake.listLPARsArgsForCall = append(fake.listLPARsArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 map[string]string
+	}{arg1, arg2})
 	stub := fake.ListLPARsStub
 	fakeReturns := fake.listLPARsReturns
-	fake.recordInvocation("ListLPARs", []interface{}{arg1})
+	fake.recordInvocation("ListLPARs", []interface{}{arg1, arg2})
 	fake.listLPARsMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -114,17 +116,17 @@ func (fake *LparAPI) ListLPARsCallCount() int {
 	return len(fake.listLPARsArgsForCall)
 }
 
-func (fake *LparAPI) ListLPARsCalls(stub func(string) ([]zhmcclient.LPAR, error)) {
+func (fake *LparAPI) ListLPARsCalls(stub func(string, map[string]string) ([]zhmcclient.LPAR, error)) {
 	fake.listLPARsMutex.Lock()
 	defer fake.listLPARsMutex.Unlock()
 	fake.ListLPARsStub = stub
 }
 
-func (fake *LparAPI) ListLPARsArgsForCall(i int) string {
+func (fake *LparAPI) ListLPARsArgsForCall(i int) (string, map[string]string) {
 	fake.listLPARsMutex.RLock()
 	defer fake.listLPARsMutex.RUnlock()
 	argsForCall := fake.listLPARsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *LparAPI) ListLPARsReturns(result1 []zhmcclient.LPAR, result2 error) {
