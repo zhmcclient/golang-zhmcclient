@@ -36,7 +36,7 @@ func main() {
 	client, _ := zhmcclient.NewClient(endpoint, creds)
 	if client != nil {
 		hmcManager := zhmcclient.NewManagerFromClient(client)
-		hmcManager.ListCPCs()
+		hmcManager.ListCPCs(nil)
 	}
 }
 ```
