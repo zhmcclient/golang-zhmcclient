@@ -11,65 +11,124 @@
 
 package zhmcclient
 
+import (
+	"encoding/json"
+	"net/http"
+	"path"
+)
+
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
 //go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
-	ListAdapters(cpcID string) ([]Adapter, error)
-	CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error)
-	DeleteAdapter(cpcID string) error
-}
-
-/**
-* Sample
-* {
-* 	"name":
-*   "description":
-*   "port-description":
-*   "maximum-transmission-unit-size":
-*   "object-uri":"/api/adapters/542b9406-d033-11e5-9f39-020000000338", retured when creating
-* }
- */
-type Adapter struct {
-	uri                         string
-	Name                        string // Required
-	Description                 string
-	PortDescription             string
-	MaximumTransmissionUnitSize int
+	ListAdapters(cpcID string, query map[string]string) ([]Adapter, error)
+	CreateHipersocket(cpcID string, adaptor *HypersocketPayload) (string, error)
+	DeleteHipersocket(adapterID string) error
 }
 
 type AdapterManager struct {
-	client   ClientAPI
-	adapters []Adapter
+	client ClientAPI
 }
 
 func NewAdapterManager(client ClientAPI) *AdapterManager {
 	return &AdapterManager{
-		client:   client,
-		adapters: nil,
+		client: client,
 	}
 }
 
 /**
 * GET /api/cpcs/{cpc-id}/adapters
+* @cpcID the ID of the CPC
+* @query the fields can be queried include:
+*        name,
+*        adapter-id,
+*        adapter-family,
+*        type,
+*        status
+* @return adapter array
+* Return: 200 and Adapters array
+*     or: 400, 404, 409
  */
-func (m *AdapterManager) ListAdapters(cpcID string) ([]Adapter, error) {
-	return nil, nil
+func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]Adapter, error) {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/cpcs", cpcID, "/adapters")
+	requestUrl, err := BuildUrlFromUri(requestUri, query)
+	if err != nil {
+		return nil, err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		adapters := []Adapter{}
+		err = json.Unmarshal(responseBody, &adapters)
+		if err != nil {
+			return nil, err
+		}
+		return adapters, nil
+	}
+
+	return nil, GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
 * POST /api/cpcs/{cpc-id}/adapters
-* Return: 201 and "object-uri"
+* @cpcID the ID of the CPC
+* @adaptor the payload includes properties when create Hipersocket
+* Return: 201 and body with "object-uri"
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) CreateAdapter(cpcID string, adaptor *Adapter) (*Adapter, error) {
-	return nil, nil
+func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPayload) (string, error) {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/cpcs", cpcID, "adapters")
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return "", err
+	}
+
+	bytes, err := json.Marshal(adaptor)
+	if err != nil {
+		return "", err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, bytes)
+	if err != nil {
+		return "", err
+	}
+
+	if status == http.StatusCreated {
+		uriObj := HipersocketCreateResponse{}
+		err = json.Unmarshal(responseBody, &uriObj)
+		if err != nil {
+			return "", err
+		}
+		return uriObj.URI, nil
+	}
+
+	return "", GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
 * DELETE /api/adapters/{adapter-id}
+* @adapterID the adapter ID to be deleted
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) DeleteAdapter(cpcID string) error {
-	return nil
+func (m *AdapterManager) DeleteHipersocket(adapterID string) error {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/adapters", adapterID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }

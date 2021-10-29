@@ -22,61 +22,24 @@ import (
 //go:generate counterfeiter -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
 	ListLPARs(cpcID string, query map[string]string) ([]LPAR, error)
-	UpdateLparProperties(lparID string, props map[string]string) (*LPAR, error)
+	GetLparProperties(lparID string) (*LparProperties, error)
+	UpdateLparProperties(lparID string, props *LparProperties) error
 	StartLPAR(lparID string) (string, error)
 	StopLPAR(lparID string) (string, error)
 
 	MountIsoImage(lparID string, isoFile string, insFile string) error
 	UnmountIsoImage(lparID string) error
-}
 
-type PartitionType string
-
-const (
-	PARTITION_TYPE_SSC   PartitionType = "ssc"
-	PARTITION_TYPE_LINUX               = "linux"
-	PARTITION_TYPE_ZVM                 = "zvm"
-)
-
-type PartitionStatus string
-
-const (
-	PARTITION_STATUS_NOT_ACTIVE   PartitionStatus = "communications-not-active"
-	PARTITION_STATUS_STATUS_CHECK                 = "status-check"
-	PARTITION_STATUS_STOPPED                      = "stopped"
-	PARTITION_STATUS_TERMINATED                   = "terminated"
-	PARTITION_STATUS_STARTING                     = "starting"
-	PARTITION_STATUS_ACTIVE                       = "active"
-	PARTITION_STATUS_STOPPING                     = "stopping"
-	PARTITION_STATUS_DEGRADED                     = "degraded"
-	PARTITION_STATUS_REV_ERR                      = "reservation-error"
-	PARTITION_STATUS_PAUSED                       = "paused"
-)
-
-/**
- */
-type LPAR struct {
-	URI    string          `json:"object-uri"`
-	Name   string          `json:"name"`
-	Status PartitionStatus `json:"status"`
-	Type   PartitionStatus `json:"type"`
-	cpc    *CPC
-}
-
-type StartStopLparResponse struct {
-	URI     string `json:"job-uri"`
-	Message string `json:"message"`
+	ListNics(lparID string) ([]string, error)
 }
 
 type LparManager struct {
 	client ClientAPI
-	lpars  []LPAR
 }
 
 func NewLparManager(client ClientAPI) *LparManager {
 	return &LparManager{
 		client: client,
-		lpars:  nil,
 	}
 }
 
@@ -85,6 +48,8 @@ func NewLparManager(client ClientAPI) *LparManager {
 * @cpcID is the cpc object-uri
 * @query is a key, value pairs array,
 *        currently, supports 'name=$name_reg_expression'
+*                            'status=PartitionStatus'
+*                            'type=PartitionType'
 * @return lpar array
 * Return: 200 and LPARs array
 *     or: 400, 404, 409
@@ -102,11 +67,43 @@ func (m *LparManager) ListLPARs(cpcID string, query map[string]string) ([]LPAR, 
 	}
 
 	if status == http.StatusOK {
-		err = json.Unmarshal(responseBody, &m.lpars)
+		lpars := []LPAR{}
+		err = json.Unmarshal(responseBody, &lpars)
 		if err != nil {
 			return nil, err
 		}
-		return m.lpars, nil
+		return lpars, nil
+	}
+
+	return nil, GenerateErrorFromResponse(status, responseBody)
+}
+
+/**
+* GET /api/partitions/{partition-id}
+* @lparID is the object-uri
+* Return: 200 and LparProperties
+*     or: 400, 404,
+ */
+func (m *LparManager) GetLparProperties(lparID string) (*LparProperties, error) {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		lparProps := LparProperties{}
+		err = json.Unmarshal(responseBody, &lparProps)
+		if err != nil {
+			return nil, err
+		}
+
+		return &lparProps, nil
 	}
 
 	return nil, GenerateErrorFromResponse(status, responseBody)
@@ -115,9 +112,31 @@ func (m *LparManager) ListLPARs(cpcID string, query map[string]string) ([]LPAR, 
 /**
 * POST /api/partitions/{partition-id}
 * @lparID is the object-uri
+* Return: 204
+*     or: 400, 403, 404, 409, 503,
  */
-func (m *LparManager) UpdateLparProperties(lparID string, props map[string]string) (*LPAR, error) {
-	return nil, nil
+func (m *LparManager) UpdateLparProperties(lparID string, props *LparProperties) error {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := json.Marshal(props)
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, bytes)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
@@ -204,4 +223,16 @@ func (m *LparManager) MountIsoImage(lparID string, isoFile string, insFile strin
  */
 func (m *LparManager) UnmountIsoImage(lparID string) error {
 	return nil
+}
+
+/**
+* get_property('nic-uris') from LPAR
+ */
+func (m *LparManager) ListNics(lparID string) ([]string, error) {
+	props, err := m.GetLparProperties(lparID)
+	if err != nil {
+		return nil, err
+	}
+
+	return props.NicUris, nil
 }

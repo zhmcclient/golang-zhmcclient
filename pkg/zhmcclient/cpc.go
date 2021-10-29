@@ -23,35 +23,13 @@ type CpcAPI interface {
 	ListCPCs(query map[string]string) ([]CPC, error)
 }
 
-/**
-* Sample:
-* {
-*    "dpm-enabled": true,
-*    "has-unacceptable-status": true,
-*    "name": "P0LXSMOZ",
-*    "object-uri": "/api/cpcs/e8753ff5-8ea6-35d9-b047-83c2624ba8da",
-*    "se-version": "2.13.1"
-*    "status": "not-operating"
-* }
- */
-type CPC struct {
-	URI                 string `json:"object-uri"`
-	Name                string `json:"name"`
-	Status              string `json:"status"`
-	HasAcceptableStatus string `json:"has-unacceptable-status"`
-	DpmEnabled          bool   `json:"dpm-enabled"`
-	SeVersion           string `json:"se-version"`
-}
-
 type CpcManager struct {
 	client ClientAPI
-	cpcs   []CPC
 }
 
 func NewCpcManager(client ClientAPI) *CpcManager {
 	return &CpcManager{
 		client: client,
-		cpcs:   nil,
 	}
 }
 
@@ -74,11 +52,12 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, error) {
 	}
 
 	if status == http.StatusOK {
-		err = json.Unmarshal(responseBody, &m.cpcs)
+		cpcs := []CPC{}
+		err = json.Unmarshal(responseBody, &cpcs)
 		if err != nil {
 			return nil, err
 		}
-		return m.cpcs, nil
+		return cpcs, nil
 	}
 
 	return nil, GenerateErrorFromResponse(status, responseBody)

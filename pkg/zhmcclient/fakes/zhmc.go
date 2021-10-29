@@ -19,43 +19,43 @@ type ZhmcAPI struct {
 	cancelJobReturnsOnCall map[int]struct {
 		result1 error
 	}
-	CreateAdapterStub        func(string, *zhmcclient.Adapter) (*zhmcclient.Adapter, error)
-	createAdapterMutex       sync.RWMutex
-	createAdapterArgsForCall []struct {
+	CreateHipersocketStub        func(string, *zhmcclient.HypersocketPayload) (string, error)
+	createHipersocketMutex       sync.RWMutex
+	createHipersocketArgsForCall []struct {
 		arg1 string
-		arg2 *zhmcclient.Adapter
+		arg2 *zhmcclient.HypersocketPayload
 	}
-	createAdapterReturns struct {
-		result1 *zhmcclient.Adapter
+	createHipersocketReturns struct {
+		result1 string
 		result2 error
 	}
-	createAdapterReturnsOnCall map[int]struct {
-		result1 *zhmcclient.Adapter
+	createHipersocketReturnsOnCall map[int]struct {
+		result1 string
 		result2 error
 	}
-	CreateNicStub        func(string, *zhmcclient.NIC) (*zhmcclient.NIC, error)
+	CreateNicStub        func(string, *zhmcclient.NIC) (string, error)
 	createNicMutex       sync.RWMutex
 	createNicArgsForCall []struct {
 		arg1 string
 		arg2 *zhmcclient.NIC
 	}
 	createNicReturns struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}
 	createNicReturnsOnCall map[int]struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}
-	DeleteAdapterStub        func(string) error
-	deleteAdapterMutex       sync.RWMutex
-	deleteAdapterArgsForCall []struct {
+	DeleteHipersocketStub        func(string) error
+	deleteHipersocketMutex       sync.RWMutex
+	deleteHipersocketArgsForCall []struct {
 		arg1 string
 	}
-	deleteAdapterReturns struct {
+	deleteHipersocketReturns struct {
 		result1 error
 	}
-	deleteAdapterReturnsOnCall map[int]struct {
+	deleteHipersocketReturnsOnCall map[int]struct {
 		result1 error
 	}
 	DeleteJobStub        func(string) error
@@ -81,68 +81,38 @@ type ZhmcAPI struct {
 	deleteNicReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetAdaptersStub        func(string) []zhmcclient.Adapter
-	getAdaptersMutex       sync.RWMutex
-	getAdaptersArgsForCall []struct {
+	GetLparPropertiesStub        func(string) (*zhmcclient.LparProperties, error)
+	getLparPropertiesMutex       sync.RWMutex
+	getLparPropertiesArgsForCall []struct {
 		arg1 string
 	}
-	getAdaptersReturns struct {
-		result1 []zhmcclient.Adapter
+	getLparPropertiesReturns struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
 	}
-	getAdaptersReturnsOnCall map[int]struct {
-		result1 []zhmcclient.Adapter
+	getLparPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
 	}
-	GetCPCsStub        func() []zhmcclient.CPC
-	getCPCsMutex       sync.RWMutex
-	getCPCsArgsForCall []struct {
-	}
-	getCPCsReturns struct {
-		result1 []zhmcclient.CPC
-	}
-	getCPCsReturnsOnCall map[int]struct {
-		result1 []zhmcclient.CPC
-	}
-	GetLPARsStub        func(string) []zhmcclient.LPAR
-	getLPARsMutex       sync.RWMutex
-	getLPARsArgsForCall []struct {
-		arg1 string
-	}
-	getLPARsReturns struct {
-		result1 []zhmcclient.LPAR
-	}
-	getLPARsReturnsOnCall map[int]struct {
-		result1 []zhmcclient.LPAR
-	}
-	GetNicStub        func(string, string) (*zhmcclient.NIC, error)
-	getNicMutex       sync.RWMutex
-	getNicArgsForCall []struct {
+	GetNicPropertiesStub        func(string, string) (*zhmcclient.NIC, error)
+	getNicPropertiesMutex       sync.RWMutex
+	getNicPropertiesArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	getNicReturns struct {
+	getNicPropertiesReturns struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}
-	getNicReturnsOnCall map[int]struct {
+	getNicPropertiesReturnsOnCall map[int]struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}
-	GetNicsStub        func(string, string) []zhmcclient.NIC
-	getNicsMutex       sync.RWMutex
-	getNicsArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	getNicsReturns struct {
-		result1 []zhmcclient.NIC
-	}
-	getNicsReturnsOnCall map[int]struct {
-		result1 []zhmcclient.NIC
-	}
-	ListAdaptersStub        func(string) ([]zhmcclient.Adapter, error)
+	ListAdaptersStub        func(string, map[string]string) ([]zhmcclient.Adapter, error)
 	listAdaptersMutex       sync.RWMutex
 	listAdaptersArgsForCall []struct {
 		arg1 string
+		arg2 map[string]string
 	}
 	listAdaptersReturns struct {
 		result1 []zhmcclient.Adapter
@@ -255,19 +225,17 @@ type ZhmcAPI struct {
 	unmountIsoImageReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UpdateLparPropertiesStub        func(string, map[string]string) (*zhmcclient.LPAR, error)
+	UpdateLparPropertiesStub        func(string, *zhmcclient.LparProperties) error
 	updateLparPropertiesMutex       sync.RWMutex
 	updateLparPropertiesArgsForCall []struct {
 		arg1 string
-		arg2 map[string]string
+		arg2 *zhmcclient.LparProperties
 	}
 	updateLparPropertiesReturns struct {
-		result1 *zhmcclient.LPAR
-		result2 error
+		result1 error
 	}
 	updateLparPropertiesReturnsOnCall map[int]struct {
-		result1 *zhmcclient.LPAR
-		result2 error
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -334,17 +302,17 @@ func (fake *ZhmcAPI) CancelJobReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *ZhmcAPI) CreateAdapter(arg1 string, arg2 *zhmcclient.Adapter) (*zhmcclient.Adapter, error) {
-	fake.createAdapterMutex.Lock()
-	ret, specificReturn := fake.createAdapterReturnsOnCall[len(fake.createAdapterArgsForCall)]
-	fake.createAdapterArgsForCall = append(fake.createAdapterArgsForCall, struct {
+func (fake *ZhmcAPI) CreateHipersocket(arg1 string, arg2 *zhmcclient.HypersocketPayload) (string, error) {
+	fake.createHipersocketMutex.Lock()
+	ret, specificReturn := fake.createHipersocketReturnsOnCall[len(fake.createHipersocketArgsForCall)]
+	fake.createHipersocketArgsForCall = append(fake.createHipersocketArgsForCall, struct {
 		arg1 string
-		arg2 *zhmcclient.Adapter
+		arg2 *zhmcclient.HypersocketPayload
 	}{arg1, arg2})
-	stub := fake.CreateAdapterStub
-	fakeReturns := fake.createAdapterReturns
-	fake.recordInvocation("CreateAdapter", []interface{}{arg1, arg2})
-	fake.createAdapterMutex.Unlock()
+	stub := fake.CreateHipersocketStub
+	fakeReturns := fake.createHipersocketReturns
+	fake.recordInvocation("CreateHipersocket", []interface{}{arg1, arg2})
+	fake.createHipersocketMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -354,52 +322,52 @@ func (fake *ZhmcAPI) CreateAdapter(arg1 string, arg2 *zhmcclient.Adapter) (*zhmc
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *ZhmcAPI) CreateAdapterCallCount() int {
-	fake.createAdapterMutex.RLock()
-	defer fake.createAdapterMutex.RUnlock()
-	return len(fake.createAdapterArgsForCall)
+func (fake *ZhmcAPI) CreateHipersocketCallCount() int {
+	fake.createHipersocketMutex.RLock()
+	defer fake.createHipersocketMutex.RUnlock()
+	return len(fake.createHipersocketArgsForCall)
 }
 
-func (fake *ZhmcAPI) CreateAdapterCalls(stub func(string, *zhmcclient.Adapter) (*zhmcclient.Adapter, error)) {
-	fake.createAdapterMutex.Lock()
-	defer fake.createAdapterMutex.Unlock()
-	fake.CreateAdapterStub = stub
+func (fake *ZhmcAPI) CreateHipersocketCalls(stub func(string, *zhmcclient.HypersocketPayload) (string, error)) {
+	fake.createHipersocketMutex.Lock()
+	defer fake.createHipersocketMutex.Unlock()
+	fake.CreateHipersocketStub = stub
 }
 
-func (fake *ZhmcAPI) CreateAdapterArgsForCall(i int) (string, *zhmcclient.Adapter) {
-	fake.createAdapterMutex.RLock()
-	defer fake.createAdapterMutex.RUnlock()
-	argsForCall := fake.createAdapterArgsForCall[i]
+func (fake *ZhmcAPI) CreateHipersocketArgsForCall(i int) (string, *zhmcclient.HypersocketPayload) {
+	fake.createHipersocketMutex.RLock()
+	defer fake.createHipersocketMutex.RUnlock()
+	argsForCall := fake.createHipersocketArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *ZhmcAPI) CreateAdapterReturns(result1 *zhmcclient.Adapter, result2 error) {
-	fake.createAdapterMutex.Lock()
-	defer fake.createAdapterMutex.Unlock()
-	fake.CreateAdapterStub = nil
-	fake.createAdapterReturns = struct {
-		result1 *zhmcclient.Adapter
+func (fake *ZhmcAPI) CreateHipersocketReturns(result1 string, result2 error) {
+	fake.createHipersocketMutex.Lock()
+	defer fake.createHipersocketMutex.Unlock()
+	fake.CreateHipersocketStub = nil
+	fake.createHipersocketReturns = struct {
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) CreateAdapterReturnsOnCall(i int, result1 *zhmcclient.Adapter, result2 error) {
-	fake.createAdapterMutex.Lock()
-	defer fake.createAdapterMutex.Unlock()
-	fake.CreateAdapterStub = nil
-	if fake.createAdapterReturnsOnCall == nil {
-		fake.createAdapterReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.Adapter
+func (fake *ZhmcAPI) CreateHipersocketReturnsOnCall(i int, result1 string, result2 error) {
+	fake.createHipersocketMutex.Lock()
+	defer fake.createHipersocketMutex.Unlock()
+	fake.CreateHipersocketStub = nil
+	if fake.createHipersocketReturnsOnCall == nil {
+		fake.createHipersocketReturnsOnCall = make(map[int]struct {
+			result1 string
 			result2 error
 		})
 	}
-	fake.createAdapterReturnsOnCall[i] = struct {
-		result1 *zhmcclient.Adapter
+	fake.createHipersocketReturnsOnCall[i] = struct {
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) CreateNic(arg1 string, arg2 *zhmcclient.NIC) (*zhmcclient.NIC, error) {
+func (fake *ZhmcAPI) CreateNic(arg1 string, arg2 *zhmcclient.NIC) (string, error) {
 	fake.createNicMutex.Lock()
 	ret, specificReturn := fake.createNicReturnsOnCall[len(fake.createNicArgsForCall)]
 	fake.createNicArgsForCall = append(fake.createNicArgsForCall, struct {
@@ -425,7 +393,7 @@ func (fake *ZhmcAPI) CreateNicCallCount() int {
 	return len(fake.createNicArgsForCall)
 }
 
-func (fake *ZhmcAPI) CreateNicCalls(stub func(string, *zhmcclient.NIC) (*zhmcclient.NIC, error)) {
+func (fake *ZhmcAPI) CreateNicCalls(stub func(string, *zhmcclient.NIC) (string, error)) {
 	fake.createNicMutex.Lock()
 	defer fake.createNicMutex.Unlock()
 	fake.CreateNicStub = stub
@@ -438,42 +406,42 @@ func (fake *ZhmcAPI) CreateNicArgsForCall(i int) (string, *zhmcclient.NIC) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *ZhmcAPI) CreateNicReturns(result1 *zhmcclient.NIC, result2 error) {
+func (fake *ZhmcAPI) CreateNicReturns(result1 string, result2 error) {
 	fake.createNicMutex.Lock()
 	defer fake.createNicMutex.Unlock()
 	fake.CreateNicStub = nil
 	fake.createNicReturns = struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) CreateNicReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 error) {
+func (fake *ZhmcAPI) CreateNicReturnsOnCall(i int, result1 string, result2 error) {
 	fake.createNicMutex.Lock()
 	defer fake.createNicMutex.Unlock()
 	fake.CreateNicStub = nil
 	if fake.createNicReturnsOnCall == nil {
 		fake.createNicReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.NIC
+			result1 string
 			result2 error
 		})
 	}
 	fake.createNicReturnsOnCall[i] = struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) DeleteAdapter(arg1 string) error {
-	fake.deleteAdapterMutex.Lock()
-	ret, specificReturn := fake.deleteAdapterReturnsOnCall[len(fake.deleteAdapterArgsForCall)]
-	fake.deleteAdapterArgsForCall = append(fake.deleteAdapterArgsForCall, struct {
+func (fake *ZhmcAPI) DeleteHipersocket(arg1 string) error {
+	fake.deleteHipersocketMutex.Lock()
+	ret, specificReturn := fake.deleteHipersocketReturnsOnCall[len(fake.deleteHipersocketArgsForCall)]
+	fake.deleteHipersocketArgsForCall = append(fake.deleteHipersocketArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DeleteAdapterStub
-	fakeReturns := fake.deleteAdapterReturns
-	fake.recordInvocation("DeleteAdapter", []interface{}{arg1})
-	fake.deleteAdapterMutex.Unlock()
+	stub := fake.DeleteHipersocketStub
+	fakeReturns := fake.deleteHipersocketReturns
+	fake.recordInvocation("DeleteHipersocket", []interface{}{arg1})
+	fake.deleteHipersocketMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
 	}
@@ -483,44 +451,44 @@ func (fake *ZhmcAPI) DeleteAdapter(arg1 string) error {
 	return fakeReturns.result1
 }
 
-func (fake *ZhmcAPI) DeleteAdapterCallCount() int {
-	fake.deleteAdapterMutex.RLock()
-	defer fake.deleteAdapterMutex.RUnlock()
-	return len(fake.deleteAdapterArgsForCall)
+func (fake *ZhmcAPI) DeleteHipersocketCallCount() int {
+	fake.deleteHipersocketMutex.RLock()
+	defer fake.deleteHipersocketMutex.RUnlock()
+	return len(fake.deleteHipersocketArgsForCall)
 }
 
-func (fake *ZhmcAPI) DeleteAdapterCalls(stub func(string) error) {
-	fake.deleteAdapterMutex.Lock()
-	defer fake.deleteAdapterMutex.Unlock()
-	fake.DeleteAdapterStub = stub
+func (fake *ZhmcAPI) DeleteHipersocketCalls(stub func(string) error) {
+	fake.deleteHipersocketMutex.Lock()
+	defer fake.deleteHipersocketMutex.Unlock()
+	fake.DeleteHipersocketStub = stub
 }
 
-func (fake *ZhmcAPI) DeleteAdapterArgsForCall(i int) string {
-	fake.deleteAdapterMutex.RLock()
-	defer fake.deleteAdapterMutex.RUnlock()
-	argsForCall := fake.deleteAdapterArgsForCall[i]
+func (fake *ZhmcAPI) DeleteHipersocketArgsForCall(i int) string {
+	fake.deleteHipersocketMutex.RLock()
+	defer fake.deleteHipersocketMutex.RUnlock()
+	argsForCall := fake.deleteHipersocketArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *ZhmcAPI) DeleteAdapterReturns(result1 error) {
-	fake.deleteAdapterMutex.Lock()
-	defer fake.deleteAdapterMutex.Unlock()
-	fake.DeleteAdapterStub = nil
-	fake.deleteAdapterReturns = struct {
+func (fake *ZhmcAPI) DeleteHipersocketReturns(result1 error) {
+	fake.deleteHipersocketMutex.Lock()
+	defer fake.deleteHipersocketMutex.Unlock()
+	fake.DeleteHipersocketStub = nil
+	fake.deleteHipersocketReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *ZhmcAPI) DeleteAdapterReturnsOnCall(i int, result1 error) {
-	fake.deleteAdapterMutex.Lock()
-	defer fake.deleteAdapterMutex.Unlock()
-	fake.DeleteAdapterStub = nil
-	if fake.deleteAdapterReturnsOnCall == nil {
-		fake.deleteAdapterReturnsOnCall = make(map[int]struct {
+func (fake *ZhmcAPI) DeleteHipersocketReturnsOnCall(i int, result1 error) {
+	fake.deleteHipersocketMutex.Lock()
+	defer fake.deleteHipersocketMutex.Unlock()
+	fake.DeleteHipersocketStub = nil
+	if fake.deleteHipersocketReturnsOnCall == nil {
+		fake.deleteHipersocketReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.deleteAdapterReturnsOnCall[i] = struct {
+	fake.deleteHipersocketReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -648,192 +616,81 @@ func (fake *ZhmcAPI) DeleteNicReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *ZhmcAPI) GetAdapters(arg1 string) []zhmcclient.Adapter {
-	fake.getAdaptersMutex.Lock()
-	ret, specificReturn := fake.getAdaptersReturnsOnCall[len(fake.getAdaptersArgsForCall)]
-	fake.getAdaptersArgsForCall = append(fake.getAdaptersArgsForCall, struct {
+func (fake *ZhmcAPI) GetLparProperties(arg1 string) (*zhmcclient.LparProperties, error) {
+	fake.getLparPropertiesMutex.Lock()
+	ret, specificReturn := fake.getLparPropertiesReturnsOnCall[len(fake.getLparPropertiesArgsForCall)]
+	fake.getLparPropertiesArgsForCall = append(fake.getLparPropertiesArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.GetAdaptersStub
-	fakeReturns := fake.getAdaptersReturns
-	fake.recordInvocation("GetAdapters", []interface{}{arg1})
-	fake.getAdaptersMutex.Unlock()
+	stub := fake.GetLparPropertiesStub
+	fakeReturns := fake.getLparPropertiesReturns
+	fake.recordInvocation("GetLparProperties", []interface{}{arg1})
+	fake.getLparPropertiesMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *ZhmcAPI) GetAdaptersCallCount() int {
-	fake.getAdaptersMutex.RLock()
-	defer fake.getAdaptersMutex.RUnlock()
-	return len(fake.getAdaptersArgsForCall)
+func (fake *ZhmcAPI) GetLparPropertiesCallCount() int {
+	fake.getLparPropertiesMutex.RLock()
+	defer fake.getLparPropertiesMutex.RUnlock()
+	return len(fake.getLparPropertiesArgsForCall)
 }
 
-func (fake *ZhmcAPI) GetAdaptersCalls(stub func(string) []zhmcclient.Adapter) {
-	fake.getAdaptersMutex.Lock()
-	defer fake.getAdaptersMutex.Unlock()
-	fake.GetAdaptersStub = stub
+func (fake *ZhmcAPI) GetLparPropertiesCalls(stub func(string) (*zhmcclient.LparProperties, error)) {
+	fake.getLparPropertiesMutex.Lock()
+	defer fake.getLparPropertiesMutex.Unlock()
+	fake.GetLparPropertiesStub = stub
 }
 
-func (fake *ZhmcAPI) GetAdaptersArgsForCall(i int) string {
-	fake.getAdaptersMutex.RLock()
-	defer fake.getAdaptersMutex.RUnlock()
-	argsForCall := fake.getAdaptersArgsForCall[i]
+func (fake *ZhmcAPI) GetLparPropertiesArgsForCall(i int) string {
+	fake.getLparPropertiesMutex.RLock()
+	defer fake.getLparPropertiesMutex.RUnlock()
+	argsForCall := fake.getLparPropertiesArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *ZhmcAPI) GetAdaptersReturns(result1 []zhmcclient.Adapter) {
-	fake.getAdaptersMutex.Lock()
-	defer fake.getAdaptersMutex.Unlock()
-	fake.GetAdaptersStub = nil
-	fake.getAdaptersReturns = struct {
-		result1 []zhmcclient.Adapter
-	}{result1}
+func (fake *ZhmcAPI) GetLparPropertiesReturns(result1 *zhmcclient.LparProperties, result2 error) {
+	fake.getLparPropertiesMutex.Lock()
+	defer fake.getLparPropertiesMutex.Unlock()
+	fake.GetLparPropertiesStub = nil
+	fake.getLparPropertiesReturns = struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) GetAdaptersReturnsOnCall(i int, result1 []zhmcclient.Adapter) {
-	fake.getAdaptersMutex.Lock()
-	defer fake.getAdaptersMutex.Unlock()
-	fake.GetAdaptersStub = nil
-	if fake.getAdaptersReturnsOnCall == nil {
-		fake.getAdaptersReturnsOnCall = make(map[int]struct {
-			result1 []zhmcclient.Adapter
+func (fake *ZhmcAPI) GetLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.LparProperties, result2 error) {
+	fake.getLparPropertiesMutex.Lock()
+	defer fake.getLparPropertiesMutex.Unlock()
+	fake.GetLparPropertiesStub = nil
+	if fake.getLparPropertiesReturnsOnCall == nil {
+		fake.getLparPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.LparProperties
+			result2 error
 		})
 	}
-	fake.getAdaptersReturnsOnCall[i] = struct {
-		result1 []zhmcclient.Adapter
-	}{result1}
+	fake.getLparPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) GetCPCs() []zhmcclient.CPC {
-	fake.getCPCsMutex.Lock()
-	ret, specificReturn := fake.getCPCsReturnsOnCall[len(fake.getCPCsArgsForCall)]
-	fake.getCPCsArgsForCall = append(fake.getCPCsArgsForCall, struct {
-	}{})
-	stub := fake.GetCPCsStub
-	fakeReturns := fake.getCPCsReturns
-	fake.recordInvocation("GetCPCs", []interface{}{})
-	fake.getCPCsMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *ZhmcAPI) GetCPCsCallCount() int {
-	fake.getCPCsMutex.RLock()
-	defer fake.getCPCsMutex.RUnlock()
-	return len(fake.getCPCsArgsForCall)
-}
-
-func (fake *ZhmcAPI) GetCPCsCalls(stub func() []zhmcclient.CPC) {
-	fake.getCPCsMutex.Lock()
-	defer fake.getCPCsMutex.Unlock()
-	fake.GetCPCsStub = stub
-}
-
-func (fake *ZhmcAPI) GetCPCsReturns(result1 []zhmcclient.CPC) {
-	fake.getCPCsMutex.Lock()
-	defer fake.getCPCsMutex.Unlock()
-	fake.GetCPCsStub = nil
-	fake.getCPCsReturns = struct {
-		result1 []zhmcclient.CPC
-	}{result1}
-}
-
-func (fake *ZhmcAPI) GetCPCsReturnsOnCall(i int, result1 []zhmcclient.CPC) {
-	fake.getCPCsMutex.Lock()
-	defer fake.getCPCsMutex.Unlock()
-	fake.GetCPCsStub = nil
-	if fake.getCPCsReturnsOnCall == nil {
-		fake.getCPCsReturnsOnCall = make(map[int]struct {
-			result1 []zhmcclient.CPC
-		})
-	}
-	fake.getCPCsReturnsOnCall[i] = struct {
-		result1 []zhmcclient.CPC
-	}{result1}
-}
-
-func (fake *ZhmcAPI) GetLPARs(arg1 string) []zhmcclient.LPAR {
-	fake.getLPARsMutex.Lock()
-	ret, specificReturn := fake.getLPARsReturnsOnCall[len(fake.getLPARsArgsForCall)]
-	fake.getLPARsArgsForCall = append(fake.getLPARsArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	stub := fake.GetLPARsStub
-	fakeReturns := fake.getLPARsReturns
-	fake.recordInvocation("GetLPARs", []interface{}{arg1})
-	fake.getLPARsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *ZhmcAPI) GetLPARsCallCount() int {
-	fake.getLPARsMutex.RLock()
-	defer fake.getLPARsMutex.RUnlock()
-	return len(fake.getLPARsArgsForCall)
-}
-
-func (fake *ZhmcAPI) GetLPARsCalls(stub func(string) []zhmcclient.LPAR) {
-	fake.getLPARsMutex.Lock()
-	defer fake.getLPARsMutex.Unlock()
-	fake.GetLPARsStub = stub
-}
-
-func (fake *ZhmcAPI) GetLPARsArgsForCall(i int) string {
-	fake.getLPARsMutex.RLock()
-	defer fake.getLPARsMutex.RUnlock()
-	argsForCall := fake.getLPARsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *ZhmcAPI) GetLPARsReturns(result1 []zhmcclient.LPAR) {
-	fake.getLPARsMutex.Lock()
-	defer fake.getLPARsMutex.Unlock()
-	fake.GetLPARsStub = nil
-	fake.getLPARsReturns = struct {
-		result1 []zhmcclient.LPAR
-	}{result1}
-}
-
-func (fake *ZhmcAPI) GetLPARsReturnsOnCall(i int, result1 []zhmcclient.LPAR) {
-	fake.getLPARsMutex.Lock()
-	defer fake.getLPARsMutex.Unlock()
-	fake.GetLPARsStub = nil
-	if fake.getLPARsReturnsOnCall == nil {
-		fake.getLPARsReturnsOnCall = make(map[int]struct {
-			result1 []zhmcclient.LPAR
-		})
-	}
-	fake.getLPARsReturnsOnCall[i] = struct {
-		result1 []zhmcclient.LPAR
-	}{result1}
-}
-
-func (fake *ZhmcAPI) GetNic(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
-	fake.getNicMutex.Lock()
-	ret, specificReturn := fake.getNicReturnsOnCall[len(fake.getNicArgsForCall)]
-	fake.getNicArgsForCall = append(fake.getNicArgsForCall, struct {
+func (fake *ZhmcAPI) GetNicProperties(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
+	fake.getNicPropertiesMutex.Lock()
+	ret, specificReturn := fake.getNicPropertiesReturnsOnCall[len(fake.getNicPropertiesArgsForCall)]
+	fake.getNicPropertiesArgsForCall = append(fake.getNicPropertiesArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetNicStub
-	fakeReturns := fake.getNicReturns
-	fake.recordInvocation("GetNic", []interface{}{arg1, arg2})
-	fake.getNicMutex.Unlock()
+	stub := fake.GetNicPropertiesStub
+	fakeReturns := fake.getNicPropertiesReturns
+	fake.recordInvocation("GetNicProperties", []interface{}{arg1, arg2})
+	fake.getNicPropertiesMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -843,125 +700,64 @@ func (fake *ZhmcAPI) GetNic(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *ZhmcAPI) GetNicCallCount() int {
-	fake.getNicMutex.RLock()
-	defer fake.getNicMutex.RUnlock()
-	return len(fake.getNicArgsForCall)
+func (fake *ZhmcAPI) GetNicPropertiesCallCount() int {
+	fake.getNicPropertiesMutex.RLock()
+	defer fake.getNicPropertiesMutex.RUnlock()
+	return len(fake.getNicPropertiesArgsForCall)
 }
 
-func (fake *ZhmcAPI) GetNicCalls(stub func(string, string) (*zhmcclient.NIC, error)) {
-	fake.getNicMutex.Lock()
-	defer fake.getNicMutex.Unlock()
-	fake.GetNicStub = stub
+func (fake *ZhmcAPI) GetNicPropertiesCalls(stub func(string, string) (*zhmcclient.NIC, error)) {
+	fake.getNicPropertiesMutex.Lock()
+	defer fake.getNicPropertiesMutex.Unlock()
+	fake.GetNicPropertiesStub = stub
 }
 
-func (fake *ZhmcAPI) GetNicArgsForCall(i int) (string, string) {
-	fake.getNicMutex.RLock()
-	defer fake.getNicMutex.RUnlock()
-	argsForCall := fake.getNicArgsForCall[i]
+func (fake *ZhmcAPI) GetNicPropertiesArgsForCall(i int) (string, string) {
+	fake.getNicPropertiesMutex.RLock()
+	defer fake.getNicPropertiesMutex.RUnlock()
+	argsForCall := fake.getNicPropertiesArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *ZhmcAPI) GetNicReturns(result1 *zhmcclient.NIC, result2 error) {
-	fake.getNicMutex.Lock()
-	defer fake.getNicMutex.Unlock()
-	fake.GetNicStub = nil
-	fake.getNicReturns = struct {
+func (fake *ZhmcAPI) GetNicPropertiesReturns(result1 *zhmcclient.NIC, result2 error) {
+	fake.getNicPropertiesMutex.Lock()
+	defer fake.getNicPropertiesMutex.Unlock()
+	fake.GetNicPropertiesStub = nil
+	fake.getNicPropertiesReturns = struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) GetNicReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 error) {
-	fake.getNicMutex.Lock()
-	defer fake.getNicMutex.Unlock()
-	fake.GetNicStub = nil
-	if fake.getNicReturnsOnCall == nil {
-		fake.getNicReturnsOnCall = make(map[int]struct {
+func (fake *ZhmcAPI) GetNicPropertiesReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 error) {
+	fake.getNicPropertiesMutex.Lock()
+	defer fake.getNicPropertiesMutex.Unlock()
+	fake.GetNicPropertiesStub = nil
+	if fake.getNicPropertiesReturnsOnCall == nil {
+		fake.getNicPropertiesReturnsOnCall = make(map[int]struct {
 			result1 *zhmcclient.NIC
 			result2 error
 		})
 	}
-	fake.getNicReturnsOnCall[i] = struct {
+	fake.getNicPropertiesReturnsOnCall[i] = struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) GetNics(arg1 string, arg2 string) []zhmcclient.NIC {
-	fake.getNicsMutex.Lock()
-	ret, specificReturn := fake.getNicsReturnsOnCall[len(fake.getNicsArgsForCall)]
-	fake.getNicsArgsForCall = append(fake.getNicsArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	stub := fake.GetNicsStub
-	fakeReturns := fake.getNicsReturns
-	fake.recordInvocation("GetNics", []interface{}{arg1, arg2})
-	fake.getNicsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *ZhmcAPI) GetNicsCallCount() int {
-	fake.getNicsMutex.RLock()
-	defer fake.getNicsMutex.RUnlock()
-	return len(fake.getNicsArgsForCall)
-}
-
-func (fake *ZhmcAPI) GetNicsCalls(stub func(string, string) []zhmcclient.NIC) {
-	fake.getNicsMutex.Lock()
-	defer fake.getNicsMutex.Unlock()
-	fake.GetNicsStub = stub
-}
-
-func (fake *ZhmcAPI) GetNicsArgsForCall(i int) (string, string) {
-	fake.getNicsMutex.RLock()
-	defer fake.getNicsMutex.RUnlock()
-	argsForCall := fake.getNicsArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *ZhmcAPI) GetNicsReturns(result1 []zhmcclient.NIC) {
-	fake.getNicsMutex.Lock()
-	defer fake.getNicsMutex.Unlock()
-	fake.GetNicsStub = nil
-	fake.getNicsReturns = struct {
-		result1 []zhmcclient.NIC
-	}{result1}
-}
-
-func (fake *ZhmcAPI) GetNicsReturnsOnCall(i int, result1 []zhmcclient.NIC) {
-	fake.getNicsMutex.Lock()
-	defer fake.getNicsMutex.Unlock()
-	fake.GetNicsStub = nil
-	if fake.getNicsReturnsOnCall == nil {
-		fake.getNicsReturnsOnCall = make(map[int]struct {
-			result1 []zhmcclient.NIC
-		})
-	}
-	fake.getNicsReturnsOnCall[i] = struct {
-		result1 []zhmcclient.NIC
-	}{result1}
-}
-
-func (fake *ZhmcAPI) ListAdapters(arg1 string) ([]zhmcclient.Adapter, error) {
+func (fake *ZhmcAPI) ListAdapters(arg1 string, arg2 map[string]string) ([]zhmcclient.Adapter, error) {
 	fake.listAdaptersMutex.Lock()
 	ret, specificReturn := fake.listAdaptersReturnsOnCall[len(fake.listAdaptersArgsForCall)]
 	fake.listAdaptersArgsForCall = append(fake.listAdaptersArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 map[string]string
+	}{arg1, arg2})
 	stub := fake.ListAdaptersStub
 	fakeReturns := fake.listAdaptersReturns
-	fake.recordInvocation("ListAdapters", []interface{}{arg1})
+	fake.recordInvocation("ListAdapters", []interface{}{arg1, arg2})
 	fake.listAdaptersMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -975,17 +771,17 @@ func (fake *ZhmcAPI) ListAdaptersCallCount() int {
 	return len(fake.listAdaptersArgsForCall)
 }
 
-func (fake *ZhmcAPI) ListAdaptersCalls(stub func(string) ([]zhmcclient.Adapter, error)) {
+func (fake *ZhmcAPI) ListAdaptersCalls(stub func(string, map[string]string) ([]zhmcclient.Adapter, error)) {
 	fake.listAdaptersMutex.Lock()
 	defer fake.listAdaptersMutex.Unlock()
 	fake.ListAdaptersStub = stub
 }
 
-func (fake *ZhmcAPI) ListAdaptersArgsForCall(i int) string {
+func (fake *ZhmcAPI) ListAdaptersArgsForCall(i int) (string, map[string]string) {
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	argsForCall := fake.listAdaptersArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *ZhmcAPI) ListAdaptersReturns(result1 []zhmcclient.Adapter, result2 error) {
@@ -1523,12 +1319,12 @@ func (fake *ZhmcAPI) UnmountIsoImageReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *ZhmcAPI) UpdateLparProperties(arg1 string, arg2 map[string]string) (*zhmcclient.LPAR, error) {
+func (fake *ZhmcAPI) UpdateLparProperties(arg1 string, arg2 *zhmcclient.LparProperties) error {
 	fake.updateLparPropertiesMutex.Lock()
 	ret, specificReturn := fake.updateLparPropertiesReturnsOnCall[len(fake.updateLparPropertiesArgsForCall)]
 	fake.updateLparPropertiesArgsForCall = append(fake.updateLparPropertiesArgsForCall, struct {
 		arg1 string
-		arg2 map[string]string
+		arg2 *zhmcclient.LparProperties
 	}{arg1, arg2})
 	stub := fake.UpdateLparPropertiesStub
 	fakeReturns := fake.updateLparPropertiesReturns
@@ -1538,9 +1334,9 @@ func (fake *ZhmcAPI) UpdateLparProperties(arg1 string, arg2 map[string]string) (
 		return stub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *ZhmcAPI) UpdateLparPropertiesCallCount() int {
@@ -1549,43 +1345,40 @@ func (fake *ZhmcAPI) UpdateLparPropertiesCallCount() int {
 	return len(fake.updateLparPropertiesArgsForCall)
 }
 
-func (fake *ZhmcAPI) UpdateLparPropertiesCalls(stub func(string, map[string]string) (*zhmcclient.LPAR, error)) {
+func (fake *ZhmcAPI) UpdateLparPropertiesCalls(stub func(string, *zhmcclient.LparProperties) error) {
 	fake.updateLparPropertiesMutex.Lock()
 	defer fake.updateLparPropertiesMutex.Unlock()
 	fake.UpdateLparPropertiesStub = stub
 }
 
-func (fake *ZhmcAPI) UpdateLparPropertiesArgsForCall(i int) (string, map[string]string) {
+func (fake *ZhmcAPI) UpdateLparPropertiesArgsForCall(i int) (string, *zhmcclient.LparProperties) {
 	fake.updateLparPropertiesMutex.RLock()
 	defer fake.updateLparPropertiesMutex.RUnlock()
 	argsForCall := fake.updateLparPropertiesArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *ZhmcAPI) UpdateLparPropertiesReturns(result1 *zhmcclient.LPAR, result2 error) {
+func (fake *ZhmcAPI) UpdateLparPropertiesReturns(result1 error) {
 	fake.updateLparPropertiesMutex.Lock()
 	defer fake.updateLparPropertiesMutex.Unlock()
 	fake.UpdateLparPropertiesStub = nil
 	fake.updateLparPropertiesReturns = struct {
-		result1 *zhmcclient.LPAR
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
-func (fake *ZhmcAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.LPAR, result2 error) {
+func (fake *ZhmcAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 error) {
 	fake.updateLparPropertiesMutex.Lock()
 	defer fake.updateLparPropertiesMutex.Unlock()
 	fake.UpdateLparPropertiesStub = nil
 	if fake.updateLparPropertiesReturnsOnCall == nil {
 		fake.updateLparPropertiesReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.LPAR
-			result2 error
+			result1 error
 		})
 	}
 	fake.updateLparPropertiesReturnsOnCall[i] = struct {
-		result1 *zhmcclient.LPAR
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
 func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
@@ -1593,26 +1386,20 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cancelJobMutex.RLock()
 	defer fake.cancelJobMutex.RUnlock()
-	fake.createAdapterMutex.RLock()
-	defer fake.createAdapterMutex.RUnlock()
+	fake.createHipersocketMutex.RLock()
+	defer fake.createHipersocketMutex.RUnlock()
 	fake.createNicMutex.RLock()
 	defer fake.createNicMutex.RUnlock()
-	fake.deleteAdapterMutex.RLock()
-	defer fake.deleteAdapterMutex.RUnlock()
+	fake.deleteHipersocketMutex.RLock()
+	defer fake.deleteHipersocketMutex.RUnlock()
 	fake.deleteJobMutex.RLock()
 	defer fake.deleteJobMutex.RUnlock()
 	fake.deleteNicMutex.RLock()
 	defer fake.deleteNicMutex.RUnlock()
-	fake.getAdaptersMutex.RLock()
-	defer fake.getAdaptersMutex.RUnlock()
-	fake.getCPCsMutex.RLock()
-	defer fake.getCPCsMutex.RUnlock()
-	fake.getLPARsMutex.RLock()
-	defer fake.getLPARsMutex.RUnlock()
-	fake.getNicMutex.RLock()
-	defer fake.getNicMutex.RUnlock()
-	fake.getNicsMutex.RLock()
-	defer fake.getNicsMutex.RUnlock()
+	fake.getLparPropertiesMutex.RLock()
+	defer fake.getLparPropertiesMutex.RUnlock()
+	fake.getNicPropertiesMutex.RLock()
+	defer fake.getNicPropertiesMutex.RUnlock()
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	fake.listCPCsMutex.RLock()

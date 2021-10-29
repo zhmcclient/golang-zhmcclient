@@ -111,9 +111,117 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
-	//Describe("UpdateLparProperties", func() {
-	//
-	//})
+	Describe("GetLparProperties", func() {
+		var (
+			response      *LparProperties
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			response = &LparProperties{
+				URI:            "uri",
+				CpcURI:         "cpcuri",
+				Class:          "partition",
+				Name:           "lpar",
+				Description:    "description",
+				Status:         PARTITION_STATUS_STARTING,
+				Type:           PARTITION_TYPE_LINUX,
+				ShortName:      "short_name",
+				ID:             "id",
+				AutoGenerateID: true,
+			}
+
+			bytesResponse, _ = json.Marshal(response)
+		})
+
+		Context("When GetLparProperties and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
+				rets, err := manager.GetLparProperties(lparid)
+
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(BeNil())
+				Expect(rets.URI).To(Equal(response.URI))
+			})
+		})
+
+		Context("When GetLparProperties and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
+				rets, err := manager.GetLparProperties(lparid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When GetLparProperties and unmarshal error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
+				rets, err := manager.GetLparProperties(lparid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+	})
+
+	Describe("UpdateLparProperties", func() {
+		var (
+			payload       *LparProperties
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			payload = &LparProperties{
+				URI:            "uri",
+				CpcURI:         "cpcuri",
+				Class:          "partition",
+				Name:           "lpar",
+				Description:    "description",
+				Status:         PARTITION_STATUS_STARTING,
+				Type:           PARTITION_TYPE_LINUX,
+				ShortName:      "short_name",
+				ID:             "id",
+				AutoGenerateID: true,
+			}
+
+			bytesResponse, _ = json.Marshal(payload)
+		})
+
+		Context("When UpdateLparProperties and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
+				err := manager.UpdateLparProperties(lparid, payload)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When UpdateLparProperties and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
+				err := manager.UpdateLparProperties(lparid, payload)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
+
+		Context("When UpdateLparProperties and unmarshal error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
+				err := manager.UpdateLparProperties(lparid, nil)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
 
 	Describe("StartLPAR", func() {
 		var (
