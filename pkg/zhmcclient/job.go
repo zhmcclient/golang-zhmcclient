@@ -25,23 +25,6 @@ type JobAPI interface {
 	CancelJob(jobID string) error
 }
 
-type JobStatus string
-
-const (
-	JOB_STATUS_RUNNING        JobStatus = "running"
-	JOB_STATUS_CANCEL_PENDING           = "cancel-pending"
-	JOB_STATUS_CANCELED                 = "canceled"
-	JOB_STATUS_COMPLETE                 = "complete"
-)
-
-type Job struct {
-	URI           string
-	Status        JobStatus `json:"status"`
-	JobStatusCode int       `json:"job-status-code"`
-	JobReasonCode int       `json:"job-reason-code"`
-	JobResults    []byte    `json:"job-results"`
-}
-
 type JobManager struct {
 	client ClientAPI
 }

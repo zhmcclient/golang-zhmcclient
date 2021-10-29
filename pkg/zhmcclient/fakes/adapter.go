@@ -8,35 +8,36 @@ import (
 )
 
 type AdapterAPI struct {
-	CreateAdapterStub        func(string, *zhmcclient.Adapter) (*zhmcclient.Adapter, error)
-	createAdapterMutex       sync.RWMutex
-	createAdapterArgsForCall []struct {
+	CreateHipersocketStub        func(string, *zhmcclient.HypersocketPayload) (string, error)
+	createHipersocketMutex       sync.RWMutex
+	createHipersocketArgsForCall []struct {
 		arg1 string
-		arg2 *zhmcclient.Adapter
+		arg2 *zhmcclient.HypersocketPayload
 	}
-	createAdapterReturns struct {
-		result1 *zhmcclient.Adapter
+	createHipersocketReturns struct {
+		result1 string
 		result2 error
 	}
-	createAdapterReturnsOnCall map[int]struct {
-		result1 *zhmcclient.Adapter
+	createHipersocketReturnsOnCall map[int]struct {
+		result1 string
 		result2 error
 	}
-	DeleteAdapterStub        func(string) error
-	deleteAdapterMutex       sync.RWMutex
-	deleteAdapterArgsForCall []struct {
+	DeleteHipersocketStub        func(string) error
+	deleteHipersocketMutex       sync.RWMutex
+	deleteHipersocketArgsForCall []struct {
 		arg1 string
 	}
-	deleteAdapterReturns struct {
+	deleteHipersocketReturns struct {
 		result1 error
 	}
-	deleteAdapterReturnsOnCall map[int]struct {
+	deleteHipersocketReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ListAdaptersStub        func(string) ([]zhmcclient.Adapter, error)
+	ListAdaptersStub        func(string, map[string]string) ([]zhmcclient.Adapter, error)
 	listAdaptersMutex       sync.RWMutex
 	listAdaptersArgsForCall []struct {
 		arg1 string
+		arg2 map[string]string
 	}
 	listAdaptersReturns struct {
 		result1 []zhmcclient.Adapter
@@ -50,17 +51,17 @@ type AdapterAPI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *AdapterAPI) CreateAdapter(arg1 string, arg2 *zhmcclient.Adapter) (*zhmcclient.Adapter, error) {
-	fake.createAdapterMutex.Lock()
-	ret, specificReturn := fake.createAdapterReturnsOnCall[len(fake.createAdapterArgsForCall)]
-	fake.createAdapterArgsForCall = append(fake.createAdapterArgsForCall, struct {
+func (fake *AdapterAPI) CreateHipersocket(arg1 string, arg2 *zhmcclient.HypersocketPayload) (string, error) {
+	fake.createHipersocketMutex.Lock()
+	ret, specificReturn := fake.createHipersocketReturnsOnCall[len(fake.createHipersocketArgsForCall)]
+	fake.createHipersocketArgsForCall = append(fake.createHipersocketArgsForCall, struct {
 		arg1 string
-		arg2 *zhmcclient.Adapter
+		arg2 *zhmcclient.HypersocketPayload
 	}{arg1, arg2})
-	stub := fake.CreateAdapterStub
-	fakeReturns := fake.createAdapterReturns
-	fake.recordInvocation("CreateAdapter", []interface{}{arg1, arg2})
-	fake.createAdapterMutex.Unlock()
+	stub := fake.CreateHipersocketStub
+	fakeReturns := fake.createHipersocketReturns
+	fake.recordInvocation("CreateHipersocket", []interface{}{arg1, arg2})
+	fake.createHipersocketMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -70,61 +71,61 @@ func (fake *AdapterAPI) CreateAdapter(arg1 string, arg2 *zhmcclient.Adapter) (*z
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *AdapterAPI) CreateAdapterCallCount() int {
-	fake.createAdapterMutex.RLock()
-	defer fake.createAdapterMutex.RUnlock()
-	return len(fake.createAdapterArgsForCall)
+func (fake *AdapterAPI) CreateHipersocketCallCount() int {
+	fake.createHipersocketMutex.RLock()
+	defer fake.createHipersocketMutex.RUnlock()
+	return len(fake.createHipersocketArgsForCall)
 }
 
-func (fake *AdapterAPI) CreateAdapterCalls(stub func(string, *zhmcclient.Adapter) (*zhmcclient.Adapter, error)) {
-	fake.createAdapterMutex.Lock()
-	defer fake.createAdapterMutex.Unlock()
-	fake.CreateAdapterStub = stub
+func (fake *AdapterAPI) CreateHipersocketCalls(stub func(string, *zhmcclient.HypersocketPayload) (string, error)) {
+	fake.createHipersocketMutex.Lock()
+	defer fake.createHipersocketMutex.Unlock()
+	fake.CreateHipersocketStub = stub
 }
 
-func (fake *AdapterAPI) CreateAdapterArgsForCall(i int) (string, *zhmcclient.Adapter) {
-	fake.createAdapterMutex.RLock()
-	defer fake.createAdapterMutex.RUnlock()
-	argsForCall := fake.createAdapterArgsForCall[i]
+func (fake *AdapterAPI) CreateHipersocketArgsForCall(i int) (string, *zhmcclient.HypersocketPayload) {
+	fake.createHipersocketMutex.RLock()
+	defer fake.createHipersocketMutex.RUnlock()
+	argsForCall := fake.createHipersocketArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *AdapterAPI) CreateAdapterReturns(result1 *zhmcclient.Adapter, result2 error) {
-	fake.createAdapterMutex.Lock()
-	defer fake.createAdapterMutex.Unlock()
-	fake.CreateAdapterStub = nil
-	fake.createAdapterReturns = struct {
-		result1 *zhmcclient.Adapter
+func (fake *AdapterAPI) CreateHipersocketReturns(result1 string, result2 error) {
+	fake.createHipersocketMutex.Lock()
+	defer fake.createHipersocketMutex.Unlock()
+	fake.CreateHipersocketStub = nil
+	fake.createHipersocketReturns = struct {
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *AdapterAPI) CreateAdapterReturnsOnCall(i int, result1 *zhmcclient.Adapter, result2 error) {
-	fake.createAdapterMutex.Lock()
-	defer fake.createAdapterMutex.Unlock()
-	fake.CreateAdapterStub = nil
-	if fake.createAdapterReturnsOnCall == nil {
-		fake.createAdapterReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.Adapter
+func (fake *AdapterAPI) CreateHipersocketReturnsOnCall(i int, result1 string, result2 error) {
+	fake.createHipersocketMutex.Lock()
+	defer fake.createHipersocketMutex.Unlock()
+	fake.CreateHipersocketStub = nil
+	if fake.createHipersocketReturnsOnCall == nil {
+		fake.createHipersocketReturnsOnCall = make(map[int]struct {
+			result1 string
 			result2 error
 		})
 	}
-	fake.createAdapterReturnsOnCall[i] = struct {
-		result1 *zhmcclient.Adapter
+	fake.createHipersocketReturnsOnCall[i] = struct {
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *AdapterAPI) DeleteAdapter(arg1 string) error {
-	fake.deleteAdapterMutex.Lock()
-	ret, specificReturn := fake.deleteAdapterReturnsOnCall[len(fake.deleteAdapterArgsForCall)]
-	fake.deleteAdapterArgsForCall = append(fake.deleteAdapterArgsForCall, struct {
+func (fake *AdapterAPI) DeleteHipersocket(arg1 string) error {
+	fake.deleteHipersocketMutex.Lock()
+	ret, specificReturn := fake.deleteHipersocketReturnsOnCall[len(fake.deleteHipersocketArgsForCall)]
+	fake.deleteHipersocketArgsForCall = append(fake.deleteHipersocketArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	stub := fake.DeleteAdapterStub
-	fakeReturns := fake.deleteAdapterReturns
-	fake.recordInvocation("DeleteAdapter", []interface{}{arg1})
-	fake.deleteAdapterMutex.Unlock()
+	stub := fake.DeleteHipersocketStub
+	fakeReturns := fake.deleteHipersocketReturns
+	fake.recordInvocation("DeleteHipersocket", []interface{}{arg1})
+	fake.deleteHipersocketMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
 	}
@@ -134,60 +135,61 @@ func (fake *AdapterAPI) DeleteAdapter(arg1 string) error {
 	return fakeReturns.result1
 }
 
-func (fake *AdapterAPI) DeleteAdapterCallCount() int {
-	fake.deleteAdapterMutex.RLock()
-	defer fake.deleteAdapterMutex.RUnlock()
-	return len(fake.deleteAdapterArgsForCall)
+func (fake *AdapterAPI) DeleteHipersocketCallCount() int {
+	fake.deleteHipersocketMutex.RLock()
+	defer fake.deleteHipersocketMutex.RUnlock()
+	return len(fake.deleteHipersocketArgsForCall)
 }
 
-func (fake *AdapterAPI) DeleteAdapterCalls(stub func(string) error) {
-	fake.deleteAdapterMutex.Lock()
-	defer fake.deleteAdapterMutex.Unlock()
-	fake.DeleteAdapterStub = stub
+func (fake *AdapterAPI) DeleteHipersocketCalls(stub func(string) error) {
+	fake.deleteHipersocketMutex.Lock()
+	defer fake.deleteHipersocketMutex.Unlock()
+	fake.DeleteHipersocketStub = stub
 }
 
-func (fake *AdapterAPI) DeleteAdapterArgsForCall(i int) string {
-	fake.deleteAdapterMutex.RLock()
-	defer fake.deleteAdapterMutex.RUnlock()
-	argsForCall := fake.deleteAdapterArgsForCall[i]
+func (fake *AdapterAPI) DeleteHipersocketArgsForCall(i int) string {
+	fake.deleteHipersocketMutex.RLock()
+	defer fake.deleteHipersocketMutex.RUnlock()
+	argsForCall := fake.deleteHipersocketArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *AdapterAPI) DeleteAdapterReturns(result1 error) {
-	fake.deleteAdapterMutex.Lock()
-	defer fake.deleteAdapterMutex.Unlock()
-	fake.DeleteAdapterStub = nil
-	fake.deleteAdapterReturns = struct {
+func (fake *AdapterAPI) DeleteHipersocketReturns(result1 error) {
+	fake.deleteHipersocketMutex.Lock()
+	defer fake.deleteHipersocketMutex.Unlock()
+	fake.DeleteHipersocketStub = nil
+	fake.deleteHipersocketReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *AdapterAPI) DeleteAdapterReturnsOnCall(i int, result1 error) {
-	fake.deleteAdapterMutex.Lock()
-	defer fake.deleteAdapterMutex.Unlock()
-	fake.DeleteAdapterStub = nil
-	if fake.deleteAdapterReturnsOnCall == nil {
-		fake.deleteAdapterReturnsOnCall = make(map[int]struct {
+func (fake *AdapterAPI) DeleteHipersocketReturnsOnCall(i int, result1 error) {
+	fake.deleteHipersocketMutex.Lock()
+	defer fake.deleteHipersocketMutex.Unlock()
+	fake.DeleteHipersocketStub = nil
+	if fake.deleteHipersocketReturnsOnCall == nil {
+		fake.deleteHipersocketReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.deleteAdapterReturnsOnCall[i] = struct {
+	fake.deleteHipersocketReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *AdapterAPI) ListAdapters(arg1 string) ([]zhmcclient.Adapter, error) {
+func (fake *AdapterAPI) ListAdapters(arg1 string, arg2 map[string]string) ([]zhmcclient.Adapter, error) {
 	fake.listAdaptersMutex.Lock()
 	ret, specificReturn := fake.listAdaptersReturnsOnCall[len(fake.listAdaptersArgsForCall)]
 	fake.listAdaptersArgsForCall = append(fake.listAdaptersArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 map[string]string
+	}{arg1, arg2})
 	stub := fake.ListAdaptersStub
 	fakeReturns := fake.listAdaptersReturns
-	fake.recordInvocation("ListAdapters", []interface{}{arg1})
+	fake.recordInvocation("ListAdapters", []interface{}{arg1, arg2})
 	fake.listAdaptersMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -201,17 +203,17 @@ func (fake *AdapterAPI) ListAdaptersCallCount() int {
 	return len(fake.listAdaptersArgsForCall)
 }
 
-func (fake *AdapterAPI) ListAdaptersCalls(stub func(string) ([]zhmcclient.Adapter, error)) {
+func (fake *AdapterAPI) ListAdaptersCalls(stub func(string, map[string]string) ([]zhmcclient.Adapter, error)) {
 	fake.listAdaptersMutex.Lock()
 	defer fake.listAdaptersMutex.Unlock()
 	fake.ListAdaptersStub = stub
 }
 
-func (fake *AdapterAPI) ListAdaptersArgsForCall(i int) string {
+func (fake *AdapterAPI) ListAdaptersArgsForCall(i int) (string, map[string]string) {
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	argsForCall := fake.listAdaptersArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *AdapterAPI) ListAdaptersReturns(result1 []zhmcclient.Adapter, result2 error) {
@@ -243,10 +245,10 @@ func (fake *AdapterAPI) ListAdaptersReturnsOnCall(i int, result1 []zhmcclient.Ad
 func (fake *AdapterAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createAdapterMutex.RLock()
-	defer fake.createAdapterMutex.RUnlock()
-	fake.deleteAdapterMutex.RLock()
-	defer fake.deleteAdapterMutex.RUnlock()
+	fake.createHipersocketMutex.RLock()
+	defer fake.createHipersocketMutex.RUnlock()
+	fake.deleteHipersocketMutex.RLock()
+	defer fake.deleteHipersocketMutex.RUnlock()
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

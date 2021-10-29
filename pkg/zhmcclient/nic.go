@@ -11,66 +11,63 @@
 
 package zhmcclient
 
+import (
+	"encoding/json"
+	"net/http"
+	"path"
+)
+
 // NicAPI defines an interface for issuing NIC requests to ZHMC
 //go:generate counterfeiter -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
-	ListNics(lparID string) ([]string, error)
-	CreateNic(lparID string, nic *NIC) (*NIC, error)
+	CreateNic(lparID string, nic *NIC) (string, error)
 	DeleteNic(lparID string, nicID string) error
-	GetNic(lparID string, nicID string) (*NIC, error)
-}
-
-/**
-* Sample:
-* {
-*    name: Required
-*    description
-*    network-adapter-port-uri
-*    virtual-switch-uri
-*    device-number
-*    ssc-management-nic
-*    ssc-ip-address-type
-*    ssc-ip-address
-*    vlan-id
-*    ssc-mask-prefix
-*    mac-address
-*    vlan-type
-*    element-uri: "/api/partitions/b4c4bf9e-97e0-11e5-9d1f-020000000192/nics/eb6887e4-
-      97e8-11e5-9d1f-020000000192", Returned when create
-* }
-*/
-type NIC struct {
-	uri    string
-	device string
-	lpar   *LPAR
-	Name   string
-	Mac    string
+	GetNicProperties(lparID string, nicID string) (*NIC, error)
 }
 
 type NicManager struct {
 	client ClientAPI
-	nics   []NIC
 }
 
 func NewNicManager(client ClientAPI) *NicManager {
 	return &NicManager{
 		client: client,
-		nics:   nil,
 	}
 }
 
 /**
-* get_property('nic-uris') from LPAR
- */
-func (m *NicManager) ListNics(lparID string) ([]string, error) {
-	return nil, nil
-}
-
-/**
 * POST /api/partitions/{partition-id}/nics
+* @ return element-uri
+* Return: 201 and element-uri
+*     or: 400, 403, 404, 409, 503,
  */
-func (m *NicManager) CreateNic(lparID string, nic *NIC) (*NIC, error) {
-	return nil, nil
+func (m *NicManager) CreateNic(lparID string, nic *NIC) (string, error) {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "nics")
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return "", err
+	}
+
+	bytes, err := json.Marshal(nic)
+	if err != nil {
+		return "", err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, bytes)
+	if err != nil {
+		return "", err
+	}
+
+	if status == http.StatusCreated {
+		uriObj := NicCreateResponse{}
+		err = json.Unmarshal(responseBody, &uriObj)
+		if err != nil {
+			return "", err
+		}
+		return uriObj.URI, nil
+	}
+
+	return "", GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
@@ -79,12 +76,50 @@ func (m *NicManager) CreateNic(lparID string, nic *NIC) (*NIC, error) {
 *     or: 400, 403, 404, 409, 503
  */
 func (m *NicManager) DeleteNic(lparID string, nicID string) error {
-	return nil
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "nics", nicID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
 * GET /api/partitions/{partition-id}/nics/{nic-id}
+* Return: 200 and LparProperties
+*     or: 400, 404,
  */
-func (m *NicManager) GetNic(lparID string, nicID string) (*NIC, error) {
-	return nil, nil
+func (m *NicManager) GetNicProperties(lparID string, nicID string) (*NIC, error) {
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "nics", nicID)
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		nic := NIC{}
+		err = json.Unmarshal(responseBody, &nic)
+		if err != nil {
+			return nil, err
+		}
+
+		return &nic, nil
+	}
+
+	return nil, GenerateErrorFromResponse(status, responseBody)
 }

@@ -8,6 +8,19 @@ import (
 )
 
 type LparAPI struct {
+	GetLparPropertiesStub        func(string) (*zhmcclient.LparProperties, error)
+	getLparPropertiesMutex       sync.RWMutex
+	getLparPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getLparPropertiesReturns struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
+	}
+	getLparPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
+	}
 	ListLPARsStub        func(string, map[string]string) ([]zhmcclient.LPAR, error)
 	listLPARsMutex       sync.RWMutex
 	listLPARsArgsForCall []struct {
@@ -20,6 +33,19 @@ type LparAPI struct {
 	}
 	listLPARsReturnsOnCall map[int]struct {
 		result1 []zhmcclient.LPAR
+		result2 error
+	}
+	ListNicsStub        func(string) ([]string, error)
+	listNicsMutex       sync.RWMutex
+	listNicsArgsForCall []struct {
+		arg1 string
+	}
+	listNicsReturns struct {
+		result1 []string
+		result2 error
+	}
+	listNicsReturnsOnCall map[int]struct {
+		result1 []string
 		result2 error
 	}
 	MountIsoImageStub        func(string, string, string) error
@@ -72,22 +98,84 @@ type LparAPI struct {
 	unmountIsoImageReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UpdateLparPropertiesStub        func(string, map[string]string) (*zhmcclient.LPAR, error)
+	UpdateLparPropertiesStub        func(string, *zhmcclient.LparProperties) error
 	updateLparPropertiesMutex       sync.RWMutex
 	updateLparPropertiesArgsForCall []struct {
 		arg1 string
-		arg2 map[string]string
+		arg2 *zhmcclient.LparProperties
 	}
 	updateLparPropertiesReturns struct {
-		result1 *zhmcclient.LPAR
-		result2 error
+		result1 error
 	}
 	updateLparPropertiesReturnsOnCall map[int]struct {
-		result1 *zhmcclient.LPAR
-		result2 error
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *LparAPI) GetLparProperties(arg1 string) (*zhmcclient.LparProperties, error) {
+	fake.getLparPropertiesMutex.Lock()
+	ret, specificReturn := fake.getLparPropertiesReturnsOnCall[len(fake.getLparPropertiesArgsForCall)]
+	fake.getLparPropertiesArgsForCall = append(fake.getLparPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetLparPropertiesStub
+	fakeReturns := fake.getLparPropertiesReturns
+	fake.recordInvocation("GetLparProperties", []interface{}{arg1})
+	fake.getLparPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *LparAPI) GetLparPropertiesCallCount() int {
+	fake.getLparPropertiesMutex.RLock()
+	defer fake.getLparPropertiesMutex.RUnlock()
+	return len(fake.getLparPropertiesArgsForCall)
+}
+
+func (fake *LparAPI) GetLparPropertiesCalls(stub func(string) (*zhmcclient.LparProperties, error)) {
+	fake.getLparPropertiesMutex.Lock()
+	defer fake.getLparPropertiesMutex.Unlock()
+	fake.GetLparPropertiesStub = stub
+}
+
+func (fake *LparAPI) GetLparPropertiesArgsForCall(i int) string {
+	fake.getLparPropertiesMutex.RLock()
+	defer fake.getLparPropertiesMutex.RUnlock()
+	argsForCall := fake.getLparPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *LparAPI) GetLparPropertiesReturns(result1 *zhmcclient.LparProperties, result2 error) {
+	fake.getLparPropertiesMutex.Lock()
+	defer fake.getLparPropertiesMutex.Unlock()
+	fake.GetLparPropertiesStub = nil
+	fake.getLparPropertiesReturns = struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *LparAPI) GetLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.LparProperties, result2 error) {
+	fake.getLparPropertiesMutex.Lock()
+	defer fake.getLparPropertiesMutex.Unlock()
+	fake.GetLparPropertiesStub = nil
+	if fake.getLparPropertiesReturnsOnCall == nil {
+		fake.getLparPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.LparProperties
+			result2 error
+		})
+	}
+	fake.getLparPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.LparProperties
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *LparAPI) ListLPARs(arg1 string, arg2 map[string]string) ([]zhmcclient.LPAR, error) {
@@ -151,6 +239,70 @@ func (fake *LparAPI) ListLPARsReturnsOnCall(i int, result1 []zhmcclient.LPAR, re
 	}
 	fake.listLPARsReturnsOnCall[i] = struct {
 		result1 []zhmcclient.LPAR
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *LparAPI) ListNics(arg1 string) ([]string, error) {
+	fake.listNicsMutex.Lock()
+	ret, specificReturn := fake.listNicsReturnsOnCall[len(fake.listNicsArgsForCall)]
+	fake.listNicsArgsForCall = append(fake.listNicsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.ListNicsStub
+	fakeReturns := fake.listNicsReturns
+	fake.recordInvocation("ListNics", []interface{}{arg1})
+	fake.listNicsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *LparAPI) ListNicsCallCount() int {
+	fake.listNicsMutex.RLock()
+	defer fake.listNicsMutex.RUnlock()
+	return len(fake.listNicsArgsForCall)
+}
+
+func (fake *LparAPI) ListNicsCalls(stub func(string) ([]string, error)) {
+	fake.listNicsMutex.Lock()
+	defer fake.listNicsMutex.Unlock()
+	fake.ListNicsStub = stub
+}
+
+func (fake *LparAPI) ListNicsArgsForCall(i int) string {
+	fake.listNicsMutex.RLock()
+	defer fake.listNicsMutex.RUnlock()
+	argsForCall := fake.listNicsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *LparAPI) ListNicsReturns(result1 []string, result2 error) {
+	fake.listNicsMutex.Lock()
+	defer fake.listNicsMutex.Unlock()
+	fake.ListNicsStub = nil
+	fake.listNicsReturns = struct {
+		result1 []string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *LparAPI) ListNicsReturnsOnCall(i int, result1 []string, result2 error) {
+	fake.listNicsMutex.Lock()
+	defer fake.listNicsMutex.Unlock()
+	fake.ListNicsStub = nil
+	if fake.listNicsReturnsOnCall == nil {
+		fake.listNicsReturnsOnCall = make(map[int]struct {
+			result1 []string
+			result2 error
+		})
+	}
+	fake.listNicsReturnsOnCall[i] = struct {
+		result1 []string
 		result2 error
 	}{result1, result2}
 }
@@ -407,12 +559,12 @@ func (fake *LparAPI) UnmountIsoImageReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *LparAPI) UpdateLparProperties(arg1 string, arg2 map[string]string) (*zhmcclient.LPAR, error) {
+func (fake *LparAPI) UpdateLparProperties(arg1 string, arg2 *zhmcclient.LparProperties) error {
 	fake.updateLparPropertiesMutex.Lock()
 	ret, specificReturn := fake.updateLparPropertiesReturnsOnCall[len(fake.updateLparPropertiesArgsForCall)]
 	fake.updateLparPropertiesArgsForCall = append(fake.updateLparPropertiesArgsForCall, struct {
 		arg1 string
-		arg2 map[string]string
+		arg2 *zhmcclient.LparProperties
 	}{arg1, arg2})
 	stub := fake.UpdateLparPropertiesStub
 	fakeReturns := fake.updateLparPropertiesReturns
@@ -422,9 +574,9 @@ func (fake *LparAPI) UpdateLparProperties(arg1 string, arg2 map[string]string) (
 		return stub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *LparAPI) UpdateLparPropertiesCallCount() int {
@@ -433,50 +585,51 @@ func (fake *LparAPI) UpdateLparPropertiesCallCount() int {
 	return len(fake.updateLparPropertiesArgsForCall)
 }
 
-func (fake *LparAPI) UpdateLparPropertiesCalls(stub func(string, map[string]string) (*zhmcclient.LPAR, error)) {
+func (fake *LparAPI) UpdateLparPropertiesCalls(stub func(string, *zhmcclient.LparProperties) error) {
 	fake.updateLparPropertiesMutex.Lock()
 	defer fake.updateLparPropertiesMutex.Unlock()
 	fake.UpdateLparPropertiesStub = stub
 }
 
-func (fake *LparAPI) UpdateLparPropertiesArgsForCall(i int) (string, map[string]string) {
+func (fake *LparAPI) UpdateLparPropertiesArgsForCall(i int) (string, *zhmcclient.LparProperties) {
 	fake.updateLparPropertiesMutex.RLock()
 	defer fake.updateLparPropertiesMutex.RUnlock()
 	argsForCall := fake.updateLparPropertiesArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *LparAPI) UpdateLparPropertiesReturns(result1 *zhmcclient.LPAR, result2 error) {
+func (fake *LparAPI) UpdateLparPropertiesReturns(result1 error) {
 	fake.updateLparPropertiesMutex.Lock()
 	defer fake.updateLparPropertiesMutex.Unlock()
 	fake.UpdateLparPropertiesStub = nil
 	fake.updateLparPropertiesReturns = struct {
-		result1 *zhmcclient.LPAR
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
-func (fake *LparAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.LPAR, result2 error) {
+func (fake *LparAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 error) {
 	fake.updateLparPropertiesMutex.Lock()
 	defer fake.updateLparPropertiesMutex.Unlock()
 	fake.UpdateLparPropertiesStub = nil
 	if fake.updateLparPropertiesReturnsOnCall == nil {
 		fake.updateLparPropertiesReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.LPAR
-			result2 error
+			result1 error
 		})
 	}
 	fake.updateLparPropertiesReturnsOnCall[i] = struct {
-		result1 *zhmcclient.LPAR
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
 func (fake *LparAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.getLparPropertiesMutex.RLock()
+	defer fake.getLparPropertiesMutex.RUnlock()
 	fake.listLPARsMutex.RLock()
 	defer fake.listLPARsMutex.RUnlock()
+	fake.listNicsMutex.RLock()
+	defer fake.listNicsMutex.RUnlock()
 	fake.mountIsoImageMutex.RLock()
 	defer fake.mountIsoImageMutex.RUnlock()
 	fake.startLPARMutex.RLock()

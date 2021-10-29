@@ -8,18 +8,18 @@ import (
 )
 
 type NicAPI struct {
-	CreateNicStub        func(string, *zhmcclient.NIC) (*zhmcclient.NIC, error)
+	CreateNicStub        func(string, *zhmcclient.NIC) (string, error)
 	createNicMutex       sync.RWMutex
 	createNicArgsForCall []struct {
 		arg1 string
 		arg2 *zhmcclient.NIC
 	}
 	createNicReturns struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}
 	createNicReturnsOnCall map[int]struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}
 	DeleteNicStub        func(string, string) error
@@ -34,38 +34,25 @@ type NicAPI struct {
 	deleteNicReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetNicStub        func(string, string) (*zhmcclient.NIC, error)
-	getNicMutex       sync.RWMutex
-	getNicArgsForCall []struct {
+	GetNicPropertiesStub        func(string, string) (*zhmcclient.NIC, error)
+	getNicPropertiesMutex       sync.RWMutex
+	getNicPropertiesArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	getNicReturns struct {
+	getNicPropertiesReturns struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}
-	getNicReturnsOnCall map[int]struct {
+	getNicPropertiesReturnsOnCall map[int]struct {
 		result1 *zhmcclient.NIC
-		result2 error
-	}
-	ListNicsStub        func(string) ([]string, error)
-	listNicsMutex       sync.RWMutex
-	listNicsArgsForCall []struct {
-		arg1 string
-	}
-	listNicsReturns struct {
-		result1 []string
-		result2 error
-	}
-	listNicsReturnsOnCall map[int]struct {
-		result1 []string
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *NicAPI) CreateNic(arg1 string, arg2 *zhmcclient.NIC) (*zhmcclient.NIC, error) {
+func (fake *NicAPI) CreateNic(arg1 string, arg2 *zhmcclient.NIC) (string, error) {
 	fake.createNicMutex.Lock()
 	ret, specificReturn := fake.createNicReturnsOnCall[len(fake.createNicArgsForCall)]
 	fake.createNicArgsForCall = append(fake.createNicArgsForCall, struct {
@@ -91,7 +78,7 @@ func (fake *NicAPI) CreateNicCallCount() int {
 	return len(fake.createNicArgsForCall)
 }
 
-func (fake *NicAPI) CreateNicCalls(stub func(string, *zhmcclient.NIC) (*zhmcclient.NIC, error)) {
+func (fake *NicAPI) CreateNicCalls(stub func(string, *zhmcclient.NIC) (string, error)) {
 	fake.createNicMutex.Lock()
 	defer fake.createNicMutex.Unlock()
 	fake.CreateNicStub = stub
@@ -104,28 +91,28 @@ func (fake *NicAPI) CreateNicArgsForCall(i int) (string, *zhmcclient.NIC) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *NicAPI) CreateNicReturns(result1 *zhmcclient.NIC, result2 error) {
+func (fake *NicAPI) CreateNicReturns(result1 string, result2 error) {
 	fake.createNicMutex.Lock()
 	defer fake.createNicMutex.Unlock()
 	fake.CreateNicStub = nil
 	fake.createNicReturns = struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *NicAPI) CreateNicReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 error) {
+func (fake *NicAPI) CreateNicReturnsOnCall(i int, result1 string, result2 error) {
 	fake.createNicMutex.Lock()
 	defer fake.createNicMutex.Unlock()
 	fake.CreateNicStub = nil
 	if fake.createNicReturnsOnCall == nil {
 		fake.createNicReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.NIC
+			result1 string
 			result2 error
 		})
 	}
 	fake.createNicReturnsOnCall[i] = struct {
-		result1 *zhmcclient.NIC
+		result1 string
 		result2 error
 	}{result1, result2}
 }
@@ -192,17 +179,17 @@ func (fake *NicAPI) DeleteNicReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *NicAPI) GetNic(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
-	fake.getNicMutex.Lock()
-	ret, specificReturn := fake.getNicReturnsOnCall[len(fake.getNicArgsForCall)]
-	fake.getNicArgsForCall = append(fake.getNicArgsForCall, struct {
+func (fake *NicAPI) GetNicProperties(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
+	fake.getNicPropertiesMutex.Lock()
+	ret, specificReturn := fake.getNicPropertiesReturnsOnCall[len(fake.getNicPropertiesArgsForCall)]
+	fake.getNicPropertiesArgsForCall = append(fake.getNicPropertiesArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetNicStub
-	fakeReturns := fake.getNicReturns
-	fake.recordInvocation("GetNic", []interface{}{arg1, arg2})
-	fake.getNicMutex.Unlock()
+	stub := fake.GetNicPropertiesStub
+	fakeReturns := fake.getNicPropertiesReturns
+	fake.recordInvocation("GetNicProperties", []interface{}{arg1, arg2})
+	fake.getNicPropertiesMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -212,111 +199,47 @@ func (fake *NicAPI) GetNic(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *NicAPI) GetNicCallCount() int {
-	fake.getNicMutex.RLock()
-	defer fake.getNicMutex.RUnlock()
-	return len(fake.getNicArgsForCall)
+func (fake *NicAPI) GetNicPropertiesCallCount() int {
+	fake.getNicPropertiesMutex.RLock()
+	defer fake.getNicPropertiesMutex.RUnlock()
+	return len(fake.getNicPropertiesArgsForCall)
 }
 
-func (fake *NicAPI) GetNicCalls(stub func(string, string) (*zhmcclient.NIC, error)) {
-	fake.getNicMutex.Lock()
-	defer fake.getNicMutex.Unlock()
-	fake.GetNicStub = stub
+func (fake *NicAPI) GetNicPropertiesCalls(stub func(string, string) (*zhmcclient.NIC, error)) {
+	fake.getNicPropertiesMutex.Lock()
+	defer fake.getNicPropertiesMutex.Unlock()
+	fake.GetNicPropertiesStub = stub
 }
 
-func (fake *NicAPI) GetNicArgsForCall(i int) (string, string) {
-	fake.getNicMutex.RLock()
-	defer fake.getNicMutex.RUnlock()
-	argsForCall := fake.getNicArgsForCall[i]
+func (fake *NicAPI) GetNicPropertiesArgsForCall(i int) (string, string) {
+	fake.getNicPropertiesMutex.RLock()
+	defer fake.getNicPropertiesMutex.RUnlock()
+	argsForCall := fake.getNicPropertiesArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *NicAPI) GetNicReturns(result1 *zhmcclient.NIC, result2 error) {
-	fake.getNicMutex.Lock()
-	defer fake.getNicMutex.Unlock()
-	fake.GetNicStub = nil
-	fake.getNicReturns = struct {
+func (fake *NicAPI) GetNicPropertiesReturns(result1 *zhmcclient.NIC, result2 error) {
+	fake.getNicPropertiesMutex.Lock()
+	defer fake.getNicPropertiesMutex.Unlock()
+	fake.GetNicPropertiesStub = nil
+	fake.getNicPropertiesReturns = struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *NicAPI) GetNicReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 error) {
-	fake.getNicMutex.Lock()
-	defer fake.getNicMutex.Unlock()
-	fake.GetNicStub = nil
-	if fake.getNicReturnsOnCall == nil {
-		fake.getNicReturnsOnCall = make(map[int]struct {
+func (fake *NicAPI) GetNicPropertiesReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 error) {
+	fake.getNicPropertiesMutex.Lock()
+	defer fake.getNicPropertiesMutex.Unlock()
+	fake.GetNicPropertiesStub = nil
+	if fake.getNicPropertiesReturnsOnCall == nil {
+		fake.getNicPropertiesReturnsOnCall = make(map[int]struct {
 			result1 *zhmcclient.NIC
 			result2 error
 		})
 	}
-	fake.getNicReturnsOnCall[i] = struct {
+	fake.getNicPropertiesReturnsOnCall[i] = struct {
 		result1 *zhmcclient.NIC
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *NicAPI) ListNics(arg1 string) ([]string, error) {
-	fake.listNicsMutex.Lock()
-	ret, specificReturn := fake.listNicsReturnsOnCall[len(fake.listNicsArgsForCall)]
-	fake.listNicsArgsForCall = append(fake.listNicsArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	stub := fake.ListNicsStub
-	fakeReturns := fake.listNicsReturns
-	fake.recordInvocation("ListNics", []interface{}{arg1})
-	fake.listNicsMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *NicAPI) ListNicsCallCount() int {
-	fake.listNicsMutex.RLock()
-	defer fake.listNicsMutex.RUnlock()
-	return len(fake.listNicsArgsForCall)
-}
-
-func (fake *NicAPI) ListNicsCalls(stub func(string) ([]string, error)) {
-	fake.listNicsMutex.Lock()
-	defer fake.listNicsMutex.Unlock()
-	fake.ListNicsStub = stub
-}
-
-func (fake *NicAPI) ListNicsArgsForCall(i int) string {
-	fake.listNicsMutex.RLock()
-	defer fake.listNicsMutex.RUnlock()
-	argsForCall := fake.listNicsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *NicAPI) ListNicsReturns(result1 []string, result2 error) {
-	fake.listNicsMutex.Lock()
-	defer fake.listNicsMutex.Unlock()
-	fake.ListNicsStub = nil
-	fake.listNicsReturns = struct {
-		result1 []string
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *NicAPI) ListNicsReturnsOnCall(i int, result1 []string, result2 error) {
-	fake.listNicsMutex.Lock()
-	defer fake.listNicsMutex.Unlock()
-	fake.ListNicsStub = nil
-	if fake.listNicsReturnsOnCall == nil {
-		fake.listNicsReturnsOnCall = make(map[int]struct {
-			result1 []string
-			result2 error
-		})
-	}
-	fake.listNicsReturnsOnCall[i] = struct {
-		result1 []string
 		result2 error
 	}{result1, result2}
 }
@@ -328,10 +251,8 @@ func (fake *NicAPI) Invocations() map[string][][]interface{} {
 	defer fake.createNicMutex.RUnlock()
 	fake.deleteNicMutex.RLock()
 	defer fake.deleteNicMutex.RUnlock()
-	fake.getNicMutex.RLock()
-	defer fake.getNicMutex.RUnlock()
-	fake.listNicsMutex.RLock()
-	defer fake.listNicsMutex.RUnlock()
+	fake.getNicPropertiesMutex.RLock()
+	defer fake.getNicPropertiesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
