@@ -306,10 +306,11 @@ const (
 )
 
 type NIC struct {
-	ID                    string           `json:"element-id"`
-	URI                   string           `json:"element-uri"`
-	Parent                string           `json:"parent"`
-	Class                 string           `default:"nic"`
+	ID     string `json:"element-id"`
+	URI    string `json:"element-uri"`
+	Parent string `json:"parent"`
+	Class  string `default:"nic"`
+	/* below are payloads when create a new Nic */
 	Name                  string           `json:"name"`
 	Description           string           `json:"description"`
 	DeviceNumber          string           `json:"device-number"`
