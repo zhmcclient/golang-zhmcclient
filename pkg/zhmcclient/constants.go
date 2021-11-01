@@ -34,6 +34,9 @@ const (
 	DEFAULT_MAX_REDIRECTS     = 30 * time.Second
 	DEFAULT_OPERATION_TIMEOUT = 3600 * time.Second
 	DEFAULT_STATUS_TIMEOUT    = 900 * time.Second
+
+	APPLICATION_BODY_JSON         = "application/json"
+	APPLICATION_BODY_OCTET_STREAM = "application/octet-stream"
 )
 
 // List of success status.

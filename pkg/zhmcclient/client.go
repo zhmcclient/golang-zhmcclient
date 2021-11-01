@@ -41,6 +41,7 @@ type ClientAPI interface {
 	Logoff() error
 	IsLogon(verify bool) bool
 	ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error)
+	UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err error)
 }
 
 // HTTP Client interface required for unit tests
@@ -232,11 +233,15 @@ func (c *Client) setUserAgent(req *http.Request) {
 }
 
 // TODO, add "Content-Type" according to requestBody
-func (c *Client) setRequestHeaders(req *http.Request) {
+func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
 	c.setUserAgent(req)
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Content-Type", bodyType)
 	req.Header.Add("Accept", "*/*")
 	req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
+}
+
+func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
+	return c.executeUpload(requestType, url.String(), requestData)
 }
 
 func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
@@ -285,7 +290,42 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 		return -1, nil, err
 	}
 
-	c.setRequestHeaders(request)
+	c.setRequestHeaders(request, APPLICATION_BODY_JSON)
+
+	response, err := c.httpClient.Do(request)
+	if response == nil {
+		return -1, nil, errors.New("HTTP Response is empty.")
+	}
+
+	if err != nil {
+		return -1, nil, err
+	}
+
+	defer response.Body.Close()
+
+	responseBodyStream, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		return -1, nil, err
+	}
+
+	if c.isTraceEnabled {
+		err = c.traceHTTP(request, response)
+		if err != nil {
+			return response.StatusCode, nil, err
+		}
+	}
+
+	return response.StatusCode, responseBodyStream, err
+}
+
+func (c *Client) executeUpload(requestType string, urlStr string, requestBody []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
+
+	request, err := http.NewRequest(requestType, urlStr, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return -1, nil, err
+	}
+
+	c.setRequestHeaders(request, APPLICATION_BODY_OCTET_STREAM)
 
 	response, err := c.httpClient.Do(request)
 	if response == nil {

@@ -359,6 +359,41 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
+	Describe("MountIsoImage", func() {
+
+		var (
+			bytes     []byte
+			imageFile string
+			insFile   string
+		)
+
+		BeforeEach(func() {
+			imageFile = "imageFileName"
+			insFile = "insFileName"
+			bytes = []byte("Here is a bytes array represents an image file contents....")
+		})
+
+		Context("When mount iso image and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.UploadRequestReturns(http.StatusNoContent, nil, nil)
+				err := manager.MountIsoImage(lparid, bytes, imageFile, insFile)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When mount iso image and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.UploadRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
+				err := manager.MountIsoImage(lparid, bytes, imageFile, insFile)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
+
 	Describe("UnmountIsoImage", func() {
 
 		Context("When unmount iso image and returns correctly", func() {
