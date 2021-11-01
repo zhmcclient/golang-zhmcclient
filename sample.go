@@ -28,6 +28,13 @@ func main() {
 		VerifyCert: false,
 		Trace:      true,
 	}
+	if endpoint == "" || username == "" || password == "" {
+		fmt.Println("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
+		os.Exit(1)
+	}
+	fmt.Println("HMC_ENDPOINT: ", endpoint)
+	fmt.Println("HMC_USERNAME: ", username)
+	fmt.Println("HMC_PASSWORD: xxxxxx")
 	client, _ := zhmcclient.NewClient(endpoint, creds)
 	if client != nil {
 		hmcManager := zhmcclient.NewManagerFromClient(client)
