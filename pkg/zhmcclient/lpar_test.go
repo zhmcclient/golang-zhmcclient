@@ -358,4 +358,27 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 	})
+
+	Describe("UnmountIsoImage", func() {
+
+		Context("When unmount iso image and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
+				err := manager.UnmountIsoImage(lparid)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When unmount iso image and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
+				err := manager.UnmountIsoImage(lparid)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
 })

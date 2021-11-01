@@ -64,6 +64,7 @@ type LogonData struct {
 	Password string `json:"password"`
 }
 
+// TODO, Use cache and use JobTopic, ObjectTopic to update cache
 type Session struct {
 	SessionID    string `json:"api-session"`
 	ObjectTopic  string `json:"notification-topic"`
@@ -98,7 +99,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 		Transport: netTransport,
 	}
 
-	endpointurl, err := getEndpointURLFromString(endpoint)
+	endpointurl, err := GetEndpointURLFromString(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +129,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 	return client, nil
 }
 
-func getEndpointURLFromString(endpoint string) (*url.URL, error) {
+func GetEndpointURLFromString(endpoint string) (*url.URL, error) {
 
 	if !strings.HasPrefix(strings.ToLower(endpoint), "https") {
 		return nil, errors.New("HTTPS is used for the client for secure reason.")
@@ -139,6 +140,15 @@ func getEndpointURLFromString(endpoint string) (*url.URL, error) {
 		return nil, err
 	}
 	return url, nil
+}
+
+func IsExpectedHttpStatus(status int) bool {
+	for _, httpStatus := range KNOWN_SUCCESS_STATUS {
+		if httpStatus == status {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Client) GetEndpointURL() *url.URL {
@@ -229,15 +239,6 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
 }
 
-func (c *Client) isKnownHttpStatus(status int) bool {
-	for _, httpStatus := range KNOWN_SUCCESS_STATUS {
-		if httpStatus == status {
-			return true
-		}
-	}
-	return false
-}
-
 func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
 	var (
 		retries int
@@ -260,7 +261,7 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 			c.Logon()
 			c.executeMethod(requestType, url.String(), requestData)
 		}
-		if c.isKnownHttpStatus(responseStatusCode) || err == nil { // 2. Known error, don't retry
+		if IsExpectedHttpStatus(responseStatusCode) || err == nil { // 2. Known error, don't retry
 			break
 		} else { // 3. Retry
 			retries -= 1

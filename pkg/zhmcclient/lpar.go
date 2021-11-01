@@ -220,9 +220,26 @@ func (m *LparManager) MountIsoImage(lparID string, isoFile string, insFile strin
 /**
 * POST /api/partitions/{partition-id}/operations/unmount-iso-image
 * @lparID is the object-uri
+* Return: 204
+*     or: 400, 403, 404, 409, 503
  */
 func (m *LparManager) UnmountIsoImage(lparID string) error {
-	return nil
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "/operations/unmount-iso-image")
+	requestUrl, err := BuildUrlFromUri(requestUri, nil)
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
