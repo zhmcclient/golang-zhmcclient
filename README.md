@@ -21,22 +21,9 @@ go test
 
 ## Sample Usage
 ```
-import (
-	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
-)
-
-func main() {
-	endpoint := "https://192.168.195.118:9955"
-	creds := &zhmcclient.Options{
-		Username:   "name",
-		Password:   "psw",
-		VerifyCert: false,
-		Trace:      false,
-	}
-	client, _ := zhmcclient.NewClient(endpoint, creds)
-	if client != nil {
-		hmcManager := zhmcclient.NewManagerFromClient(client)
-		hmcManager.ListCPCs(nil)
-	}
-}
+make sample-build
+export HMC_ENDPOINT="https://192.168.195.118:9955"
+export HMC_USERNAME=${username}
+export HMC_PASSWORD=${password}
+./bin/sample
 ```
