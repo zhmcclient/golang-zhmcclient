@@ -12,6 +12,7 @@
 package zhmcclient
 
 import (
+	"net/http"
 	"runtime"
 	"time"
 )
@@ -23,7 +24,29 @@ const (
 	libraryUserAgentPrefix = "ZHMC (" + runtime.GOOS + "; " + runtime.GOARCH + ") "
 	libraryUserAgent       = libraryUserAgentPrefix + libraryName + "/" + libraryVersion
 
-	HttpClientTimeout = 10 * time.Second
-	HandshakeTimeout  = 5 * time.Second
-	DialTimeout       = 5 * time.Second
+	DEFAULT_READ_RETRIES    = 0
+	DEFAULT_CONNECT_RETRIES = 3
+
+	DEFAULT_DIAL_TIMEOUT      = 10 * time.Second
+	DEFAULT_HANDSHAKE_TIMEOUT = 10 * time.Second
+	DEFAULT_CONNECT_TIMEOUT   = 30 * time.Second
+	DEFAULT_READ_TIMEOUT      = 3600 * time.Second
+	DEFAULT_MAX_REDIRECTS     = 30 * time.Second
+	DEFAULT_OPERATION_TIMEOUT = 3600 * time.Second
+	DEFAULT_STATUS_TIMEOUT    = 900 * time.Second
 )
+
+// List of success status.
+var KNOWN_SUCCESS_STATUS = []int{
+	http.StatusOK,                  // 200
+	http.StatusCreated,             // 201
+	http.StatusAccepted,            // 202
+	http.StatusNoContent,           // 204
+	http.StatusPartialContent,      // 206
+	http.StatusBadRequest,          // 400
+	http.StatusForbidden,           // 403
+	http.StatusNotFound,            // 404
+	http.StatusConflict,            // 409
+	http.StatusInternalServerError, // 500
+	http.StatusServiceUnavailable,  // 503
+}

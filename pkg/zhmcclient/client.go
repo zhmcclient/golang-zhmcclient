@@ -13,6 +13,7 @@ package zhmcclient
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -86,13 +87,14 @@ type Client struct {
 func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: DialTimeout,
+			Timeout: DEFAULT_DIAL_TIMEOUT,
 		}).Dial,
-		TLSHandshakeTimeout: HandshakeTimeout,
+		TLSClientConfig:     &tls.Config{InsecureSkipVerify: !opts.VerifyCert},
+		TLSHandshakeTimeout: DEFAULT_HANDSHAKE_TIMEOUT,
 	}
 
 	httpclient := &http.Client{
-		Timeout:   HttpClientTimeout,
+		Timeout:   DEFAULT_CONNECT_TIMEOUT,
 		Transport: netTransport,
 	}
 
@@ -126,9 +128,17 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 	return client, nil
 }
 
-// TODO, validate the endpoint
 func getEndpointURLFromString(endpoint string) (*url.URL, error) {
-	return url.Parse(endpoint)
+
+	if !strings.HasPrefix(strings.ToLower(endpoint), "https") {
+		return nil, errors.New("HTTPS is used for the client for secure reason.")
+	}
+
+	url, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return url, nil
 }
 
 func (c *Client) GetEndpointURL() *url.URL {
@@ -173,17 +183,20 @@ func (c *Client) Logon() error {
 		return nil
 	}
 
-	return errors.New("Logon -- Unknown Error")
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 func (c *Client) Logoff() error {
 	logoffUri := path.Join(c.endpointURL.Path, "/api/sessions/this-session")
-	status, _, err := c.executeMethod(http.MethodDelete, logoffUri, nil)
+	status, responseBody, err := c.executeMethod(http.MethodDelete, logoffUri, nil)
+	if err != nil {
+		return err
+	}
 	if status == http.StatusNoContent {
 		c.clearSession()
 		return nil
 	}
-	return err
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 func (c *Client) IsLogon(verify bool) bool {
@@ -212,14 +225,50 @@ func (c *Client) setUserAgent(req *http.Request) {
 func (c *Client) setRequestHeaders(req *http.Request) {
 	c.setUserAgent(req)
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "*/*")
 	req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
 }
 
-func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
-	return c.executeMethod(requestType, url.String(), requestData)
+func (c *Client) isKnownHttpStatus(status int) bool {
+	for _, httpStatus := range KNOWN_SUCCESS_STATUS {
+		if httpStatus == status {
+			return true
+		}
+	}
+	return false
 }
 
-// TODO, 1. Retry, 2. Logon when 401/403
+func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
+	var (
+		retries int
+	)
+
+	if requestType == http.MethodGet {
+		retries = DEFAULT_READ_RETRIES
+
+	} else {
+		retries = DEFAULT_CONNECT_RETRIES
+	}
+
+	if retries <= 0 {
+		retries = 1
+	}
+
+	for retries > 0 {
+		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
+		if responseStatusCode == http.StatusUnauthorized { // 1. invalid session, logon again
+			c.Logon()
+			c.executeMethod(requestType, url.String(), requestData)
+		}
+		if c.isKnownHttpStatus(responseStatusCode) || err == nil { // 2. Known error, don't retry
+			break
+		} else { // 3. Retry
+			retries -= 1
+		}
+	}
+	return responseStatusCode, responseBodyStream, err
+}
+
 func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
 	var requestBody []byte
 
@@ -238,6 +287,10 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 	c.setRequestHeaders(request)
 
 	response, err := c.httpClient.Do(request)
+	if response == nil {
+		return -1, nil, errors.New("HTTP Response is empty.")
+	}
+
 	if err != nil {
 		return -1, nil, err
 	}
@@ -249,8 +302,6 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 		return -1, nil, err
 	}
 
-	err = c.checkResponseStatus(response.StatusCode)
-
 	if c.isTraceEnabled {
 		err = c.traceHTTP(request, response)
 		if err != nil {
@@ -259,15 +310,6 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 	}
 
 	return response.StatusCode, responseBodyStream, err
-}
-
-func (c *Client) checkResponseStatus(responseStatusCode int) error {
-	if responseStatusCode != http.StatusAccepted && responseStatusCode != http.StatusOK && responseStatusCode != http.StatusNoContent {
-		errorText := fmt.Sprintf("Invalid Status Code[%d]", responseStatusCode)
-		return errors.New(errorText)
-	}
-
-	return nil
 }
 
 func (c *Client) traceHTTP(req *http.Request, resp *http.Response) error {
