@@ -95,8 +95,8 @@ func (m *ZhmcManager) StartLPAR(lparID string) (string, error) {
 func (m *ZhmcManager) StopLPAR(lparID string) (string, error) {
 	return m.lparManager.StopLPAR(lparID)
 }
-func (m *ZhmcManager) MountIsoImage(lparID string, isoFile string, insFile string) error {
-	return m.lparManager.MountIsoImage(lparID, isoFile, insFile)
+func (m *ZhmcManager) MountIsoImage(lparID string, image []byte, isoFile string, insFile string) error {
+	return m.lparManager.MountIsoImage(lparID, image, isoFile, insFile)
 }
 func (m *ZhmcManager) UnmountIsoImage(lparID string) error {
 	return m.lparManager.UnmountIsoImage(lparID)

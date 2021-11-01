@@ -82,6 +82,23 @@ type ClientAPI struct {
 	traceOnArgsForCall []struct {
 		arg1 io.Writer
 	}
+	UploadRequestStub        func(string, *url.URL, []byte) (int, []byte, error)
+	uploadRequestMutex       sync.RWMutex
+	uploadRequestArgsForCall []struct {
+		arg1 string
+		arg2 *url.URL
+		arg3 []byte
+	}
+	uploadRequestReturns struct {
+		result1 int
+		result2 []byte
+		result3 error
+	}
+	uploadRequestReturnsOnCall map[int]struct {
+		result1 int
+		result2 []byte
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -463,6 +480,80 @@ func (fake *ClientAPI) TraceOnArgsForCall(i int) io.Writer {
 	return argsForCall.arg1
 }
 
+func (fake *ClientAPI) UploadRequest(arg1 string, arg2 *url.URL, arg3 []byte) (int, []byte, error) {
+	var arg3Copy []byte
+	if arg3 != nil {
+		arg3Copy = make([]byte, len(arg3))
+		copy(arg3Copy, arg3)
+	}
+	fake.uploadRequestMutex.Lock()
+	ret, specificReturn := fake.uploadRequestReturnsOnCall[len(fake.uploadRequestArgsForCall)]
+	fake.uploadRequestArgsForCall = append(fake.uploadRequestArgsForCall, struct {
+		arg1 string
+		arg2 *url.URL
+		arg3 []byte
+	}{arg1, arg2, arg3Copy})
+	stub := fake.UploadRequestStub
+	fakeReturns := fake.uploadRequestReturns
+	fake.recordInvocation("UploadRequest", []interface{}{arg1, arg2, arg3Copy})
+	fake.uploadRequestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *ClientAPI) UploadRequestCallCount() int {
+	fake.uploadRequestMutex.RLock()
+	defer fake.uploadRequestMutex.RUnlock()
+	return len(fake.uploadRequestArgsForCall)
+}
+
+func (fake *ClientAPI) UploadRequestCalls(stub func(string, *url.URL, []byte) (int, []byte, error)) {
+	fake.uploadRequestMutex.Lock()
+	defer fake.uploadRequestMutex.Unlock()
+	fake.UploadRequestStub = stub
+}
+
+func (fake *ClientAPI) UploadRequestArgsForCall(i int) (string, *url.URL, []byte) {
+	fake.uploadRequestMutex.RLock()
+	defer fake.uploadRequestMutex.RUnlock()
+	argsForCall := fake.uploadRequestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *ClientAPI) UploadRequestReturns(result1 int, result2 []byte, result3 error) {
+	fake.uploadRequestMutex.Lock()
+	defer fake.uploadRequestMutex.Unlock()
+	fake.UploadRequestStub = nil
+	fake.uploadRequestReturns = struct {
+		result1 int
+		result2 []byte
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *ClientAPI) UploadRequestReturnsOnCall(i int, result1 int, result2 []byte, result3 error) {
+	fake.uploadRequestMutex.Lock()
+	defer fake.uploadRequestMutex.Unlock()
+	fake.UploadRequestStub = nil
+	if fake.uploadRequestReturnsOnCall == nil {
+		fake.uploadRequestReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 []byte
+			result3 error
+		})
+	}
+	fake.uploadRequestReturnsOnCall[i] = struct {
+		result1 int
+		result2 []byte
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *ClientAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -482,6 +573,8 @@ func (fake *ClientAPI) Invocations() map[string][][]interface{} {
 	defer fake.traceOffMutex.RUnlock()
 	fake.traceOnMutex.RLock()
 	defer fake.traceOnMutex.RUnlock()
+	fake.uploadRequestMutex.RLock()
+	defer fake.uploadRequestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -27,7 +27,7 @@ type LparAPI interface {
 	StartLPAR(lparID string) (string, error)
 	StopLPAR(lparID string) (string, error)
 
-	MountIsoImage(lparID string, isoFile string, insFile string) error
+	MountIsoImage(lparID string, image []byte, isoFile string, insFile string) error
 	UnmountIsoImage(lparID string) error
 
 	ListNics(lparID string) ([]string, error)
@@ -213,8 +213,29 @@ func (m *LparManager) StopLPAR(lparID string) (string, error) {
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *LparManager) MountIsoImage(lparID string, isoFile string, insFile string) error {
-	return nil
+func (m *LparManager) MountIsoImage(lparID string, image []byte, isoFile string, insFile string) error {
+	query := map[string]string{
+		"image-name":    isoFile,
+		"ins-file-name": insFile,
+	}
+
+	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "/operations/mount-iso-image")
+	requestUrl, err := BuildUrlFromUri(requestUri, query)
+
+	if err != nil {
+		return err
+	}
+
+	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, image)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(status, responseBody)
 }
 
 /**
