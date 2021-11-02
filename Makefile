@@ -15,7 +15,7 @@ sample-build: clean
 
 .PHONY: sample-build-mac
 sample-build-mac: clean
-	CGO_ENABLED=0 GOOS=darwin GOARCH=$(GO_BLD_ARCH) go build -a -installsuffix cgo -o $(BUILD_ROOT)/bin/sample $(BUILD_ROOT)/sample.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=$(GO_BLD_ARCH) go build -a -installsuffix cgo -o $(BUILD_ROOT)/bin/sample-mac $(BUILD_ROOT)/sample.go
 
 .PHONY: sample-build-mac-docker
 sample-build-docker:
