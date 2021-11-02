@@ -68,7 +68,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When query job and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
 				rets, err := manager.QueryJob(jobid)
 
@@ -81,7 +81,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When query job  and returns error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, errors.New("error"))
 				rets, err := manager.QueryJob(jobid)
 
@@ -92,7 +92,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When query job and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
 				rets, err := manager.QueryJob(jobid)
 
@@ -103,7 +103,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When query job and returns incorrect status", func() {
 			It("check the results is empty", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, nil)
 				rets, err := manager.QueryJob(jobid)
 
@@ -117,7 +117,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When delete job and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
 				err := manager.DeleteJob(jobid)
 
@@ -127,7 +127,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When delete job  and returns error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, errors.New("error"))
 				err := manager.DeleteJob(jobid)
 
@@ -137,7 +137,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When delete job  and returns incorrect status", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)
 				err := manager.DeleteJob(jobid)
 
@@ -150,7 +150,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When cancel job and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
 				err := manager.CancelJob(jobid)
 
@@ -160,7 +160,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When cancel job  and returns error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, errors.New("error"))
 				err := manager.CancelJob(jobid)
 
@@ -170,7 +170,7 @@ var _ = Describe("JOB", func() {
 
 		Context("When cancel job  and returns incorrect status", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)
 				err := manager.CancelJob(jobid)
 

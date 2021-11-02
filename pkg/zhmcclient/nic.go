@@ -42,18 +42,10 @@ func NewNicManager(client ClientAPI) *NicManager {
 *     or: 400, 403, 404, 409, 503,
  */
 func (m *NicManager) CreateNic(lparID string, nic *NIC) (string, error) {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "nics")
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return "", err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "nics")
 
-	bytes, err := json.Marshal(nic)
-	if err != nil {
-		return "", err
-	}
-
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, bytes)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic)
 	if err != nil {
 		return "", err
 	}
@@ -76,11 +68,8 @@ func (m *NicManager) CreateNic(lparID string, nic *NIC) (string, error) {
 *     or: 400, 403, 404, 409, 503
  */
 func (m *NicManager) DeleteNic(lparID string, nicID string) error {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "nics", nicID)
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "nics", nicID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {
@@ -100,11 +89,8 @@ func (m *NicManager) DeleteNic(lparID string, nicID string) error {
 *     or: 400, 404,
  */
 func (m *NicManager) GetNicProperties(lparID string, nicID string) (*NIC, error) {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/partitions", lparID, "nics", nicID)
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return nil, err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "nics", nicID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {

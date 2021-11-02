@@ -49,8 +49,9 @@ func NewAdapterManager(client ClientAPI) *AdapterManager {
 *     or: 400, 404, 409
  */
 func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]Adapter, error) {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/cpcs", cpcID, "/adapters")
-	requestUrl, err := BuildUrlFromUri(requestUri, query)
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs", cpcID, "/adapters")
+	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
 	if err != nil {
 		return nil, err
 	}
@@ -80,18 +81,10 @@ func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]
 *     or: 400, 403, 404, 409, 503
  */
 func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPayload) (string, error) {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/cpcs", cpcID, "adapters")
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return "", err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs", cpcID, "/adapters")
 
-	bytes, err := json.Marshal(adaptor)
-	if err != nil {
-		return "", err
-	}
-
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, bytes)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor)
 	if err != nil {
 		return "", err
 	}
@@ -115,11 +108,8 @@ func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPay
 *     or: 400, 403, 404, 409, 503
  */
 func (m *AdapterManager) DeleteHipersocket(adapterID string) error {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/adapters", adapterID)
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/adapters", adapterID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {

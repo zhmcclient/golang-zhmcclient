@@ -10,6 +10,16 @@ import (
 )
 
 type ClientAPI struct {
+	CloneEndpointURLStub        func() *url.URL
+	cloneEndpointURLMutex       sync.RWMutex
+	cloneEndpointURLArgsForCall []struct {
+	}
+	cloneEndpointURLReturns struct {
+		result1 *url.URL
+	}
+	cloneEndpointURLReturnsOnCall map[int]struct {
+		result1 *url.URL
+	}
 	ExecuteRequestStub        func(string, *url.URL, interface{}) (int, []byte, error)
 	executeRequestMutex       sync.RWMutex
 	executeRequestArgsForCall []struct {
@@ -26,16 +36,6 @@ type ClientAPI struct {
 		result1 int
 		result2 []byte
 		result3 error
-	}
-	GetEndpointURLStub        func() *url.URL
-	getEndpointURLMutex       sync.RWMutex
-	getEndpointURLArgsForCall []struct {
-	}
-	getEndpointURLReturns struct {
-		result1 *url.URL
-	}
-	getEndpointURLReturnsOnCall map[int]struct {
-		result1 *url.URL
 	}
 	IsLogonStub        func(bool) bool
 	isLogonMutex       sync.RWMutex
@@ -101,6 +101,59 @@ type ClientAPI struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *ClientAPI) CloneEndpointURL() *url.URL {
+	fake.cloneEndpointURLMutex.Lock()
+	ret, specificReturn := fake.cloneEndpointURLReturnsOnCall[len(fake.cloneEndpointURLArgsForCall)]
+	fake.cloneEndpointURLArgsForCall = append(fake.cloneEndpointURLArgsForCall, struct {
+	}{})
+	stub := fake.CloneEndpointURLStub
+	fakeReturns := fake.cloneEndpointURLReturns
+	fake.recordInvocation("CloneEndpointURL", []interface{}{})
+	fake.cloneEndpointURLMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *ClientAPI) CloneEndpointURLCallCount() int {
+	fake.cloneEndpointURLMutex.RLock()
+	defer fake.cloneEndpointURLMutex.RUnlock()
+	return len(fake.cloneEndpointURLArgsForCall)
+}
+
+func (fake *ClientAPI) CloneEndpointURLCalls(stub func() *url.URL) {
+	fake.cloneEndpointURLMutex.Lock()
+	defer fake.cloneEndpointURLMutex.Unlock()
+	fake.CloneEndpointURLStub = stub
+}
+
+func (fake *ClientAPI) CloneEndpointURLReturns(result1 *url.URL) {
+	fake.cloneEndpointURLMutex.Lock()
+	defer fake.cloneEndpointURLMutex.Unlock()
+	fake.CloneEndpointURLStub = nil
+	fake.cloneEndpointURLReturns = struct {
+		result1 *url.URL
+	}{result1}
+}
+
+func (fake *ClientAPI) CloneEndpointURLReturnsOnCall(i int, result1 *url.URL) {
+	fake.cloneEndpointURLMutex.Lock()
+	defer fake.cloneEndpointURLMutex.Unlock()
+	fake.CloneEndpointURLStub = nil
+	if fake.cloneEndpointURLReturnsOnCall == nil {
+		fake.cloneEndpointURLReturnsOnCall = make(map[int]struct {
+			result1 *url.URL
+		})
+	}
+	fake.cloneEndpointURLReturnsOnCall[i] = struct {
+		result1 *url.URL
+	}{result1}
 }
 
 func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 *url.URL, arg3 interface{}) (int, []byte, error) {
@@ -170,59 +223,6 @@ func (fake *ClientAPI) ExecuteRequestReturnsOnCall(i int, result1 int, result2 [
 		result2 []byte
 		result3 error
 	}{result1, result2, result3}
-}
-
-func (fake *ClientAPI) GetEndpointURL() *url.URL {
-	fake.getEndpointURLMutex.Lock()
-	ret, specificReturn := fake.getEndpointURLReturnsOnCall[len(fake.getEndpointURLArgsForCall)]
-	fake.getEndpointURLArgsForCall = append(fake.getEndpointURLArgsForCall, struct {
-	}{})
-	stub := fake.GetEndpointURLStub
-	fakeReturns := fake.getEndpointURLReturns
-	fake.recordInvocation("GetEndpointURL", []interface{}{})
-	fake.getEndpointURLMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *ClientAPI) GetEndpointURLCallCount() int {
-	fake.getEndpointURLMutex.RLock()
-	defer fake.getEndpointURLMutex.RUnlock()
-	return len(fake.getEndpointURLArgsForCall)
-}
-
-func (fake *ClientAPI) GetEndpointURLCalls(stub func() *url.URL) {
-	fake.getEndpointURLMutex.Lock()
-	defer fake.getEndpointURLMutex.Unlock()
-	fake.GetEndpointURLStub = stub
-}
-
-func (fake *ClientAPI) GetEndpointURLReturns(result1 *url.URL) {
-	fake.getEndpointURLMutex.Lock()
-	defer fake.getEndpointURLMutex.Unlock()
-	fake.GetEndpointURLStub = nil
-	fake.getEndpointURLReturns = struct {
-		result1 *url.URL
-	}{result1}
-}
-
-func (fake *ClientAPI) GetEndpointURLReturnsOnCall(i int, result1 *url.URL) {
-	fake.getEndpointURLMutex.Lock()
-	defer fake.getEndpointURLMutex.Unlock()
-	fake.GetEndpointURLStub = nil
-	if fake.getEndpointURLReturnsOnCall == nil {
-		fake.getEndpointURLReturnsOnCall = make(map[int]struct {
-			result1 *url.URL
-		})
-	}
-	fake.getEndpointURLReturnsOnCall[i] = struct {
-		result1 *url.URL
-	}{result1}
 }
 
 func (fake *ClientAPI) IsLogon(arg1 bool) bool {
@@ -557,10 +557,10 @@ func (fake *ClientAPI) UploadRequestReturnsOnCall(i int, result1 int, result2 []
 func (fake *ClientAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.cloneEndpointURLMutex.RLock()
+	defer fake.cloneEndpointURLMutex.RUnlock()
 	fake.executeRequestMutex.RLock()
 	defer fake.executeRequestMutex.RUnlock()
-	fake.getEndpointURLMutex.RLock()
-	defer fake.getEndpointURLMutex.RUnlock()
 	fake.isLogonMutex.RLock()
 	defer fake.isLogonMutex.RUnlock()
 	fake.logoffMutex.RLock()

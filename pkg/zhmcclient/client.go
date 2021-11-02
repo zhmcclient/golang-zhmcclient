@@ -33,7 +33,7 @@ import (
 // ClientAPI defines an interface for issuing client requests to ZHMC
 //go:generate counterfeiter -o fakes/client.go --fake-name ClientAPI . ClientAPI
 type ClientAPI interface {
-	GetEndpointURL() *url.URL
+	CloneEndpointURL() *url.URL
 	TraceOn(outputStream io.Writer)
 	TraceOff()
 	SetCertVerify(isVerify bool)
@@ -152,8 +152,12 @@ func IsExpectedHttpStatus(status int) bool {
 	return false
 }
 
-func (c *Client) GetEndpointURL() *url.URL {
-	return c.endpointURL
+/**
+* make a copy of the URL as it may be changed.
+ */
+func (c *Client) CloneEndpointURL() *url.URL {
+	url, _ := url.Parse(c.endpointURL.String())
+	return url
 }
 
 func (c *Client) TraceOn(outputStream io.Writer) {
@@ -180,8 +184,10 @@ func (c *Client) clearSession() {
 
 func (c *Client) Logon() error {
 	c.clearSession()
-	logonUri := path.Join(c.endpointURL.Path, "/api/sessions")
-	status, responseBody, err := c.executeMethod(http.MethodPost, logonUri, c.logondata)
+	url := c.CloneEndpointURL()
+	url.Path = path.Join(url.Path, "/api/sessions")
+
+	status, responseBody, err := c.executeMethod(http.MethodPost, url.String(), c.logondata)
 	if err != nil {
 		return err
 	}
@@ -198,8 +204,10 @@ func (c *Client) Logon() error {
 }
 
 func (c *Client) Logoff() error {
-	logoffUri := path.Join(c.endpointURL.Path, "/api/sessions/this-session")
-	status, responseBody, err := c.executeMethod(http.MethodDelete, logoffUri, nil)
+	url := c.CloneEndpointURL()
+	url.Path = path.Join(url.Path, "/api/sessions/this-session")
+
+	status, responseBody, err := c.executeMethod(http.MethodDelete, url.String(), nil)
 	if err != nil {
 		return err
 	}
@@ -212,8 +220,10 @@ func (c *Client) Logoff() error {
 
 func (c *Client) IsLogon(verify bool) bool {
 	if verify {
-		testUri := path.Join(c.endpointURL.Path, "/api/console")
-		status, _, err := c.executeMethod(http.MethodGet, testUri, nil)
+		url := c.CloneEndpointURL()
+		url.Path = path.Join(url.Path, "/api/console")
+
+		status, _, err := c.executeMethod(http.MethodGet, url.String(), nil)
 		if err != nil {
 			return false
 		} else if status == http.StatusOK || status == http.StatusBadRequest {
@@ -237,7 +247,10 @@ func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
 	c.setUserAgent(req)
 	req.Header.Add("Content-Type", bodyType)
 	req.Header.Add("Accept", "*/*")
-	req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
+	if c.session != nil && c.session.SessionID != "" {
+		req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
+	}
+
 }
 
 func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
@@ -293,12 +306,12 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 	c.setRequestHeaders(request, APPLICATION_BODY_JSON)
 
 	response, err := c.httpClient.Do(request)
-	if response == nil {
-		return -1, nil, errors.New("HTTP Response is empty.")
-	}
 
 	if err != nil {
 		return -1, nil, err
+	}
+	if response == nil {
+		return -1, nil, errors.New("HTTP Response is empty.")
 	}
 
 	defer response.Body.Close()

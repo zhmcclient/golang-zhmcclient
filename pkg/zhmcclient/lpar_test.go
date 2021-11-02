@@ -67,7 +67,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When list lpars and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
 				rets, err := manager.ListLPARs(cpcid, nil)
 
@@ -79,7 +79,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When list lpars and returns error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, errors.New("error"))
 				rets, err := manager.ListLPARs(cpcid, nil)
 
@@ -90,7 +90,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When list lpars and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
 				rets, err := manager.ListLPARs(cpcid, nil)
 
@@ -101,7 +101,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When list lpars and returns incorrect status", func() {
 			It("check the results is empty", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
 				rets, err := manager.ListLPARs(cpcid, nil)
 
@@ -136,7 +136,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When GetLparProperties and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
 				rets, err := manager.GetLparProperties(lparid)
 
@@ -148,7 +148,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When GetLparProperties and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
 				rets, err := manager.GetLparProperties(lparid)
 
@@ -159,7 +159,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When GetLparProperties and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
 				rets, err := manager.GetLparProperties(lparid)
 
@@ -194,7 +194,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When UpdateLparProperties and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
 				err := manager.UpdateLparProperties(lparid, payload)
 
@@ -204,7 +204,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When UpdateLparProperties and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
 				err := manager.UpdateLparProperties(lparid, payload)
 
@@ -214,7 +214,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When UpdateLparProperties and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
 				err := manager.UpdateLparProperties(lparid, nil)
 
@@ -247,7 +247,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When start lpar and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponse, nil)
 				rets, err := manager.StartLPAR(lparid)
 
@@ -259,7 +259,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When start lpar and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
 				rets, err := manager.StartLPAR(lparid)
 
@@ -270,7 +270,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When start lpar and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, []byte("incorrect json bytes"), errors.New("error"))
 				rets, err := manager.StartLPAR(lparid)
 
@@ -281,7 +281,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When start lpar and no URI responded", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, errors.New("error"))
 				rets, err := manager.StartLPAR(lparid)
 
@@ -315,7 +315,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When stop lpar and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponse, nil)
 				rets, err := manager.StopLPAR(lparid)
 
@@ -327,7 +327,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When stop lpar and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
 				rets, err := manager.StopLPAR(lparid)
 
@@ -338,7 +338,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When stop lpar and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, []byte("incorrect json bytes"), errors.New("error"))
 				rets, err := manager.StopLPAR(lparid)
 
@@ -349,7 +349,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When stop lpar and no URI responded", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, errors.New("error"))
 				rets, err := manager.StopLPAR(lparid)
 
@@ -375,7 +375,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When mount iso image and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.UploadRequestReturns(http.StatusNoContent, nil, nil)
 				err := manager.MountIsoImage(lparid, bytes, imageFile, insFile)
 
@@ -385,7 +385,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When mount iso image and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.UploadRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
 				err := manager.MountIsoImage(lparid, bytes, imageFile, insFile)
 
@@ -398,7 +398,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When unmount iso image and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
 				err := manager.UnmountIsoImage(lparid)
 
@@ -408,7 +408,7 @@ var _ = Describe("LPAR", func() {
 
 		Context("When unmount iso image and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
 				err := manager.UnmountIsoImage(lparid)
 

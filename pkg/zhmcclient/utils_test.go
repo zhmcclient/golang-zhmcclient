@@ -14,6 +14,7 @@ package zhmcclient_test
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,9 +22,9 @@ import (
 )
 
 var _ = Describe("utils", func() {
-	Describe("BuildUrlFromUri", func() {
+	Describe("BuildUrlFromQuery", func() {
 		var (
-			uri    string
+			url    *url.URL
 			query0 map[string]string
 			query1 map[string]string
 			query2 map[string]string
@@ -39,42 +40,46 @@ var _ = Describe("utils", func() {
 				"type": "dpm",
 			}
 
-			uri = "https://127.0.0.1:80/api"
+			url, _ = url.Parse("https://127.0.0.1:80/api")
 		})
 
 		Context("When nil query passed in", func() {
 			It("returns same uri", func() {
-				url, err := BuildUrlFromUri(uri, nil)
+				ret, _ := url.Parse(url.String())
+				ret, err := BuildUrlFromQuery(ret, nil)
 
 				Expect(err).To(BeNil())
-				Expect(url.String()).To(Equal(uri))
+				Expect(ret.String()).To(Equal(url.String()))
 			})
 		})
 
 		Context("When empty query passed in", func() {
 			It("returns same uri", func() {
-				url, err := BuildUrlFromUri(uri, query0)
+				ret, _ := url.Parse(url.String())
+				ret, err := BuildUrlFromQuery(ret, query0)
 
 				Expect(err).To(BeNil())
-				Expect(url.String()).To(Equal(uri))
+				Expect(ret.String()).To(Equal(url.String()))
 			})
 		})
 
 		Context("When 1 query passed in", func() {
 			It("returns correct uri", func() {
-				url, err := BuildUrlFromUri(uri, query1)
+				ret, _ := url.Parse(url.String())
+				ret, err := BuildUrlFromQuery(ret, query1)
 
 				Expect(err).To(BeNil())
-				Expect(url.String()).To(Equal(uri + "?name=lpar1"))
+				Expect(ret.String()).To(Equal(url.String() + "?name=lpar1"))
 			})
 		})
 
 		Context("When 2 query passed in", func() {
 			It("returns correct uri", func() {
-				url, err := BuildUrlFromUri(uri, query2)
+				ret, _ := url.Parse(url.String())
+				ret, err := BuildUrlFromQuery(ret, query2)
 
 				Expect(err).To(BeNil())
-				Expect(url.String()).To(Equal(uri + "?name=lpar1&type=dpm"))
+				Expect(ret.String()).To(Equal(url.String() + "?name=lpar1&type=dpm"))
 			})
 		})
 	})
