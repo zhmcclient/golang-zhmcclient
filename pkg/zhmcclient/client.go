@@ -67,12 +67,13 @@ type LogonData struct {
 
 // TODO, Use cache and use JobTopic, ObjectTopic to update cache
 type Session struct {
-	SessionID    string `json:"api-session"`
-	ObjectTopic  string `json:"notification-topic"`
-	JobTopic     string `json:"job-notification-topic"`
-	Credential   string `json:"session-credential"`
 	MajorVersion string `json:"api-major-version"`
 	MinorVersion string `json:"api-minor-version"`
+	SessionID    string `json:"api-session"`
+	JobTopic     string `json:"job-notification-topic"`
+	ObjectTopic  string `json:"notification-topic"`
+	Expires      string `json:"password-expires"`
+	Credential   string `json:"session-credential"`
 }
 
 type Client struct {
@@ -195,10 +196,12 @@ func (c *Client) Logon() error {
 	}
 
 	if status == http.StatusOK || status == http.StatusCreated {
-		err = json.Unmarshal(responseBody, &c.session)
+		session := &Session{}
+		err = json.Unmarshal(responseBody, session)
 		if err != nil {
 			return err
 		}
+		c.session = session
 		return nil
 	}
 
