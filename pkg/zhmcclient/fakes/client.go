@@ -68,9 +68,9 @@ type ClientAPI struct {
 	logonReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SetCertVerifyStub        func(bool)
-	setCertVerifyMutex       sync.RWMutex
-	setCertVerifyArgsForCall []struct {
+	SetSkipCertVerifyStub        func(bool)
+	setSkipCertVerifyMutex       sync.RWMutex
+	setSkipCertVerifyArgsForCall []struct {
 		arg1 bool
 	}
 	TraceOffStub        func()
@@ -392,35 +392,35 @@ func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *ClientAPI) SetCertVerify(arg1 bool) {
-	fake.setCertVerifyMutex.Lock()
-	fake.setCertVerifyArgsForCall = append(fake.setCertVerifyArgsForCall, struct {
+func (fake *ClientAPI) SetSkipCertVerify(arg1 bool) {
+	fake.setSkipCertVerifyMutex.Lock()
+	fake.setSkipCertVerifyArgsForCall = append(fake.setSkipCertVerifyArgsForCall, struct {
 		arg1 bool
 	}{arg1})
-	stub := fake.SetCertVerifyStub
-	fake.recordInvocation("SetCertVerify", []interface{}{arg1})
-	fake.setCertVerifyMutex.Unlock()
+	stub := fake.SetSkipCertVerifyStub
+	fake.recordInvocation("SetSkipCertVerify", []interface{}{arg1})
+	fake.setSkipCertVerifyMutex.Unlock()
 	if stub != nil {
-		fake.SetCertVerifyStub(arg1)
+		fake.SetSkipCertVerifyStub(arg1)
 	}
 }
 
-func (fake *ClientAPI) SetCertVerifyCallCount() int {
-	fake.setCertVerifyMutex.RLock()
-	defer fake.setCertVerifyMutex.RUnlock()
-	return len(fake.setCertVerifyArgsForCall)
+func (fake *ClientAPI) SetSkipCertVerifyCallCount() int {
+	fake.setSkipCertVerifyMutex.RLock()
+	defer fake.setSkipCertVerifyMutex.RUnlock()
+	return len(fake.setSkipCertVerifyArgsForCall)
 }
 
-func (fake *ClientAPI) SetCertVerifyCalls(stub func(bool)) {
-	fake.setCertVerifyMutex.Lock()
-	defer fake.setCertVerifyMutex.Unlock()
-	fake.SetCertVerifyStub = stub
+func (fake *ClientAPI) SetSkipCertVerifyCalls(stub func(bool)) {
+	fake.setSkipCertVerifyMutex.Lock()
+	defer fake.setSkipCertVerifyMutex.Unlock()
+	fake.SetSkipCertVerifyStub = stub
 }
 
-func (fake *ClientAPI) SetCertVerifyArgsForCall(i int) bool {
-	fake.setCertVerifyMutex.RLock()
-	defer fake.setCertVerifyMutex.RUnlock()
-	argsForCall := fake.setCertVerifyArgsForCall[i]
+func (fake *ClientAPI) SetSkipCertVerifyArgsForCall(i int) bool {
+	fake.setSkipCertVerifyMutex.RLock()
+	defer fake.setSkipCertVerifyMutex.RUnlock()
+	argsForCall := fake.setSkipCertVerifyArgsForCall[i]
 	return argsForCall.arg1
 }
 
@@ -567,8 +567,8 @@ func (fake *ClientAPI) Invocations() map[string][][]interface{} {
 	defer fake.logoffMutex.RUnlock()
 	fake.logonMutex.RLock()
 	defer fake.logonMutex.RUnlock()
-	fake.setCertVerifyMutex.RLock()
-	defer fake.setCertVerifyMutex.RUnlock()
+	fake.setSkipCertVerifyMutex.RLock()
+	defer fake.setSkipCertVerifyMutex.RUnlock()
 	fake.traceOffMutex.RLock()
 	defer fake.traceOffMutex.RUnlock()
 	fake.traceOnMutex.RLock()

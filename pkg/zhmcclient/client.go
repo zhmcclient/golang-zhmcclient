@@ -36,7 +36,7 @@ type ClientAPI interface {
 	CloneEndpointURL() *url.URL
 	TraceOn(outputStream io.Writer)
 	TraceOff()
-	SetCertVerify(isVerify bool)
+	SetSkipCertVerify(isSkipCert bool)
 	Logon() error
 	Logoff() error
 	IsLogon(verify bool) bool
@@ -54,10 +54,10 @@ const (
 )
 
 type Options struct {
-	Username   string
-	Password   string
-	Trace      bool
-	VerifyCert bool
+	Username string
+	Password string
+	Trace    bool
+	SkipCert bool
 }
 
 type LogonData struct {
@@ -81,23 +81,25 @@ type Client struct {
 	logondata   *LogonData
 	session     *Session
 
-	isVerifyCert   bool
+	isSkipCert     bool
 	isTraceEnabled bool
 	traceOutput    io.Writer
 }
 
 func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
-	var netTransport = &http.Transport{
+	transport := &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: DEFAULT_DIAL_TIMEOUT,
 		}).Dial,
-		TLSClientConfig:     &tls.Config{InsecureSkipVerify: !opts.VerifyCert},
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: opts.SkipCert,
+		},
 		TLSHandshakeTimeout: DEFAULT_HANDSHAKE_TIMEOUT,
 	}
 
 	httpclient := &http.Client{
 		Timeout:   DEFAULT_CONNECT_TIMEOUT,
-		Transport: netTransport,
+		Transport: transport,
 	}
 
 	endpointurl, err := GetEndpointURLFromString(endpoint)
@@ -125,7 +127,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 		client.TraceOff()
 	}
 
-	client.SetCertVerify(opts.VerifyCert)
+	client.SetSkipCertVerify(opts.SkipCert)
 
 	return client, nil
 }
@@ -174,8 +176,8 @@ func (c *Client) TraceOff() {
 }
 
 // TODO, check cert when request/logon
-func (c *Client) SetCertVerify(isVerify bool) {
-	c.isVerifyCert = isVerify
+func (c *Client) SetSkipCertVerify(isSkipCert bool) {
+	c.isSkipCert = isSkipCert
 }
 
 func (c *Client) clearSession() {
