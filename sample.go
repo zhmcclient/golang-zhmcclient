@@ -23,10 +23,10 @@ func main() {
 	username := os.Getenv("HMC_USERNAME")
 	password := os.Getenv("HMC_PASSWORD")
 	creds := &zhmcclient.Options{
-		Username:   username,
-		Password:   password,
-		VerifyCert: false,
-		Trace:      true,
+		Username: username,
+		Password: password,
+		SkipCert: true,
+		Trace:    true,
 	}
 	if endpoint == "" || username == "" || password == "" {
 		fmt.Println("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
