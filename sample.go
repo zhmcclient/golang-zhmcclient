@@ -35,13 +35,19 @@ func main() {
 	fmt.Println("HMC_ENDPOINT: ", endpoint)
 	fmt.Println("HMC_USERNAME: ", username)
 	fmt.Println("HMC_PASSWORD: xxxxxx")
-	client, _ := zhmcclient.NewClient(endpoint, creds)
+	client, err := zhmcclient.NewClient(endpoint, creds)
+	if err != nil {
+		fmt.Println("Error: ", err.Error())
+	}
 	if client != nil {
+		fmt.Println("client initiliazed.")
 		hmcManager := zhmcclient.NewManagerFromClient(client)
 
 		query := map[string]string{}
 		cpcs, err := hmcManager.ListCPCs(query)
 		if err != nil {
+			fmt.Println("Error: ", err.Error())
+		} else {
 			for _, cpc := range cpcs {
 				fmt.Println("########################################")
 				fmt.Println("cpc name: ", cpc.Name)
@@ -49,6 +55,8 @@ func main() {
 
 				adapters, err := hmcManager.ListAdapters(cpc.URI, query)
 				if err != nil {
+					fmt.Println("Error: ", err.Error())
+				} else {
 					fmt.Println("-----------------------")
 					for _, adapter := range adapters {
 						fmt.Println("--")
@@ -58,6 +66,8 @@ func main() {
 
 				lpars, err := hmcManager.ListLPARs(cpc.URI, query)
 				if err != nil {
+					fmt.Println("Error: ", err.Error())
+				} else {
 					fmt.Println("-----------------------")
 					for _, lpar := range lpars {
 						fmt.Println("--")
@@ -66,6 +76,8 @@ func main() {
 
 						props, err := hmcManager.GetLparProperties(lpar.URI)
 						if err != nil {
+							fmt.Println("Error: ", err.Error())
+						} else {
 							fmt.Println("lpar properties: ", props)
 						}
 					}

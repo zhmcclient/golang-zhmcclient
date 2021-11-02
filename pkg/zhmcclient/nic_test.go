@@ -84,7 +84,7 @@ var _ = Describe("Nic", func() {
 
 		Context("When CreateNic and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, bytesResponse, nil)
 				rets, err := manager.CreateNic(lparid, payload)
 
@@ -96,7 +96,7 @@ var _ = Describe("Nic", func() {
 
 		Context("When CreateNic and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
 				rets, err := manager.CreateNic(lparid, payload)
 
@@ -107,7 +107,7 @@ var _ = Describe("Nic", func() {
 
 		Context("When CreateNic and unmarshal error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), errors.New("error"))
 				rets, err := manager.CreateNic(lparid, payload)
 
@@ -118,7 +118,7 @@ var _ = Describe("Nic", func() {
 
 		Context("When CreateNic and no URI responded", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, errors.New("error"))
 				rets, err := manager.CreateNic(lparid, payload)
 
@@ -132,7 +132,7 @@ var _ = Describe("Nic", func() {
 
 		Context("When DeleteNic and returns correctly", func() {
 			It("check the results succeed", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
 				err := manager.DeleteNic(lparid, nicid)
 
@@ -142,7 +142,7 @@ var _ = Describe("Nic", func() {
 
 		Context("When DeleteNic and ExecuteRequest error", func() {
 			It("check the error happened", func() {
-				fakeClient.GetEndpointURLReturns(url)
+				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
 				err := manager.DeleteNic(lparid, nicid)
 

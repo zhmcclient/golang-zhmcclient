@@ -41,11 +41,8 @@ func NewJobManager(client ClientAPI) *JobManager {
 *     or: 400, 404
  */
 func (m *JobManager) QueryJob(jobID string) (*Job, error) {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/jobs", jobID)
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return nil, err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/jobs", jobID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -70,11 +67,8 @@ func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 *     or: 400, 404, 409
  */
 func (m *JobManager) DeleteJob(jobID string) error {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/jobs", jobID)
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/jobs", jobID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {
@@ -94,11 +88,8 @@ func (m *JobManager) DeleteJob(jobID string) error {
 *     or: 400, 404, 409
  */
 func (m *JobManager) CancelJob(jobID string) error {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/jobs", jobID, "operations/cancel")
-	requestUrl, err := BuildUrlFromUri(requestUri, nil)
-	if err != nil {
-		return err
-	}
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/jobs", jobID, "operations/cancel")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {

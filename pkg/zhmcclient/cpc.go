@@ -40,8 +40,9 @@ func NewCpcManager(client ClientAPI) *CpcManager {
 *     or: 400
  */
 func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, error) {
-	requestUri := path.Join(m.client.GetEndpointURL().Path, "/api/cpcs")
-	requestUrl, err := BuildUrlFromUri(requestUri, query)
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs")
+	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
 	if err != nil {
 		return nil, err
 	}

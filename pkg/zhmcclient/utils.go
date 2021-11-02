@@ -24,12 +24,7 @@ type ErrorBody struct {
 	Message string `json:"message"`
 }
 
-func BuildUrlFromUri(uri string, query map[string]string) (*url.URL, error) {
-	url, err := url.Parse(uri)
-	if err != nil {
-		return nil, err
-	}
-
+func BuildUrlFromQuery(url *url.URL, query map[string]string) (*url.URL, error) {
 	if query != nil {
 		q := url.Query()
 		for key, value := range query {
