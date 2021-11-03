@@ -43,8 +43,9 @@ var _ = Describe("LPAR", func() {
 
 	Describe("ListLPARs", func() {
 		var (
-			lpars []LPAR
-			bytes []byte
+			lpars      []LPAR
+			lparsArray LPARsArray
+			bytes      []byte
 		)
 
 		BeforeEach(func() {
@@ -62,7 +63,10 @@ var _ = Describe("LPAR", func() {
 					Type:   "type",
 				},
 			}
-			bytes, _ = json.Marshal(lpars)
+			lparsArray = LPARsArray{
+				lpars,
+			}
+			bytes, _ = json.Marshal(lparsArray)
 		})
 
 		Context("When list lpars and returns correctly", func() {

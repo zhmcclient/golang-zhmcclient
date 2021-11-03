@@ -43,8 +43,9 @@ var _ = Describe("Adapter", func() {
 
 	Describe("ListAdapters", func() {
 		var (
-			adapters []Adapter
-			bytes    []byte
+			adapters      []Adapter
+			adaptersArray AdaptersArray
+			bytes         []byte
 		)
 
 		BeforeEach(func() {
@@ -66,7 +67,11 @@ var _ = Describe("Adapter", func() {
 					Status: ADAPTER_STATUS_ACTIVE,
 				},
 			}
-			bytes, _ = json.Marshal(adapters)
+
+			adaptersArray = AdaptersArray{
+				adapters,
+			}
+			bytes, _ = json.Marshal(adaptersArray)
 		})
 
 		Context("When list adapters and returns correctly", func() {

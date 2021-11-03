@@ -29,9 +29,10 @@ var _ = Describe("CPC", func() {
 			manager    *CpcManager
 			fakeClient *fakes.ClientAPI
 
-			cpcs  []CPC
-			url   *url.URL
-			bytes []byte
+			cpcs      []CPC
+			cpcsArray = &CpcsArray{}
+			url       *url.URL
+			bytes     []byte
 		)
 
 		BeforeEach(func() {
@@ -43,7 +44,7 @@ var _ = Describe("CPC", func() {
 					URI:                 "object-uri1",
 					Name:                "name1",
 					Status:              "status1",
-					HasAcceptableStatus: "has-unacceptable-status1",
+					HasAcceptableStatus: false,
 					DpmEnabled:          false,
 					SeVersion:           "se-version1",
 				},
@@ -51,14 +52,18 @@ var _ = Describe("CPC", func() {
 					URI:                 "object-uri2",
 					Name:                "name2",
 					Status:              "status2",
-					HasAcceptableStatus: "has-unacceptable-status2",
+					HasAcceptableStatus: false,
 					DpmEnabled:          true,
 					SeVersion:           "se-version2",
 				},
 			}
 
+			cpcsArray = &CpcsArray{
+				cpcs,
+			}
+
 			url, _ = url.Parse("https://127.0.0.1:443")
-			bytes, _ = json.Marshal(cpcs)
+			bytes, _ = json.Marshal(cpcsArray)
 		})
 
 		Context("When list cpcs and returns correctly", func() {
