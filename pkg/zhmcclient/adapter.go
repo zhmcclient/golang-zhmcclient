@@ -20,9 +20,9 @@ import (
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
 //go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
-	ListAdapters(cpcID string, query map[string]string) ([]Adapter, error)
-	CreateHipersocket(cpcID string, adaptor *HypersocketPayload) (string, error)
-	DeleteHipersocket(adapterID string) error
+	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error)
+	CreateHipersocket(cpcURI string, adaptor *HypersocketPayload) (string, error)
+	DeleteHipersocket(adapterURI string) error
 }
 
 type AdapterManager struct {
@@ -37,7 +37,7 @@ func NewAdapterManager(client ClientAPI) *AdapterManager {
 
 /**
 * GET /api/cpcs/{cpc-id}/adapters
-* @cpcID the ID of the CPC
+* @cpcURI the ID of the CPC
 * @query the fields can be queried include:
 *        name,
 *        adapter-id,
@@ -48,9 +48,9 @@ func NewAdapterManager(client ClientAPI) *AdapterManager {
 * Return: 200 and Adapters array
 *     or: 400, 404, 409
  */
-func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]Adapter, error) {
+func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, cpcID, "/adapters")
+	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
 	if err != nil {
 		return nil, err
@@ -75,14 +75,14 @@ func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]
 
 /**
 * POST /api/cpcs/{cpc-id}/adapters
-* @cpcID the ID of the CPC
+* @cpcURI the ID of the CPC
 * @adaptor the payload includes properties when create Hipersocket
 * Return: 201 and body with "object-uri"
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPayload) (string, error) {
+func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HypersocketPayload) (string, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, cpcID, "/adapters")
+	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor)
 	if err != nil {
@@ -103,13 +103,13 @@ func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPay
 
 /**
 * DELETE /api/adapters/{adapter-id}
-* @adapterID the adapter ID to be deleted
+* @adapterURI the adapter ID to be deleted
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) DeleteHipersocket(adapterID string) error {
+func (m *AdapterManager) DeleteHipersocket(adapterURI string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, adapterID)
+	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {

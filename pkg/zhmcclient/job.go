@@ -20,9 +20,9 @@ import (
 // JobAPI defines an interface for issuing Job requests to ZHMC
 //go:generate counterfeiter -o fakes/job.go --fake-name JobAPI . JobAPI
 type JobAPI interface {
-	QueryJob(jobID string) (*Job, error)
-	DeleteJob(jobID string) error
-	CancelJob(jobID string) error
+	QueryJob(jobURI string) (*Job, error)
+	DeleteJob(jobURI string) error
+	CancelJob(jobURI string) error
 }
 
 type JobManager struct {
@@ -40,9 +40,9 @@ func NewJobManager(client ClientAPI) *JobManager {
 * Return: 200 and job status
 *     or: 400, 404
  */
-func (m *JobManager) QueryJob(jobID string) (*Job, error) {
+func (m *JobManager) QueryJob(jobURI string) (*Job, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, jobID)
+	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -66,9 +66,9 @@ func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 * Return: 204
 *     or: 400, 404, 409
  */
-func (m *JobManager) DeleteJob(jobID string) error {
+func (m *JobManager) DeleteJob(jobURI string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, jobID)
+	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {
@@ -87,9 +87,9 @@ func (m *JobManager) DeleteJob(jobID string) error {
 * Return: 204
 *     or: 400, 404, 409
  */
-func (m *JobManager) CancelJob(jobID string) error {
+func (m *JobManager) CancelJob(jobURI string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, jobID, "operations/cancel")
+	requestUrl.Path = path.Join(requestUrl.Path, jobURI, "operations/cancel")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
