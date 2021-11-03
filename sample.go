@@ -19,14 +19,14 @@ import (
 )
 
 func main() {
-	endpoint := os.Getenv("HMC_ENDPOINT") // "https://192.168.195.118:9955"
+	endpoint := os.Getenv("HMC_ENDPOINT") // "https://9.114.87.7:6794/", "https://192.168.195.118:6794"
 	username := os.Getenv("HMC_USERNAME")
 	password := os.Getenv("HMC_PASSWORD")
 	creds := &zhmcclient.Options{
 		Username: username,
 		Password: password,
 		SkipCert: true,
-		Trace:    true,
+		Trace:    false,
 	}
 	if endpoint == "" || username == "" || password == "" {
 		fmt.Println("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
@@ -42,51 +42,62 @@ func main() {
 	if client != nil {
 		fmt.Println("client initiliazed.")
 		hmcManager := zhmcclient.NewManagerFromClient(client)
+		ListAll(hmcManager)
+	}
+}
 
-		query := map[string]string{}
-		cpcs, err := hmcManager.ListCPCs(query)
-		if err != nil {
-			fmt.Println("Error: ", err.Error())
-		} else {
-			for _, cpc := range cpcs {
-				fmt.Println("########################################")
-				fmt.Println("cpc name: ", cpc.Name)
-				fmt.Println("cpc id: ", cpc.URI)
+func ListAll(hmcManager zhmcclient.ZhmcAPI) {
+	query := map[string]string{}
+	cpcs, err := hmcManager.ListCPCs(query)
+	if err != nil {
+		fmt.Println("Error: ", err.Error())
+	} else {
+		for _, cpc := range cpcs {
+			fmt.Println("########################################")
+			fmt.Println("cpc name: ", cpc.Name)
+			fmt.Println("cpc uri: ", cpc.URI)
 
-				adapters, err := hmcManager.ListAdapters(cpc.URI, query)
-				if err != nil {
-					fmt.Println("Error: ", err.Error())
-				} else {
-					fmt.Println("-----------------------")
-					for _, adapter := range adapters {
-						fmt.Println("++++++++++++++++++++++++")
-						fmt.Println("adapter properties: ", adapter)
-					}
+			adapters, err := hmcManager.ListAdapters(cpc.URI, query)
+			if err != nil {
+				fmt.Println("Error: ", err.Error())
+			} else {
+				fmt.Println("-----------------------")
+				for _, adapter := range adapters {
+					fmt.Println("++++++++++++++++++++++++")
+					fmt.Println("adapter properties: ", adapter)
 				}
+			}
 
-				lpars, err := hmcManager.ListLPARs(cpc.URI, query)
-				if err != nil {
-					fmt.Println("Error: ", err.Error())
-				} else {
-					fmt.Println("-----------------------")
-					for _, lpar := range lpars {
-						fmt.Println("++++++++++++++++++++++++")
-						fmt.Println("lpar name: ", lpar.Name)
-						fmt.Println("lpar id: ", lpar.URI)
+			lpars, err := hmcManager.ListLPARs(cpc.URI, query)
+			if err != nil {
+				fmt.Println("Error: ", err.Error())
+			} else {
+				fmt.Println("-----------------------")
+				for _, lpar := range lpars {
+					fmt.Println("++++++++++++++++++++++++")
+					fmt.Println("lpar name: ", lpar.Name)
+					fmt.Println("lpar uri: ", lpar.URI)
 
-						props, err := hmcManager.GetLparProperties(lpar.URI)
-						if err != nil {
-							fmt.Println("Error: ", err.Error())
-						} else {
-							fmt.Println("lpar properties: ", props)
-						}
+					props, err := hmcManager.GetLparProperties(lpar.URI)
+					if err != nil {
+						fmt.Println("Error: ", err.Error())
+					} else {
+						fmt.Println("lpar properties: ", props)
+					}
 
-						fmt.Println("++++++++++++++++++++++++")
-						nics, err := hmcManager.ListNics(lpar.URI)
-						if err != nil {
-							fmt.Println("Error: ", err.Error())
-						} else {
-							fmt.Println("nics properties: ", nics)
+					fmt.Println("++++++++++++++++++++++++")
+					nics, err := hmcManager.ListNics(lpar.URI)
+					if err != nil {
+						fmt.Println("Error: ", err.Error())
+					} else {
+						fmt.Println("nics list: ", nics)
+						for _, nicURI := range nics {
+							nic, err := hmcManager.GetNicProperties(nicURI)
+							if err != nil {
+								fmt.Println("Error: ", err.Error())
+							} else {
+								fmt.Println("nic properties: ", nic)
+							}
 						}
 					}
 				}

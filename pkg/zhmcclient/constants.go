@@ -24,6 +24,8 @@ const (
 	libraryUserAgentPrefix = "ZHMC (" + runtime.GOOS + "; " + runtime.GOARCH + ") "
 	libraryUserAgent       = libraryUserAgentPrefix + libraryName + "/" + libraryVersion
 
+	HMC_DEFAULT_PORT = "6794"
+
 	DEFAULT_READ_RETRIES    = 0
 	DEFAULT_CONNECT_RETRIES = 3
 
