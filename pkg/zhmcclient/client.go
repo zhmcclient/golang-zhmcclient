@@ -338,7 +338,7 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 
 func (c *Client) executeUpload(requestType string, urlStr string, requestBody []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
 
-	request, err := http.NewRequest(requestType, urlStr, bytes.NewBuffer(requestBody))
+	request, err := http.NewRequest(requestType, urlStr, bytes.NewReader(requestBody))
 	if err != nil {
 		return -1, nil, err
 	}
