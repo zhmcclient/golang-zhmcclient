@@ -50,7 +50,7 @@ func NewAdapterManager(client ClientAPI) *AdapterManager {
  */
 func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]Adapter, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs", cpcID, "/adapters")
+	requestUrl.Path = path.Join(requestUrl.Path, cpcID, "/adapters")
 	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
 	if err != nil {
 		return nil, err
@@ -62,12 +62,12 @@ func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]
 	}
 
 	if status == http.StatusOK {
-		adapters := []Adapter{}
-		err = json.Unmarshal(responseBody, &adapters)
+		adapters := &AdaptersArray{}
+		err = json.Unmarshal(responseBody, adapters)
 		if err != nil {
 			return nil, err
 		}
-		return adapters, nil
+		return adapters.ADAPTERS, nil
 	}
 
 	return nil, GenerateErrorFromResponse(status, responseBody)
@@ -82,7 +82,7 @@ func (m *AdapterManager) ListAdapters(cpcID string, query map[string]string) ([]
  */
 func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPayload) (string, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs", cpcID, "/adapters")
+	requestUrl.Path = path.Join(requestUrl.Path, cpcID, "/adapters")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor)
 	if err != nil {
@@ -109,7 +109,7 @@ func (m *AdapterManager) CreateHipersocket(cpcID string, adaptor *HypersocketPay
  */
 func (m *AdapterManager) DeleteHipersocket(adapterID string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/adapters", adapterID)
+	requestUrl.Path = path.Join(requestUrl.Path, adapterID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {

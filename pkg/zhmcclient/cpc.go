@@ -53,12 +53,12 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, error) {
 	}
 
 	if status == http.StatusOK {
-		cpcs := []CPC{}
+		cpcs := &CpcsArray{}
 		err = json.Unmarshal(responseBody, &cpcs)
 		if err != nil {
 			return nil, err
 		}
-		return cpcs, nil
+		return cpcs.CPCS, nil
 	}
 
 	return nil, GenerateErrorFromResponse(status, responseBody)

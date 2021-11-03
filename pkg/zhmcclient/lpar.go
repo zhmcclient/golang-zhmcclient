@@ -56,7 +56,7 @@ func NewLparManager(client ClientAPI) *LparManager {
  */
 func (m *LparManager) ListLPARs(cpcID string, query map[string]string) ([]LPAR, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs", cpcID, "/partitions")
+	requestUrl.Path = path.Join(requestUrl.Path, cpcID, "/partitions")
 	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
 	if err != nil {
 		return nil, err
@@ -68,12 +68,12 @@ func (m *LparManager) ListLPARs(cpcID string, query map[string]string) ([]LPAR, 
 	}
 
 	if status == http.StatusOK {
-		lpars := []LPAR{}
-		err = json.Unmarshal(responseBody, &lpars)
+		lpars := &LPARsArray{}
+		err = json.Unmarshal(responseBody, lpars)
 		if err != nil {
 			return nil, err
 		}
-		return lpars, nil
+		return lpars.LPARS, nil
 	}
 
 	return nil, GenerateErrorFromResponse(status, responseBody)
@@ -87,7 +87,7 @@ func (m *LparManager) ListLPARs(cpcID string, query map[string]string) ([]LPAR, 
  */
 func (m *LparManager) GetLparProperties(lparID string) (*LparProperties, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID)
+	requestUrl.Path = path.Join(requestUrl.Path, lparID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -115,7 +115,7 @@ func (m *LparManager) GetLparProperties(lparID string) (*LparProperties, error) 
  */
 func (m *LparManager) UpdateLparProperties(lparID string, props *LparProperties) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID)
+	requestUrl.Path = path.Join(requestUrl.Path, lparID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props)
 	if err != nil {
@@ -138,7 +138,7 @@ func (m *LparManager) UpdateLparProperties(lparID string, props *LparProperties)
  */
 func (m *LparManager) StartLPAR(lparID string) (string, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "/operations/start")
+	requestUrl.Path = path.Join(requestUrl.Path, lparID, "/operations/start")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
@@ -169,7 +169,7 @@ func (m *LparManager) StartLPAR(lparID string) (string, error) {
  */
 func (m *LparManager) StopLPAR(lparID string) (string, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "/operations/stop")
+	requestUrl.Path = path.Join(requestUrl.Path, lparID, "/operations/stop")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
@@ -204,7 +204,7 @@ func (m *LparManager) MountIsoImage(lparID string, image []byte, isoFile string,
 	}
 
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "/operations/mount-iso-image")
+	requestUrl.Path = path.Join(requestUrl.Path, lparID, "/operations/mount-iso-image")
 	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
 
 	if err != nil {
@@ -231,7 +231,7 @@ func (m *LparManager) MountIsoImage(lparID string, image []byte, isoFile string,
  */
 func (m *LparManager) UnmountIsoImage(lparID string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "/operations/unmount-iso-image")
+	requestUrl.Path = path.Join(requestUrl.Path, lparID, "/operations/unmount-iso-image")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {

@@ -59,7 +59,7 @@ func main() {
 				} else {
 					fmt.Println("-----------------------")
 					for _, adapter := range adapters {
-						fmt.Println("--")
+						fmt.Println("++++++++++++++++++++++++")
 						fmt.Println("adapter properties: ", adapter)
 					}
 				}
@@ -70,7 +70,7 @@ func main() {
 				} else {
 					fmt.Println("-----------------------")
 					for _, lpar := range lpars {
-						fmt.Println("--")
+						fmt.Println("++++++++++++++++++++++++")
 						fmt.Println("lpar name: ", lpar.Name)
 						fmt.Println("lpar id: ", lpar.URI)
 
@@ -79,6 +79,14 @@ func main() {
 							fmt.Println("Error: ", err.Error())
 						} else {
 							fmt.Println("lpar properties: ", props)
+						}
+
+						fmt.Println("++++++++++++++++++++++++")
+						nics, err := hmcManager.ListNics(lpar.URI)
+						if err != nil {
+							fmt.Println("Error: ", err.Error())
+						} else {
+							fmt.Println("nics properties: ", nics)
 						}
 					}
 				}
