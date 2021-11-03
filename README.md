@@ -23,7 +23,7 @@ go test
 ## Sample Usage
 ```
 make sample-build
-export HMC_ENDPOINT="https://192.168.195.118:9955"
+export HMC_ENDPOINT="https://192.168.195.118:6794"
 export HMC_USERNAME=${username}
 export HMC_PASSWORD=${password}
 ./bin/sample
@@ -33,7 +33,7 @@ or
 
 ```
 make sample-build-mac
-export HMC_ENDPOINT="https://192.168.195.118:9955"
+export HMC_ENDPOINT="https://192.168.195.118:6794"
 export HMC_USERNAME=${username}
 export HMC_PASSWORD=${password}
 ./bin/sample-mac
