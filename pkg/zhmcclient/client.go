@@ -67,12 +67,12 @@ type LogonData struct {
 
 // TODO, Use cache and use JobTopic, ObjectTopic to update cache
 type Session struct {
-	MajorVersion string `json:"api-major-version"`
-	MinorVersion string `json:"api-minor-version"`
+	MajorVersion int    `json:"api-major-version"`
+	MinorVersion int    `json:"api-minor-version"`
 	SessionID    string `json:"api-session"`
 	JobTopic     string `json:"job-notification-topic"`
 	ObjectTopic  string `json:"notification-topic"`
-	Expires      string `json:"password-expires"`
+	Expires      int    `json:"password-expires"`
 	Credential   string `json:"session-credential"`
 }
 

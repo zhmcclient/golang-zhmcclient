@@ -42,7 +42,7 @@ func NewJobManager(client ClientAPI) *JobManager {
  */
 func (m *JobManager) QueryJob(jobID string) (*Job, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/jobs", jobID)
+	requestUrl.Path = path.Join(requestUrl.Path, jobID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -68,7 +68,7 @@ func (m *JobManager) QueryJob(jobID string) (*Job, error) {
  */
 func (m *JobManager) DeleteJob(jobID string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/jobs", jobID)
+	requestUrl.Path = path.Join(requestUrl.Path, jobID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {
@@ -89,7 +89,7 @@ func (m *JobManager) DeleteJob(jobID string) error {
  */
 func (m *JobManager) CancelJob(jobID string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/jobs", jobID, "operations/cancel")
+	requestUrl.Path = path.Join(requestUrl.Path, jobID, "operations/cancel")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {

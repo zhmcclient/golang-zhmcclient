@@ -21,8 +21,8 @@ import (
 //go:generate counterfeiter -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
 	CreateNic(lparID string, nic *NIC) (string, error)
-	DeleteNic(lparID string, nicID string) error
-	GetNicProperties(lparID string, nicID string) (*NIC, error)
+	DeleteNic(lnicID string) error
+	GetNicProperties(lnicID string) (*NIC, error)
 }
 
 type NicManager struct {
@@ -43,7 +43,7 @@ func NewNicManager(client ClientAPI) *NicManager {
  */
 func (m *NicManager) CreateNic(lparID string, nic *NIC) (string, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "nics")
+	requestUrl.Path = path.Join(requestUrl.Path, lparID, "nics")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic)
 	if err != nil {
@@ -67,9 +67,9 @@ func (m *NicManager) CreateNic(lparID string, nic *NIC) (string, error) {
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *NicManager) DeleteNic(lparID string, nicID string) error {
+func (m *NicManager) DeleteNic(nicID string) error {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "nics", nicID)
+	requestUrl.Path = path.Join(requestUrl.Path, nicID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
 	if err != nil {
@@ -88,9 +88,9 @@ func (m *NicManager) DeleteNic(lparID string, nicID string) error {
 * Return: 200 and LparProperties
 *     or: 400, 404,
  */
-func (m *NicManager) GetNicProperties(lparID string, nicID string) (*NIC, error) {
+func (m *NicManager) GetNicProperties(nicID string) (*NIC, error) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, "/api/partitions", lparID, "nics", nicID)
+	requestUrl.Path = path.Join(requestUrl.Path, nicID)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {

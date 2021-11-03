@@ -120,11 +120,11 @@ func (m *ZhmcManager) DeleteHipersocket(adapterID string) error {
 func (m *ZhmcManager) CreateNic(lparID string, nic *NIC) (string, error) {
 	return m.nicManager.CreateNic(lparID, nic)
 }
-func (m *ZhmcManager) DeleteNic(lparID string, nicID string) error {
-	return m.nicManager.DeleteNic(lparID, nicID)
+func (m *ZhmcManager) DeleteNic(nicID string) error {
+	return m.nicManager.DeleteNic(nicID)
 }
-func (m *ZhmcManager) GetNicProperties(lparID string, nicID string) (*NIC, error) {
-	return m.nicManager.GetNicProperties(lparID, nicID)
+func (m *ZhmcManager) GetNicProperties(nicID string) (*NIC, error) {
+	return m.nicManager.GetNicProperties(nicID)
 }
 
 // JOB

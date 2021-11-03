@@ -134,7 +134,7 @@ var _ = Describe("Nic", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
-				err := manager.DeleteNic(lparid, nicid)
+				err := manager.DeleteNic(nicid)
 
 				Expect(err).To(BeNil())
 			})
@@ -144,7 +144,7 @@ var _ = Describe("Nic", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
-				err := manager.DeleteNic(lparid, nicid)
+				err := manager.DeleteNic(nicid)
 
 				Expect(err).ToNot(BeNil())
 			})

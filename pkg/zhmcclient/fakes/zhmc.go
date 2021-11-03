@@ -69,11 +69,10 @@ type ZhmcAPI struct {
 	deleteJobReturnsOnCall map[int]struct {
 		result1 error
 	}
-	DeleteNicStub        func(string, string) error
+	DeleteNicStub        func(string) error
 	deleteNicMutex       sync.RWMutex
 	deleteNicArgsForCall []struct {
 		arg1 string
-		arg2 string
 	}
 	deleteNicReturns struct {
 		result1 error
@@ -94,11 +93,10 @@ type ZhmcAPI struct {
 		result1 *zhmcclient.LparProperties
 		result2 error
 	}
-	GetNicPropertiesStub        func(string, string) (*zhmcclient.NIC, error)
+	GetNicPropertiesStub        func(string) (*zhmcclient.NIC, error)
 	getNicPropertiesMutex       sync.RWMutex
 	getNicPropertiesArgsForCall []struct {
 		arg1 string
-		arg2 string
 	}
 	getNicPropertiesReturns struct {
 		result1 *zhmcclient.NIC
@@ -555,19 +553,18 @@ func (fake *ZhmcAPI) DeleteJobReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *ZhmcAPI) DeleteNic(arg1 string, arg2 string) error {
+func (fake *ZhmcAPI) DeleteNic(arg1 string) error {
 	fake.deleteNicMutex.Lock()
 	ret, specificReturn := fake.deleteNicReturnsOnCall[len(fake.deleteNicArgsForCall)]
 	fake.deleteNicArgsForCall = append(fake.deleteNicArgsForCall, struct {
 		arg1 string
-		arg2 string
-	}{arg1, arg2})
+	}{arg1})
 	stub := fake.DeleteNicStub
 	fakeReturns := fake.deleteNicReturns
-	fake.recordInvocation("DeleteNic", []interface{}{arg1, arg2})
+	fake.recordInvocation("DeleteNic", []interface{}{arg1})
 	fake.deleteNicMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -581,17 +578,17 @@ func (fake *ZhmcAPI) DeleteNicCallCount() int {
 	return len(fake.deleteNicArgsForCall)
 }
 
-func (fake *ZhmcAPI) DeleteNicCalls(stub func(string, string) error) {
+func (fake *ZhmcAPI) DeleteNicCalls(stub func(string) error) {
 	fake.deleteNicMutex.Lock()
 	defer fake.deleteNicMutex.Unlock()
 	fake.DeleteNicStub = stub
 }
 
-func (fake *ZhmcAPI) DeleteNicArgsForCall(i int) (string, string) {
+func (fake *ZhmcAPI) DeleteNicArgsForCall(i int) string {
 	fake.deleteNicMutex.RLock()
 	defer fake.deleteNicMutex.RUnlock()
 	argsForCall := fake.deleteNicArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *ZhmcAPI) DeleteNicReturns(result1 error) {
@@ -681,19 +678,18 @@ func (fake *ZhmcAPI) GetLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.L
 	}{result1, result2}
 }
 
-func (fake *ZhmcAPI) GetNicProperties(arg1 string, arg2 string) (*zhmcclient.NIC, error) {
+func (fake *ZhmcAPI) GetNicProperties(arg1 string) (*zhmcclient.NIC, error) {
 	fake.getNicPropertiesMutex.Lock()
 	ret, specificReturn := fake.getNicPropertiesReturnsOnCall[len(fake.getNicPropertiesArgsForCall)]
 	fake.getNicPropertiesArgsForCall = append(fake.getNicPropertiesArgsForCall, struct {
 		arg1 string
-		arg2 string
-	}{arg1, arg2})
+	}{arg1})
 	stub := fake.GetNicPropertiesStub
 	fakeReturns := fake.getNicPropertiesReturns
-	fake.recordInvocation("GetNicProperties", []interface{}{arg1, arg2})
+	fake.recordInvocation("GetNicProperties", []interface{}{arg1})
 	fake.getNicPropertiesMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -707,17 +703,17 @@ func (fake *ZhmcAPI) GetNicPropertiesCallCount() int {
 	return len(fake.getNicPropertiesArgsForCall)
 }
 
-func (fake *ZhmcAPI) GetNicPropertiesCalls(stub func(string, string) (*zhmcclient.NIC, error)) {
+func (fake *ZhmcAPI) GetNicPropertiesCalls(stub func(string) (*zhmcclient.NIC, error)) {
 	fake.getNicPropertiesMutex.Lock()
 	defer fake.getNicPropertiesMutex.Unlock()
 	fake.GetNicPropertiesStub = stub
 }
 
-func (fake *ZhmcAPI) GetNicPropertiesArgsForCall(i int) (string, string) {
+func (fake *ZhmcAPI) GetNicPropertiesArgsForCall(i int) string {
 	fake.getNicPropertiesMutex.RLock()
 	defer fake.getNicPropertiesMutex.RUnlock()
 	argsForCall := fake.getNicPropertiesArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *ZhmcAPI) GetNicPropertiesReturns(result1 *zhmcclient.NIC, result2 error) {

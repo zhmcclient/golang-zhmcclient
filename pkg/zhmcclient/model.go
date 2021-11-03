@@ -58,6 +58,10 @@ type Adapter struct {
 	Status AdapterStatus `json:"status"`
 }
 
+type AdaptersArray struct {
+	ADAPTERS []Adapter `json:"adapters"`
+}
+
 /**
 * Sample
 * {
@@ -82,6 +86,22 @@ type HipersocketCreateResponse struct {
 //////////////////////////////////////////////////
 // CPC
 //////////////////////////////////////////////////
+
+type CpcStatus string
+
+const (
+	CPC_STATUS_ACTIVE           CpcStatus = "active"
+	CPC_STATUS_OPERATING                  = "operating"
+	CPC_STATUS_NO_COMMUNICATING           = "not-communicating"
+	CPC_STATUS_EXCEPTIONS                 = "exceptions"
+	CPC_STATUS_STATUS_CHECK               = "status-check"
+	CPC_STATUS_SERVICE                    = "service"
+	CPC_STATUS_NOT_OPERATING              = "not-operating"
+	CPC_STATUS_NO_POWER                   = "no-power"
+	CPC_STATUS_SERVICE_REQUIRED           = "service-required"
+	CPC_STATUS_DEGRADED                   = "degraded"
+)
+
 /**
 * Sample:
 * {
@@ -94,12 +114,16 @@ type HipersocketCreateResponse struct {
 * }
  */
 type CPC struct {
-	URI                 string `json:"object-uri"`
-	Name                string `json:"name"`
-	Status              string `json:"status"`
-	HasAcceptableStatus string `json:"has-unacceptable-status"`
-	DpmEnabled          bool   `json:"dpm-enabled"`
-	SeVersion           string `json:"se-version"`
+	URI                 string    `json:"object-uri"`
+	Name                string    `json:"name"`
+	Status              CpcStatus `json:"status"`
+	HasAcceptableStatus bool      `json:"has-unacceptable-status"`
+	DpmEnabled          bool      `json:"dpm-enabled"`
+	SeVersion           string    `json:"se-version"`
+}
+
+type CpcsArray struct {
+	CPCS []CPC `json:"cpcs"`
 }
 
 //////////////////////////////////////////////////
@@ -190,6 +214,16 @@ type LPAR struct {
 	Type   PartitionType   `json:"type"`
 }
 
+type LPARsArray struct {
+	LPARS []LPAR `json:"partitions"`
+}
+
+type PartitionFeatureInfo struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	State       bool   `json:"state"`
+}
+
 type LparProperties struct {
 	URI                              string                        `json:"object-uri"`
 	CpcURI                           string                        `json:"parent"`
@@ -270,7 +304,7 @@ type LparProperties struct {
 	SscDnsServers                    []string                      `json:"ssc-dns-servers"`
 	SscMasterUserid                  string                        `json:"ssc-master-userid"`
 	SscMasterPw                      string                        `json:"ssc-master-pw"`
-	AvailableFeaturesList            []byte                        `json:"available-features-list"`
+	AvailableFeaturesList            []PartitionFeatureInfo        `json:"available-features-list"`
 }
 
 type StartStopLparResponse struct {
