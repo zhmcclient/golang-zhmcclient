@@ -247,7 +247,6 @@ func (c *Client) setUserAgent(req *http.Request) {
 	req.Header.Set("User-Agent", libraryUserAgent)
 }
 
-// TODO, add "Content-Type" according to requestBody
 func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
 	c.setUserAgent(req)
 	req.Header.Add("Content-Type", bodyType)
@@ -259,7 +258,25 @@ func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
 }
 
 func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
-	return c.executeUpload(requestType, url.String(), requestData)
+	retries := DEFAULT_CONNECT_RETRIES
+	responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
+	if IsExpectedHttpStatus(responseStatusCode) {
+		return
+	}
+	for retries > 0 {
+		if responseStatusCode == http.StatusUnauthorized {
+			c.Logon()
+			c.executeUpload(requestType, url.String(), requestData)
+		}
+		if IsExpectedHttpStatus(responseStatusCode) {
+			break
+		} else {
+			fmt.Println("Retry upload...", retries)
+			responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
+			retries -= 1
+		}
+	}
+	return responseStatusCode, responseBodyStream, err
 }
 
 func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
@@ -346,6 +363,7 @@ func (c *Client) executeUpload(requestType string, urlStr string, requestBody []
 	c.setRequestHeaders(request, APPLICATION_BODY_OCTET_STREAM)
 
 	response, err := c.httpClient.Do(request)
+
 	if response == nil {
 		return -1, nil, errors.New("HTTP Response is empty.")
 	}
