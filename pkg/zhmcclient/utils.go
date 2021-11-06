@@ -17,6 +17,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
+	"bufio"
 )
 
 type ErrorBody struct {
@@ -33,6 +35,27 @@ func BuildUrlFromQuery(url *url.URL, query map[string]string) (*url.URL, error) 
 		url.RawQuery = q.Encode()
 	}
 	return url, nil
+}
+
+func RetrieveBytes(filename string) ([]byte, error) {
+    file, err := os.Open(filename)
+
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
+
+    stats, statsErr := file.Stat()
+    if statsErr != nil {
+		fmt.Println(statsErr.Error())
+        return nil, statsErr
+    }
+
+	var size int64 = stats.Size()
+	bytes := make([]byte, size)
+    bufr := bufio.NewReader(file)
+    _,err = bufr.Read(bytes)
+    return bytes, err
 }
 
 func GenerateErrorFromResponse(status int, responseBodyStream []byte) error {

@@ -84,6 +84,34 @@ var _ = Describe("utils", func() {
 		})
 	})
 
+	Describe("RetrieveBytes", func() {
+		var (
+			filename    string
+		)
+
+		BeforeEach(func() {
+			filename, _ = os.Create("data.txt")
+			_, err = filename.WriteString("test data")
+		})
+
+		Context("When no file is passed in", func() {
+			It("returns error", func() {
+				ret, err := RetrieveBytes("")
+
+				Expect(err).ToNot(BeNil())
+				Expect(ret).To(BeNil())
+			})
+		})
+
+		Context("When file is passed in", func() {
+			It("returns byte stream", func() {
+				ret, err := RetrieveBytes(filename)
+				Expect(err).To(BeNil())
+				Expect(ret.Length).ToNot(Equal(0))
+			})
+		})
+	})
+
 	Describe("GenerateErrorFromResponse", func() {
 		var (
 			status     int
