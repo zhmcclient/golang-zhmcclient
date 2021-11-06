@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -86,12 +87,13 @@ var _ = Describe("utils", func() {
 
 	Describe("RetrieveBytes", func() {
 		var (
-			filename    string
+			filename string
 		)
 
 		BeforeEach(func() {
-			filename, _ = os.Create("data.txt")
-			_, err = filename.WriteString("test data")
+			filename = "data.txt"
+			file, _ := os.Create(filename)
+			_, _ = file.WriteString("test data")
 		})
 
 		Context("When no file is passed in", func() {
@@ -107,7 +109,7 @@ var _ = Describe("utils", func() {
 			It("returns byte stream", func() {
 				ret, err := RetrieveBytes(filename)
 				Expect(err).To(BeNil())
-				Expect(ret.Length).ToNot(Equal(0))
+				Expect(len(ret)).ToNot(Equal(0))
 			})
 		})
 	})
