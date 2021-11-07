@@ -40,7 +40,7 @@ func main() {
 		fmt.Println("Error: ", err.Error())
 	}
 	if client != nil {
-		fmt.Println("client initiliazed.")
+		fmt.Println("client initialized.")
 		hmcManager := zhmcclient.NewManagerFromClient(client)
 		ListAll(hmcManager)
 	}
