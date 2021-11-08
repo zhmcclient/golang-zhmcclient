@@ -14,9 +14,9 @@ package zhmcclient
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
-	"fmt"
 )
 
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
@@ -210,7 +210,6 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/mount-iso-image")
 	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
-	fmt.Println("Request URL: ", requestUrl)
 	if err != nil {
 		return err
 	}

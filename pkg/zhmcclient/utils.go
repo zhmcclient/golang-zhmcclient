@@ -12,13 +12,13 @@
 package zhmcclient
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
-	"bufio"
 )
 
 type ErrorBody struct {
@@ -38,24 +38,23 @@ func BuildUrlFromQuery(url *url.URL, query map[string]string) (*url.URL, error) 
 }
 
 func RetrieveBytes(filename string) ([]byte, error) {
-    file, err := os.Open(filename)
+	file, err := os.Open(filename)
 
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
-    stats, statsErr := file.Stat()
-    if statsErr != nil {
-		fmt.Println(statsErr.Error())
-        return nil, statsErr
-    }
+	stats, statsErr := file.Stat()
+	if statsErr != nil {
+		return nil, statsErr
+	}
 
 	var size int64 = stats.Size()
 	bytes := make([]byte, size)
-    bufr := bufio.NewReader(file)
-    _,err = bufr.Read(bytes)
-    return bytes, err
+	bufr := bufio.NewReader(file)
+	_, err = bufr.Read(bytes)
+	return bytes, err
 }
 
 func GenerateErrorFromResponse(status int, responseBodyStream []byte) error {
