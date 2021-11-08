@@ -1,6 +1,8 @@
 # Makefile
 
 BUILD_ROOT=${PWD}
+PKG_DIR=$(PKG)
+FILENAME=$(FILE)
 GO_BLD_ARCH=$(shell go env GOHOSTARCH)
 
 
@@ -12,6 +14,10 @@ clean:
 sample-build: clean
 	CGO_ENABLED=0 GOOS=linux GOARCH=$(GO_BLD_ARCH) go build -a -installsuffix cgo -o $(BUILD_ROOT)/bin/sample $(BUILD_ROOT)/sample.go
 
+
+.PHONY: unit-test
+unit-test:
+	bash go-test.sh $(PKG_DIR) $(FILENAME)
 
 .PHONY: sample-build-mac
 sample-build-mac: clean

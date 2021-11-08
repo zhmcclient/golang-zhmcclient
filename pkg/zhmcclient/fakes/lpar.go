@@ -52,8 +52,8 @@ type LparAPI struct {
 	mountIsoImageMutex       sync.RWMutex
 	mountIsoImageArgsForCall []struct {
 		arg1 string
+		arg2 string
 		arg3 string
-		arg4 string
 	}
 	mountIsoImageReturns struct {
 		result1 error
@@ -307,20 +307,20 @@ func (fake *LparAPI) ListNicsReturnsOnCall(i int, result1 []string, result2 erro
 	}{result1, result2}
 }
 
-func (fake *LparAPI) MountIsoImage(arg1 string, arg3 string, arg4 string) error {
+func (fake *LparAPI) MountIsoImage(arg1 string, arg2 string, arg3 string) error {
 	fake.mountIsoImageMutex.Lock()
 	ret, specificReturn := fake.mountIsoImageReturnsOnCall[len(fake.mountIsoImageArgsForCall)]
 	fake.mountIsoImageArgsForCall = append(fake.mountIsoImageArgsForCall, struct {
 		arg1 string
+		arg2 string
 		arg3 string
-		arg4 string
-	}{arg1, arg3, arg4})
+	}{arg1, arg2, arg3})
 	stub := fake.MountIsoImageStub
 	fakeReturns := fake.mountIsoImageReturns
-	fake.recordInvocation("MountIsoImage", []interface{}{arg1, arg3, arg4})
+	fake.recordInvocation("MountIsoImage", []interface{}{arg1, arg2, arg3})
 	fake.mountIsoImageMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg3, arg4)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
@@ -344,7 +344,7 @@ func (fake *LparAPI) MountIsoImageArgsForCall(i int) (string, string, string) {
 	fake.mountIsoImageMutex.RLock()
 	defer fake.mountIsoImageMutex.RUnlock()
 	argsForCall := fake.mountIsoImageArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *LparAPI) MountIsoImageReturns(result1 error) {

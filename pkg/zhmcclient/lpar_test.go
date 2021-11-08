@@ -16,6 +16,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -372,6 +373,8 @@ var _ = Describe("LPAR", func() {
 
 		BeforeEach(func() {
 			imageFile = "imageFileName"
+			file, _ := os.Create(imageFile)
+			_, _ = file.WriteString("test data")
 			insFile = "insFileName"
 		})
 
