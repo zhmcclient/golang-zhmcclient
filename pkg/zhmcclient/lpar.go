@@ -14,6 +14,7 @@ package zhmcclient
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 )
@@ -27,7 +28,7 @@ type LparAPI interface {
 	StartLPAR(lparURI string) (string, error)
 	StopLPAR(lparURI string) (string, error)
 
-	MountIsoImage(lparURI string, image []byte, isoFile string, insFile string) error
+	MountIsoImage(lparURI string, isoFile string, insFile string) error
 	UnmountIsoImage(lparURI string) error
 
 	ListNics(lparURI string) ([]string, error)
@@ -197,21 +198,24 @@ func (m *LparManager) StopLPAR(lparURI string) (string, error) {
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *LparManager) MountIsoImage(lparURI string, image []byte, isoFile string, insFile string) error {
+func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile string) error {
 	query := map[string]string{
 		"image-name":    isoFile,
 		"ins-file-name": insFile,
 	}
-
+	imageData, byteErr := RetrieveBytes(isoFile)
+	if byteErr != nil {
+		fmt.Println("Error: ", byteErr.Error())
+	}
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/mount-iso-image")
 	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
-
 	if err != nil {
 		return err
 	}
 
-	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, image)
+	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, imageData)
+
 	if err != nil {
 		return err
 	}
@@ -219,7 +223,6 @@ func (m *LparManager) MountIsoImage(lparURI string, image []byte, isoFile string
 	if status == http.StatusNoContent {
 		return nil
 	}
-
 	return GenerateErrorFromResponse(status, responseBody)
 }
 

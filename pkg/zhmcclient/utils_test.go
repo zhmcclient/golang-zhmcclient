@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -80,6 +81,35 @@ var _ = Describe("utils", func() {
 
 				Expect(err).To(BeNil())
 				Expect(ret.String()).To(Equal(url.String() + "?name=lpar1&type=dpm"))
+			})
+		})
+	})
+
+	Describe("RetrieveBytes", func() {
+		var (
+			filename string
+		)
+
+		BeforeEach(func() {
+			filename = "data.txt"
+			file, _ := os.Create(filename)
+			_, _ = file.WriteString("test data")
+		})
+
+		Context("When no file is passed in", func() {
+			It("returns error", func() {
+				ret, err := RetrieveBytes("")
+
+				Expect(err).ToNot(BeNil())
+				Expect(ret).To(BeNil())
+			})
+		})
+
+		Context("When file is passed in", func() {
+			It("returns byte stream", func() {
+				ret, err := RetrieveBytes(filename)
+				Expect(err).To(BeNil())
+				Expect(len(ret)).ToNot(Equal(0))
 			})
 		})
 	})
