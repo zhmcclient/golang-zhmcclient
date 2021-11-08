@@ -80,6 +80,10 @@ func (m *ZhmcManager) ListNics(lparURI string) ([]string, error) {
 	return m.lparManager.ListNics(lparURI)
 }
 
+func (m *ZhmcManager) UpdateBootDevice(lparURI string) error {
+	return m.lparManager.UpdateBootDevice(lparURI)
+}
+
 // Adapter
 func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error) {
 	return m.adapterManager.ListAdapters(cpcURI, query)

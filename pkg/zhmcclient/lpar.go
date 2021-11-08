@@ -32,6 +32,7 @@ type LparAPI interface {
 	UnmountIsoImage(lparURI string) error
 
 	ListNics(lparURI string) ([]string, error)
+	UpdateBootDevice(lparURI string) error
 }
 
 type LparManager struct {
@@ -258,4 +259,25 @@ func (m *LparManager) ListNics(lparURI string) ([]string, error) {
 	}
 
 	return props.NicUris, nil
+}
+
+/**
+* update_property('boot-device') of LPAR
+ */
+func (m *LparManager) UpdateBootDevice(lparURI string) error {
+	props, err := m.GetLparProperties(lparURI)
+	if err != nil {
+		return err
+	}
+	props.BootDevice = BOOT_DEVICE_ISO_IMAGE
+	updateErr := m.UpdateLparProperties(lparURI, props)
+	if updateErr != nil {
+		return updateErr
+	}
+	_, startErr := m.StartLPAR(lparURI)
+
+	if startErr != nil {
+		return startErr
+	}
+	return nil
 }
