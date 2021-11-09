@@ -61,7 +61,10 @@ func main() {
 					- Create linux partition with resources reserved
 					- Create linux resources (storage group: boot vol, data vol)
 						- Create Storage group
+						- Create boot volume
+						- Create data volume
 						- Map Wwpns
+						- Create volumes on storage array (part of LUN sensing)
 					- Attach storage group to partition
 
 				#2 Mount Iso image Usage
@@ -75,7 +78,8 @@ func main() {
 				err := hmcManager.MountIsoImage(lparURI, isofile, insfile)
 
 				#3 Update Lpar Properties
-				- Update the boot device property of the partition to 'iso-image'
+				- Update the boot device property of the partition to 'iso-image' to bring up
+				the partition with the mounted iso image
 				@params:
 				- lparURI: Api endpoint for LPAR (type string)
 				- props: Lpar properties to update (type *zhmcclient.LparProperties)
@@ -85,7 +89,7 @@ func main() {
 				err := hmcManager.UpdateLparProperties(lparURI, props)
 
 				#4 Start Partition
-				- Start the partition on the selected HMC endpoint
+				- Start the partition on the selected HMC endpoint with iso image
 				@params:
 				- lparURI: Api endpoint for LPAR (type string)
 				err := hmcManager.StartPartition(lparURI)
