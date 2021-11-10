@@ -8,11 +8,11 @@ import (
 )
 
 type AdapterAPI struct {
-	CreateHipersocketStub        func(string, *zhmcclient.HypersocketPayload) (string, error)
+	CreateHipersocketStub        func(string, *zhmcclient.HipersocketPayload) (string, error)
 	createHipersocketMutex       sync.RWMutex
 	createHipersocketArgsForCall []struct {
 		arg1 string
-		arg2 *zhmcclient.HypersocketPayload
+		arg2 *zhmcclient.HipersocketPayload
 	}
 	createHipersocketReturns struct {
 		result1 string
@@ -51,12 +51,12 @@ type AdapterAPI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *AdapterAPI) CreateHipersocket(arg1 string, arg2 *zhmcclient.HypersocketPayload) (string, error) {
+func (fake *AdapterAPI) CreateHipersocket(arg1 string, arg2 *zhmcclient.HipersocketPayload) (string, error) {
 	fake.createHipersocketMutex.Lock()
 	ret, specificReturn := fake.createHipersocketReturnsOnCall[len(fake.createHipersocketArgsForCall)]
 	fake.createHipersocketArgsForCall = append(fake.createHipersocketArgsForCall, struct {
 		arg1 string
-		arg2 *zhmcclient.HypersocketPayload
+		arg2 *zhmcclient.HipersocketPayload
 	}{arg1, arg2})
 	stub := fake.CreateHipersocketStub
 	fakeReturns := fake.createHipersocketReturns
@@ -77,13 +77,13 @@ func (fake *AdapterAPI) CreateHipersocketCallCount() int {
 	return len(fake.createHipersocketArgsForCall)
 }
 
-func (fake *AdapterAPI) CreateHipersocketCalls(stub func(string, *zhmcclient.HypersocketPayload) (string, error)) {
+func (fake *AdapterAPI) CreateHipersocketCalls(stub func(string, *zhmcclient.HipersocketPayload) (string, error)) {
 	fake.createHipersocketMutex.Lock()
 	defer fake.createHipersocketMutex.Unlock()
 	fake.CreateHipersocketStub = stub
 }
 
-func (fake *AdapterAPI) CreateHipersocketArgsForCall(i int) (string, *zhmcclient.HypersocketPayload) {
+func (fake *AdapterAPI) CreateHipersocketArgsForCall(i int) (string, *zhmcclient.HipersocketPayload) {
 	fake.createHipersocketMutex.RLock()
 	defer fake.createHipersocketMutex.RUnlock()
 	argsForCall := fake.createHipersocketArgsForCall[i]

@@ -124,7 +124,7 @@ var _ = Describe("Adapter", func() {
 		var (
 			response                *HipersocketCreateResponse
 			responseWithoutURI      *HipersocketCreateResponse
-			payload                 *HypersocketPayload
+			payload                 *HipersocketPayload
 			bytesResponse           []byte
 			bytesResponseWithoutURI []byte
 		)
@@ -136,7 +136,7 @@ var _ = Describe("Adapter", func() {
 			responseWithoutURI = &HipersocketCreateResponse{
 				URI: "",
 			}
-			payload = &HypersocketPayload{
+			payload = &HipersocketPayload{
 				Name:            "name",
 				Description:     "description",
 				PortDescription: "port_description",

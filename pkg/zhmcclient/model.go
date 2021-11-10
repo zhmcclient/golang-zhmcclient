@@ -72,11 +72,11 @@ type AdaptersArray struct {
 * }
 * @return *   "object-uri":"/api/adapters/542b9406-d033-11e5-9f39-020000000338"
  */
-type HypersocketPayload struct {
-	Name            string `json:"name"`
-	Description     string `json:"description"`
-	PortDescription string `json:"port-description"`
-	MaxUnitSize     int    `json:"maximum-transmission-unit-size"`
+type HipersocketPayload struct {
+	Name            string `json:"name,omitempty"`
+	Description     string `json:"description,omitempty"`
+	PortDescription string `json:"port-description,omitempty"`
+	MaxUnitSize     int    `json:"maximum-transmission-unit-size,omitempty"`
 }
 
 type HipersocketCreateResponse struct {

@@ -84,7 +84,7 @@ func (m *ZhmcManager) ListNics(lparURI string) ([]string, error) {
 func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error) {
 	return m.adapterManager.ListAdapters(cpcURI, query)
 }
-func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HypersocketPayload) (string, error) {
+func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error) {
 	return m.adapterManager.CreateHipersocket(cpcURI, adaptor)
 }
 func (m *ZhmcManager) DeleteHipersocket(adapterURI string) error {

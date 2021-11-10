@@ -21,7 +21,7 @@ import (
 //go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
 	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error)
-	CreateHipersocket(cpcURI string, adaptor *HypersocketPayload) (string, error)
+	CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error)
 	DeleteHipersocket(adapterURI string) error
 }
 
@@ -80,7 +80,7 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 * Return: 201 and body with "object-uri"
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HypersocketPayload) (string, error) {
+func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 
