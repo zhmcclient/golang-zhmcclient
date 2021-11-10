@@ -50,12 +50,12 @@ const (
 )
 
 type Adapter struct {
-	URI    string        `json:"object-uri"`
-	Name   string        `json:"name"`
-	ID     string        `json:"adapter-id"`
-	Family AdapterFamily `json:"adapter-family"`
-	Type   AdapterType   `json:"type"`
-	Status AdapterStatus `json:"status"`
+	URI    string        `json:"object-uri,omitempty"`
+	Name   string        `json:"name,omitempty"`
+	ID     string        `json:"adapter-id,omitempty"`
+	Family AdapterFamily `json:"adapter-family,omitempty"`
+	Type   AdapterType   `json:"type,omitempty"`
+	Status AdapterStatus `json:"status,omitempty"`
 }
 
 type AdaptersArray struct {
@@ -114,12 +114,12 @@ const (
 * }
  */
 type CPC struct {
-	URI                 string    `json:"object-uri"`
-	Name                string    `json:"name"`
-	Status              CpcStatus `json:"status"`
-	HasAcceptableStatus bool      `json:"has-unacceptable-status"`
-	DpmEnabled          bool      `json:"dpm-enabled"`
-	SeVersion           string    `json:"se-version"`
+	URI                 string    `json:"object-uri,omitempty"`
+	Name                string    `json:"name,omitempty"`
+	Status              CpcStatus `json:"status,omitempty"`
+	HasAcceptableStatus bool      `json:"has-unacceptable-status,omitempty"`
+	DpmEnabled          bool      `json:"dpm-enabled,omitempty"`
+	SeVersion           string    `json:"se-version,omitempty"`
 }
 
 type CpcsArray struct {
@@ -141,10 +141,10 @@ const (
 
 type Job struct {
 	URI           string
-	Status        JobStatus `json:"status"`
-	JobStatusCode int       `json:"job-status-code"`
-	JobReasonCode int       `json:"job-reason-code"`
-	JobResults    []byte    `json:"job-results"`
+	Status        JobStatus `json:"status,omitempty"`
+	JobStatusCode int       `json:"job-status-code,omitempty"`
+	JobReasonCode int       `json:"job-reason-code,omitempty"`
+	JobResults    []byte    `json:"job-results,omitempty"`
 }
 
 //////////////////////////////////////////////////
@@ -208,10 +208,10 @@ const (
 )
 
 type LPAR struct {
-	URI    string          `json:"object-uri"`
-	Name   string          `json:"name"`
-	Status PartitionStatus `json:"status"`
-	Type   PartitionType   `json:"type"`
+	URI    string          `json:"object-uri,omitempty"`
+	Name   string          `json:"name,omitempty"`
+	Status PartitionStatus `json:"status,omitempty"`
+	Type   PartitionType   `json:"type,omitempty"`
 }
 
 type LPARsArray struct {
@@ -219,9 +219,9 @@ type LPARsArray struct {
 }
 
 type PartitionFeatureInfo struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	State       bool   `json:"state"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	State       bool   `json:"state,omitempty"`
 }
 
 type LparProperties struct {
@@ -340,25 +340,25 @@ const (
 )
 
 type NIC struct {
-	ID     string `json:"element-id"`
-	URI    string `json:"element-uri"`
-	Parent string `json:"parent"`
-	Class  string `default:"nic"`
+	ID     string `json:"element-id,omitempty"`
+	URI    string `json:"element-uri,omitempty"`
+	Parent string `json:"parent,omitempty"`
+	Class  string `default:"nic,omitempty"`
 	/* below are payloads when create a new Nic */
-	Name                  string           `json:"name"`
-	Description           string           `json:"description"`
-	DeviceNumber          string           `json:"device-number"`
-	NetworkAdapterPortURI string           `json:"network-adapter-port-uri"`
-	VirtualSwitchUriType  string           `json:"virtual-switch-uri-type"`
-	VirtualSwitchURI      string           `json:"virtual-switch-uri"`
-	Type                  NicType          `json:"type"`
-	SscManagmentNIC       bool             `json:"ssc-management-nic"`
-	SscIpAddressType      SscIpAddressType `json:"ssc-ip-address-type"`
-	SscIpAddress          string           `json:"ssc-ip-address"`
-	VlanID                int              `json:"vlan-id"`
-	MacAddress            string           `json:"mac-address"`
-	SscMaskPrefix         string           `json:"ssc-mask-prefix"`
-	VlanType              VlanType         `json:"vlan-type"`
+	Name                  string           `json:"name,omitempty"`
+	Description           string           `json:"description,omitempty"`
+	DeviceNumber          string           `json:"device-number,omitempty"`
+	NetworkAdapterPortURI string           `json:"network-adapter-port-uri,omitempty"`
+	VirtualSwitchUriType  string           `json:"virtual-switch-uri-type,omitempty"`
+	VirtualSwitchURI      string           `json:"virtual-switch-uri,omitempty"`
+	Type                  NicType          `json:"type,omitempty"`
+	SscManagmentNIC       bool             `json:"ssc-management-nic,omitempty"`
+	SscIpAddressType      SscIpAddressType `json:"ssc-ip-address-type,omitempty"`
+	SscIpAddress          string           `json:"ssc-ip-address,omitempty"`
+	VlanID                int              `json:"vlan-id,omitempty"`
+	MacAddress            string           `json:"mac-address,omitempty"`
+	SscMaskPrefix         string           `json:"ssc-mask-prefix,omitempty"`
+	VlanType              VlanType         `json:"vlan-type,omitempty"`
 }
 
 type NicCreateResponse struct {
