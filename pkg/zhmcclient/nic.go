@@ -21,8 +21,8 @@ import (
 //go:generate counterfeiter -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
 	CreateNic(lparURI string, nic *NIC) (string, error)
-	DeleteNic(lnicURI string) error
-	GetNicProperties(lnicURI string) (*NIC, error)
+	DeleteNic(nicURI string) error
+	GetNicProperties(nicURI string) (*NIC, error)
 }
 
 type NicManager struct {

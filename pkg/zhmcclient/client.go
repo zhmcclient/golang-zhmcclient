@@ -54,10 +54,10 @@ const (
 )
 
 type Options struct {
-	Username string
-	Password string
-	Trace    bool
-	SkipCert bool
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Trace    bool   `json:"trace,omitempty"`
+	SkipCert bool   `json:"skip-cert,omitempty"`
 }
 
 type LogonData struct {
@@ -67,13 +67,13 @@ type LogonData struct {
 
 // TODO, Use cache and use JobTopic, ObjectTopic to update cache
 type Session struct {
-	MajorVersion int    `json:"api-major-version"`
-	MinorVersion int    `json:"api-minor-version"`
-	SessionID    string `json:"api-session"`
-	JobTopic     string `json:"job-notification-topic"`
-	ObjectTopic  string `json:"notification-topic"`
-	Expires      int    `json:"password-expires"`
-	Credential   string `json:"session-credential"`
+	MajorVersion int    `json:"api-major-version,omitempty"`
+	MinorVersion int    `json:"api-minor-version,omitempty"`
+	SessionID    string `json:"api-session,omitempty"`
+	JobTopic     string `json:"job-notification-topic,omitempty"`
+	ObjectTopic  string `json:"notification-topic,omitempty"`
+	Expires      int    `json:"password-expires,omitempty"`
+	Credential   string `json:"session-credential,omitempty"`
 }
 
 type Client struct {
