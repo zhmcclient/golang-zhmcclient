@@ -199,11 +199,10 @@ func (m *LparManager) StopLPAR(lparURI string) (string, error) {
 *     or: 400, 403, 404, 409, 503
  */
 func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile string) error {
-	pureIsoName := path.Base(isoFile)
 	pureInsName := path.Base(insFile)
 	query := map[string]string{
-		"image-name":    pureIsoName,
-		"ins-file-name": pureInsName,
+		"image-name":    isoFile,
+		"ins-file-name": "/boot/" + pureInsName,
 	}
 	imageData, byteErr := RetrieveBytes(isoFile)
 	if byteErr != nil {
