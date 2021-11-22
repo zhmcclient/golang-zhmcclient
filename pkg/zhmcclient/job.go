@@ -18,7 +18,7 @@ import (
 )
 
 // JobAPI defines an interface for issuing Job requests to ZHMC
-//go:generate counterfeiter -o fakes/job.go --fake-name JobAPI . JobAPI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/job.go --fake-name JobAPI . JobAPI
 type JobAPI interface {
 	QueryJob(jobURI string) (*Job, error)
 	DeleteJob(jobURI string) error
