@@ -155,6 +155,19 @@ func IsExpectedHttpStatus(status int) bool {
 	return false
 }
 
+func NeedLogon(status, reason int) bool {
+	if status == http.StatusUnauthorized {
+		return true
+	}
+
+	if status == http.StatusForbidden {
+		if reason == 4 || reason == 5 {
+			return true
+		}
+	}
+	return false
+}
+
 /**
 * make a copy of the URL as it may be changed.
  */
@@ -263,8 +276,9 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	if IsExpectedHttpStatus(responseStatusCode) {
 		return
 	}
+
 	for retries > 0 {
-		if responseStatusCode == http.StatusUnauthorized {
+		if NeedLogon(responseStatusCode, GetErrorReason(responseBodyStream)) {
 			c.Logon()
 			c.executeUpload(requestType, url.String(), requestData)
 		}
@@ -291,13 +305,14 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 		retries = DEFAULT_CONNECT_RETRIES
 	}
 
-	if retries <= 0 {
-		retries = 1
+	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
+	if IsExpectedHttpStatus(responseStatusCode) || err == nil { // Known error, don't retry
+		return responseStatusCode, responseBodyStream, err
 	}
 
 	for retries > 0 {
 		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
-		if responseStatusCode == http.StatusUnauthorized { // 1. invalid session, logon again
+		if NeedLogon(responseStatusCode, GetErrorReason(responseBodyStream)) { // 1. invalid session, logon again
 			c.Logon()
 			c.executeMethod(requestType, url.String(), requestData)
 		}

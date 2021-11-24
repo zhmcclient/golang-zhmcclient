@@ -185,3 +185,20 @@ func GenerateErrorFromResponse(status int, responseBodyStream []byte) error {
 	}
 	return errors.New("HTTP Error: " + fmt.Sprint(status))
 }
+
+/**
+* return:
+       Reason code
+	   -1 : when err to unmarshal the body
+	   0  : when there is no reason
+*/
+func GetErrorReason(responseBodyStream []byte) int {
+	errBody := &ErrorBody{}
+	err := json.Unmarshal(responseBodyStream, errBody)
+
+	if err != nil {
+		return -1
+	}
+
+	return errBody.Reason
+}

@@ -43,13 +43,13 @@ const (
 
 // List of success status.
 var KNOWN_SUCCESS_STATUS = []int{
-	http.StatusOK,                  // 200
-	http.StatusCreated,             // 201
-	http.StatusAccepted,            // 202
-	http.StatusNoContent,           // 204
-	http.StatusPartialContent,      // 206
-	http.StatusBadRequest,          // 400
-	http.StatusForbidden,           // 403
+	http.StatusOK,             // 200
+	http.StatusCreated,        // 201
+	http.StatusAccepted,       // 202
+	http.StatusNoContent,      // 204
+	http.StatusPartialContent, // 206
+	http.StatusBadRequest,     // 400
+	//http.StatusForbidden,    // 403, 403 susally caused by expired session header, we need handle it separately
 	http.StatusNotFound,            // 404
 	http.StatusConflict,            // 409
 	http.StatusInternalServerError, // 500

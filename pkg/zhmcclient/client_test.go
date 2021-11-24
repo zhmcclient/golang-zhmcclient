@@ -28,7 +28,6 @@ var _ = Describe("client", func() {
 								http.StatusNoContent,
 								http.StatusPartialContent,
 								http.StatusBadRequest,
-								http.StatusForbidden,
 								http.StatusNotFound,
 								http.StatusConflict,
 								http.StatusInternalServerError,
@@ -62,11 +61,6 @@ var _ = Describe("client", func() {
 			})
 			It("returns true", func() {
 				var staus = http.StatusBadRequest
-				ret := IsExpectedHttpStatus(staus)
-				Expect(ret).To(Equal(true))
-			})
-			It("returns true", func() {
-				var staus = http.StatusForbidden
 				ret := IsExpectedHttpStatus(staus)
 				Expect(ret).To(Equal(true))
 			})
@@ -143,5 +137,81 @@ var _ = Describe("client", func() {
 			})
 		})
 
+	})
+
+	Describe("NeedLogon", func() {
+
+		Context("status is 401", func() {
+			It("returns true", func() {
+				ret := NeedLogon(401, 0)
+				Expect(ret).To(Equal(true))
+			})
+		})
+
+		Context("status is 403", func() {
+			It("returns true when reason is 4 0r 5", func() {
+				ret := NeedLogon(403, 4)
+				Expect(ret).To(Equal(true))
+
+				ret = NeedLogon(403, 5)
+				Expect(ret).To(Equal(true))
+			})
+		})
+
+		Context("status is 403", func() {
+			It("returns false when reason is not 4 or 5", func() {
+				ret := NeedLogon(403, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(403, -1)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(403, 1)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(403, 2)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(403, 3)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(403, 6)
+				Expect(ret).To(Equal(false))
+			})
+		})
+
+		Context("status is not 401 or 403", func() {
+			It("returns false", func() {
+				ret := NeedLogon(200, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(201, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(202, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(204, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(206, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(400, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(404, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(409, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(500, 0)
+				Expect(ret).To(Equal(false))
+
+				ret = NeedLogon(503, 0)
+				Expect(ret).To(Equal(false))
+			})
+		})
 	})
 })

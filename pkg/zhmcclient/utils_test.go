@@ -209,4 +209,49 @@ var _ = Describe("utils", func() {
 		})
 
 	})
+
+	Describe("GetErrorReason", func() {
+		var (
+			errFull          *ErrorBody
+			errWithoutReason *ErrorBody
+
+			errByte              []byte
+			errWithoutReasonByte []byte
+		)
+
+		BeforeEach(func() {
+			errFull = &ErrorBody{
+				Reason:  1,
+				Message: "errMessage",
+			}
+			errWithoutReason = &ErrorBody{
+				Message: "errMessage",
+			}
+			errByte, _ = json.Marshal(errFull)
+			errWithoutReasonByte, _ = json.Marshal(errWithoutReason)
+		})
+
+		Context("reason is not empty", func() {
+			It("returns reason directly", func() {
+				rets := GetErrorReason(errByte)
+				Expect(rets).To(Equal(1))
+			})
+		})
+
+		Context("reason is empty", func() {
+			It("returns -1", func() {
+				rets := GetErrorReason(errWithoutReasonByte)
+				Expect(rets).To(Equal(0))
+			})
+		})
+
+		Context("unmarshal err", func() {
+			str := "strstr"
+			It("returns -1", func() {
+				rets := GetErrorReason([]byte(str))
+				Expect(rets).To(Equal(-1))
+			})
+		})
+
+	})
 })
