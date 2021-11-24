@@ -106,6 +106,19 @@ type ZhmcAPI struct {
 		result1 *zhmcclient.NIC
 		result2 error
 	}
+	GetVirtualSwitchPropertiesStub        func(string) (*zhmcclient.VirtualSwitch, error)
+	getVirtualSwitchPropertiesMutex       sync.RWMutex
+	getVirtualSwitchPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getVirtualSwitchPropertiesReturns struct {
+		result1 *zhmcclient.VirtualSwitch
+		result2 error
+	}
+	getVirtualSwitchPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.VirtualSwitch
+		result2 error
+	}
 	ListAdaptersStub        func(string, map[string]string) ([]zhmcclient.Adapter, error)
 	listAdaptersMutex       sync.RWMutex
 	listAdaptersArgsForCall []struct {
@@ -158,6 +171,19 @@ type ZhmcAPI struct {
 	}
 	listNicsReturnsOnCall map[int]struct {
 		result1 []string
+		result2 error
+	}
+	ListVirtualSwitchesStub        func(string) ([]zhmcclient.VirtualSwitch, error)
+	listVirtualSwitchesMutex       sync.RWMutex
+	listVirtualSwitchesArgsForCall []struct {
+		arg1 string
+	}
+	listVirtualSwitchesReturns struct {
+		result1 []zhmcclient.VirtualSwitch
+		result2 error
+	}
+	listVirtualSwitchesReturnsOnCall map[int]struct {
+		result1 []zhmcclient.VirtualSwitch
 		result2 error
 	}
 	MountIsoImageStub        func(string, string, string) error
@@ -741,6 +767,70 @@ func (fake *ZhmcAPI) GetNicPropertiesReturnsOnCall(i int, result1 *zhmcclient.NI
 	}{result1, result2}
 }
 
+func (fake *ZhmcAPI) GetVirtualSwitchProperties(arg1 string) (*zhmcclient.VirtualSwitch, error) {
+	fake.getVirtualSwitchPropertiesMutex.Lock()
+	ret, specificReturn := fake.getVirtualSwitchPropertiesReturnsOnCall[len(fake.getVirtualSwitchPropertiesArgsForCall)]
+	fake.getVirtualSwitchPropertiesArgsForCall = append(fake.getVirtualSwitchPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetVirtualSwitchPropertiesStub
+	fakeReturns := fake.getVirtualSwitchPropertiesReturns
+	fake.recordInvocation("GetVirtualSwitchProperties", []interface{}{arg1})
+	fake.getVirtualSwitchPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ZhmcAPI) GetVirtualSwitchPropertiesCallCount() int {
+	fake.getVirtualSwitchPropertiesMutex.RLock()
+	defer fake.getVirtualSwitchPropertiesMutex.RUnlock()
+	return len(fake.getVirtualSwitchPropertiesArgsForCall)
+}
+
+func (fake *ZhmcAPI) GetVirtualSwitchPropertiesCalls(stub func(string) (*zhmcclient.VirtualSwitch, error)) {
+	fake.getVirtualSwitchPropertiesMutex.Lock()
+	defer fake.getVirtualSwitchPropertiesMutex.Unlock()
+	fake.GetVirtualSwitchPropertiesStub = stub
+}
+
+func (fake *ZhmcAPI) GetVirtualSwitchPropertiesArgsForCall(i int) string {
+	fake.getVirtualSwitchPropertiesMutex.RLock()
+	defer fake.getVirtualSwitchPropertiesMutex.RUnlock()
+	argsForCall := fake.getVirtualSwitchPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) GetVirtualSwitchPropertiesReturns(result1 *zhmcclient.VirtualSwitch, result2 error) {
+	fake.getVirtualSwitchPropertiesMutex.Lock()
+	defer fake.getVirtualSwitchPropertiesMutex.Unlock()
+	fake.GetVirtualSwitchPropertiesStub = nil
+	fake.getVirtualSwitchPropertiesReturns = struct {
+		result1 *zhmcclient.VirtualSwitch
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) GetVirtualSwitchPropertiesReturnsOnCall(i int, result1 *zhmcclient.VirtualSwitch, result2 error) {
+	fake.getVirtualSwitchPropertiesMutex.Lock()
+	defer fake.getVirtualSwitchPropertiesMutex.Unlock()
+	fake.GetVirtualSwitchPropertiesStub = nil
+	if fake.getVirtualSwitchPropertiesReturnsOnCall == nil {
+		fake.getVirtualSwitchPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.VirtualSwitch
+			result2 error
+		})
+	}
+	fake.getVirtualSwitchPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.VirtualSwitch
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *ZhmcAPI) ListAdapters(arg1 string, arg2 map[string]string) ([]zhmcclient.Adapter, error) {
 	fake.listAdaptersMutex.Lock()
 	ret, specificReturn := fake.listAdaptersReturnsOnCall[len(fake.listAdaptersArgsForCall)]
@@ -995,6 +1085,70 @@ func (fake *ZhmcAPI) ListNicsReturnsOnCall(i int, result1 []string, result2 erro
 	}
 	fake.listNicsReturnsOnCall[i] = struct {
 		result1 []string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) ListVirtualSwitches(arg1 string) ([]zhmcclient.VirtualSwitch, error) {
+	fake.listVirtualSwitchesMutex.Lock()
+	ret, specificReturn := fake.listVirtualSwitchesReturnsOnCall[len(fake.listVirtualSwitchesArgsForCall)]
+	fake.listVirtualSwitchesArgsForCall = append(fake.listVirtualSwitchesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.ListVirtualSwitchesStub
+	fakeReturns := fake.listVirtualSwitchesReturns
+	fake.recordInvocation("ListVirtualSwitches", []interface{}{arg1})
+	fake.listVirtualSwitchesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ZhmcAPI) ListVirtualSwitchesCallCount() int {
+	fake.listVirtualSwitchesMutex.RLock()
+	defer fake.listVirtualSwitchesMutex.RUnlock()
+	return len(fake.listVirtualSwitchesArgsForCall)
+}
+
+func (fake *ZhmcAPI) ListVirtualSwitchesCalls(stub func(string) ([]zhmcclient.VirtualSwitch, error)) {
+	fake.listVirtualSwitchesMutex.Lock()
+	defer fake.listVirtualSwitchesMutex.Unlock()
+	fake.ListVirtualSwitchesStub = stub
+}
+
+func (fake *ZhmcAPI) ListVirtualSwitchesArgsForCall(i int) string {
+	fake.listVirtualSwitchesMutex.RLock()
+	defer fake.listVirtualSwitchesMutex.RUnlock()
+	argsForCall := fake.listVirtualSwitchesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) ListVirtualSwitchesReturns(result1 []zhmcclient.VirtualSwitch, result2 error) {
+	fake.listVirtualSwitchesMutex.Lock()
+	defer fake.listVirtualSwitchesMutex.Unlock()
+	fake.ListVirtualSwitchesStub = nil
+	fake.listVirtualSwitchesReturns = struct {
+		result1 []zhmcclient.VirtualSwitch
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) ListVirtualSwitchesReturnsOnCall(i int, result1 []zhmcclient.VirtualSwitch, result2 error) {
+	fake.listVirtualSwitchesMutex.Lock()
+	defer fake.listVirtualSwitchesMutex.Unlock()
+	fake.ListVirtualSwitchesStub = nil
+	if fake.listVirtualSwitchesReturnsOnCall == nil {
+		fake.listVirtualSwitchesReturnsOnCall = make(map[int]struct {
+			result1 []zhmcclient.VirtualSwitch
+			result2 error
+		})
+	}
+	fake.listVirtualSwitchesReturnsOnCall[i] = struct {
+		result1 []zhmcclient.VirtualSwitch
 		result2 error
 	}{result1, result2}
 }
@@ -1396,6 +1550,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.getLparPropertiesMutex.RUnlock()
 	fake.getNicPropertiesMutex.RLock()
 	defer fake.getNicPropertiesMutex.RUnlock()
+	fake.getVirtualSwitchPropertiesMutex.RLock()
+	defer fake.getVirtualSwitchPropertiesMutex.RUnlock()
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	fake.listCPCsMutex.RLock()
@@ -1404,6 +1560,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.listLPARsMutex.RUnlock()
 	fake.listNicsMutex.RLock()
 	defer fake.listNicsMutex.RUnlock()
+	fake.listVirtualSwitchesMutex.RLock()
+	defer fake.listVirtualSwitchesMutex.RUnlock()
 	fake.mountIsoImageMutex.RLock()
 	defer fake.mountIsoImageMutex.RUnlock()
 	fake.queryJobMutex.RLock()

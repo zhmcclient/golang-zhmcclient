@@ -18,7 +18,7 @@ import (
 )
 
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
-//go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
 	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error)
 	CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error)

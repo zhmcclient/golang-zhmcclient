@@ -20,7 +20,7 @@ import (
 )
 
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
-//go:generate counterfeiter -o fakes/lpar.go --fake-name LparAPI . LparAPI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
 	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, error)
 	GetLparProperties(lparURI string) (*LparProperties, error)

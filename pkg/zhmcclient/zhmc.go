@@ -12,22 +12,24 @@
 package zhmcclient
 
 // ZhmcAPI defines an interface for issuing requests to ZHMC
-//go:generate counterfeiter -o fakes/zhmc.go --fake-name ZhmcAPI . ZhmcAPI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/zhmc.go --fake-name ZhmcAPI . ZhmcAPI
 type ZhmcAPI interface {
 	CpcAPI
 	LparAPI
 	NicAPI
 	AdapterAPI
+	VirtualSwitchAPI
 	JobAPI
 }
 
 type ZhmcManager struct {
-	client         ClientAPI
-	cpcManager     CpcAPI
-	lparManager    LparAPI
-	adapterManager AdapterAPI
-	nicManager     NicAPI
-	jobManager     JobAPI
+	client               ClientAPI
+	cpcManager           CpcAPI
+	lparManager          LparAPI
+	adapterManager       AdapterAPI
+	virtualSwitchManager VirtualSwitchAPI
+	nicManager           NicAPI
+	jobManager           JobAPI
 }
 
 func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
@@ -40,12 +42,13 @@ func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
 
 func NewManagerFromClient(client ClientAPI) ZhmcAPI {
 	return &ZhmcManager{
-		client:         client,
-		cpcManager:     NewCpcManager(client),
-		lparManager:    NewLparManager(client),
-		adapterManager: NewAdapterManager(client),
-		nicManager:     NewNicManager(client),
-		jobManager:     NewJobManager(client),
+		client:               client,
+		cpcManager:           NewCpcManager(client),
+		lparManager:          NewLparManager(client),
+		adapterManager:       NewAdapterManager(client),
+		virtualSwitchManager: NewVirtualSwitchManager(client),
+		nicManager:           NewNicManager(client),
+		jobManager:           NewJobManager(client),
 	}
 }
 
@@ -89,6 +92,16 @@ func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPaylo
 }
 func (m *ZhmcManager) DeleteHipersocket(adapterURI string) error {
 	return m.adapterManager.DeleteHipersocket(adapterURI)
+}
+
+// Virtual Switches
+
+func (m *ZhmcManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, error) {
+	return m.virtualSwitchManager.ListVirtualSwitches(cpcURI)
+}
+
+func (m *ZhmcManager) GetVirtualSwitchProperties(vsSwitchId string) (*VirtualSwitch, error) {
+	return m.virtualSwitchManager.GetVirtualSwitchProperties(vsSwitchId)
 }
 
 // NIC

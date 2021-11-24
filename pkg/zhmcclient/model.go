@@ -84,6 +84,26 @@ type HipersocketCreateResponse struct {
 }
 
 //////////////////////////////////////////////////
+// Virtual Switches
+//////////////////////////////////////////////////
+
+type VirtualSwitchType string
+
+const (
+	VIRTUALSWITCH_TYPE_HIPERSOCKET VirtualSwitchType = "hipersockets"
+)
+
+type VirtualSwitchesArray struct {
+	VIRTUALSWITCHES []VirtualSwitch `json:"virtual-switches"`
+}
+
+type VirtualSwitch struct {
+	URI  string            `json:"object-uri,omitempty"`
+	Name string            `json:"name,omitempty"`
+	Type VirtualSwitchType `json:"type,omitempty"`
+}
+
+//////////////////////////////////////////////////
 // CPC
 //////////////////////////////////////////////////
 
