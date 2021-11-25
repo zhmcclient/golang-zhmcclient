@@ -20,9 +20,9 @@ import (
 // NicAPI defines an interface for issuing NIC requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
-	CreateNic(lparURI string, nic *NIC) (string, error)
-	DeleteNic(nicURI string) error
-	GetNicProperties(nicURI string) (*NIC, error)
+	CreateNic(lparURI string, nic *NIC) (string, *HmcError)
+	DeleteNic(nicURI string) *HmcError
+	GetNicProperties(nicURI string) (*NIC, *HmcError)
 }
 
 type NicManager struct {
@@ -41,7 +41,7 @@ func NewNicManager(client ClientAPI) *NicManager {
 * Return: 201 and element-uri
 *     or: 400, 403, 404, 409, 503,
  */
-func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, error) {
+func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "nics")
 
@@ -52,14 +52,14 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, error) {
 
 	if status == http.StatusCreated {
 		uriObj := NicCreateResponse{}
-		err = json.Unmarshal(responseBody, &uriObj)
+		err := json.Unmarshal(responseBody, &uriObj)
 		if err != nil {
-			return "", err
+			return "", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return uriObj.URI, nil
 	}
 
-	return "", GenerateErrorFromResponse(status, responseBody)
+	return "", GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -67,7 +67,7 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, error) {
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *NicManager) DeleteNic(nicURI string) error {
+func (m *NicManager) DeleteNic(nicURI string) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
 
@@ -80,7 +80,7 @@ func (m *NicManager) DeleteNic(nicURI string) error {
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -88,7 +88,7 @@ func (m *NicManager) DeleteNic(nicURI string) error {
 * Return: 200 and LparProperties
 *     or: 400, 404,
  */
-func (m *NicManager) GetNicProperties(nicURI string) (*NIC, error) {
+func (m *NicManager) GetNicProperties(nicURI string) (*NIC, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
 
@@ -99,13 +99,13 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, error) {
 
 	if status == http.StatusOK {
 		nic := NIC{}
-		err = json.Unmarshal(responseBody, &nic)
+		err := json.Unmarshal(responseBody, &nic)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 
 		return &nic, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }

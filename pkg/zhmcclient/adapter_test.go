@@ -13,7 +13,6 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -25,11 +24,12 @@ import (
 
 var _ = Describe("Adapter", func() {
 	var (
-		manager    *AdapterManager
-		fakeClient *fakes.ClientAPI
-		cpcid      string
-		adapterid  string
-		url        *url.URL
+		manager              *AdapterManager
+		fakeClient           *fakes.ClientAPI
+		cpcid                string
+		adapterid            string
+		url                  *url.URL
+		hmcErr, unmarshalErr *HmcError
 	)
 
 	BeforeEach(func() {
@@ -39,6 +39,16 @@ var _ = Describe("Adapter", func() {
 		url, _ = url.Parse("https://127.0.0.1:443")
 		cpcid = "cpcid"
 		adapterid = "adapterid"
+
+		hmcErr = &HmcError{
+			Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+			Message: "error message",
+		}
+
+		unmarshalErr = &HmcError{
+			Reason:  int(ERR_CODE_HMC_UNMARSHAL_FAIL),
+			Message: "invalid character 'i' looking for beginning of value",
+		}
 	})
 
 	Describe("ListAdapters", func() {
@@ -89,10 +99,10 @@ var _ = Describe("Adapter", func() {
 		Context("When list adapters and returns error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
 				rets, err := manager.ListAdapters(cpcid, nil)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -100,10 +110,10 @@ var _ = Describe("Adapter", func() {
 		Context("When list adapters and unmarshal error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
 				rets, err := manager.ListAdapters(cpcid, nil)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -162,10 +172,10 @@ var _ = Describe("Adapter", func() {
 		Context("When CreateHipersocket and ExecuteRequest error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
 				rets, err := manager.CreateHipersocket(cpcid, payload)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(Equal(""))
 			})
 		})
@@ -173,10 +183,10 @@ var _ = Describe("Adapter", func() {
 		Context("When CreateHipersocket and unmarshal error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
 				rets, err := manager.CreateHipersocket(cpcid, payload)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(Equal(""))
 			})
 		})
@@ -184,10 +194,10 @@ var _ = Describe("Adapter", func() {
 		Context("When CreateHipersocket and no URI responded", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusCreated, bytesResponseWithoutURI, nil)
 				rets, err := manager.CreateHipersocket(cpcid, payload)
 
-				Expect(err).ToNot(BeNil())
+				Expect(err).To(BeNil())
 				Expect(rets).To(Equal(""))
 			})
 		})
@@ -208,10 +218,10 @@ var _ = Describe("Adapter", func() {
 		Context("When DeleteHipersocket and ExecuteRequest error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
 				err := manager.DeleteHipersocket(adapterid)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 			})
 		})
 	})

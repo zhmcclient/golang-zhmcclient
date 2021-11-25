@@ -20,9 +20,9 @@ import (
 // JobAPI defines an interface for issuing Job requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/job.go --fake-name JobAPI . JobAPI
 type JobAPI interface {
-	QueryJob(jobURI string) (*Job, error)
-	DeleteJob(jobURI string) error
-	CancelJob(jobURI string) error
+	QueryJob(jobURI string) (*Job, *HmcError)
+	DeleteJob(jobURI string) *HmcError
+	CancelJob(jobURI string) *HmcError
 }
 
 type JobManager struct {
@@ -40,7 +40,7 @@ func NewJobManager(client ClientAPI) *JobManager {
 * Return: 200 and job status
 *     or: 400, 404
  */
-func (m *JobManager) QueryJob(jobURI string) (*Job, error) {
+func (m *JobManager) QueryJob(jobURI string) (*Job, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
@@ -51,14 +51,14 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, error) {
 
 	if status == http.StatusOK {
 		myjob := Job{}
-		err = json.Unmarshal(responseBody, &myjob)
+		err := json.Unmarshal(responseBody, &myjob)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return &myjob, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -66,7 +66,7 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, error) {
 * Return: 204
 *     or: 400, 404, 409
  */
-func (m *JobManager) DeleteJob(jobURI string) error {
+func (m *JobManager) DeleteJob(jobURI string) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
@@ -79,7 +79,7 @@ func (m *JobManager) DeleteJob(jobURI string) error {
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -87,7 +87,7 @@ func (m *JobManager) DeleteJob(jobURI string) error {
 * Return: 204
 *     or: 400, 404, 409
  */
-func (m *JobManager) CancelJob(jobURI string) error {
+func (m *JobManager) CancelJob(jobURI string) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI, "operations/cancel")
 
@@ -100,5 +100,5 @@ func (m *JobManager) CancelJob(jobURI string) error {
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }

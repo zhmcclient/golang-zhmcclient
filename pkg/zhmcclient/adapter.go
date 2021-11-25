@@ -20,9 +20,9 @@ import (
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
-	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error)
-	CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error)
-	DeleteHipersocket(adapterURI string) error
+	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError)
+	CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, *HmcError)
+	DeleteHipersocket(adapterURI string) *HmcError
 }
 
 type AdapterManager struct {
@@ -48,13 +48,10 @@ func NewAdapterManager(client ClientAPI) *AdapterManager {
 * Return: 200 and Adapters array
 *     or: 400, 404, 409
  */
-func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error) {
+func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
-	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
-	if err != nil {
-		return nil, err
-	}
+	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -63,14 +60,14 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 
 	if status == http.StatusOK {
 		adapters := &AdaptersArray{}
-		err = json.Unmarshal(responseBody, adapters)
+		err := json.Unmarshal(responseBody, adapters)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return adapters.ADAPTERS, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -80,7 +77,7 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 * Return: 201 and body with "object-uri"
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error) {
+func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 
@@ -91,14 +88,14 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 
 	if status == http.StatusCreated {
 		uriObj := HipersocketCreateResponse{}
-		err = json.Unmarshal(responseBody, &uriObj)
+		err := json.Unmarshal(responseBody, &uriObj)
 		if err != nil {
-			return "", err
+			return "", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return uriObj.URI, nil
 	}
 
-	return "", GenerateErrorFromResponse(status, responseBody)
+	return "", GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -107,7 +104,7 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *AdapterManager) DeleteHipersocket(adapterURI string) error {
+func (m *AdapterManager) DeleteHipersocket(adapterURI string) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
 
@@ -120,5 +117,5 @@ func (m *AdapterManager) DeleteHipersocket(adapterURI string) error {
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }

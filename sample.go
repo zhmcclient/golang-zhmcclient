@@ -35,7 +35,7 @@ func main() {
 	fmt.Println("HMC_PASSWORD: xxxxxx")
 	client, err := zhmcclient.NewClient(endpoint, creds)
 	if err != nil {
-		fmt.Println("Error: ", err.Error())
+		fmt.Println("Error: ", err.Message)
 	}
 	if client != nil {
 		fmt.Println("client initialized.")
@@ -109,7 +109,7 @@ func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 	cpcs,
 		err := hmcManager.ListCPCs(query)
 	if err != nil {
-		fmt.Println("Error: ", err.Error())
+		fmt.Println("Error: ", err.Message)
 	} else {
 		for _, cpc := range cpcs {
 			fmt.Println("########################################")
@@ -119,7 +119,7 @@ func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 			adapters,
 				err := hmcManager.ListAdapters(cpc.URI, query)
 			if err != nil {
-				fmt.Println("Error: ", err.Error())
+				fmt.Println("Error: ", err.Message)
 			} else {
 				fmt.Println("-----------------------")
 				for _, adapter := range adapters {
@@ -131,7 +131,7 @@ func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 			lpars,
 				err := hmcManager.ListLPARs(cpc.URI, query)
 			if err != nil {
-				fmt.Println("Error: ", err.Error())
+				fmt.Println("Error: ", err.Message)
 			} else {
 				fmt.Println("-----------------------")
 				for _, lpar := range lpars {
@@ -142,7 +142,7 @@ func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 					props,
 						err := hmcManager.GetLparProperties(lpar.URI)
 					if err != nil {
-						fmt.Println("Error: ", err.Error())
+						fmt.Println("Error: ", err.Message)
 					} else {
 						fmt.Println("lpar properties: ", props)
 					}
@@ -151,14 +151,14 @@ func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 					nics,
 						err := hmcManager.ListNics(lpar.URI)
 					if err != nil {
-						fmt.Println("Error: ", err.Error())
+						fmt.Println("Error: ", err.Message)
 					} else {
 						fmt.Println("nics list: ", nics)
 						for _, nicURI := range nics {
 							nic,
 								err := hmcManager.GetNicProperties(nicURI)
 							if err != nil {
-								fmt.Println("Error: ", err.Error())
+								fmt.Println("Error: ", err.Message)
 							} else {
 								fmt.Println("nic properties: ", nic)
 							}

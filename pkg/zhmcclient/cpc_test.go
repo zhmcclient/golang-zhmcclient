@@ -13,7 +13,6 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -33,6 +32,8 @@ var _ = Describe("CPC", func() {
 			cpcsArray = &CpcsArray{}
 			url       *url.URL
 			bytes     []byte
+
+			hmcErr, unmarshalErr *HmcError
 		)
 
 		BeforeEach(func() {
@@ -64,6 +65,16 @@ var _ = Describe("CPC", func() {
 
 			url, _ = url.Parse("https://127.0.0.1:443")
 			bytes, _ = json.Marshal(cpcsArray)
+
+			hmcErr = &HmcError{
+				Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+				Message: "error message",
+			}
+
+			unmarshalErr = &HmcError{
+				Reason:  int(ERR_CODE_HMC_UNMARSHAL_FAIL),
+				Message: "invalid character 'i' looking for beginning of value",
+			}
 		})
 
 		Context("When list cpcs and returns correctly", func() {
@@ -81,10 +92,10 @@ var _ = Describe("CPC", func() {
 		Context("When list cpcs and returns error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
 				rets, err := manager.ListCPCs(nil)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -92,10 +103,10 @@ var _ = Describe("CPC", func() {
 		Context("When list cpcs and unmarshal error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
 				rets, err := manager.ListCPCs(nil)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
 			})
 		})

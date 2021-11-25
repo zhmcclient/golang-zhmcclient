@@ -13,7 +13,6 @@ package zhmcclient
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -22,16 +21,16 @@ import (
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
-	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, error)
-	GetLparProperties(lparURI string) (*LparProperties, error)
-	UpdateLparProperties(lparURI string, props *LparProperties) error
-	StartLPAR(lparURI string) (string, error)
-	StopLPAR(lparURI string) (string, error)
+	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, *HmcError)
+	GetLparProperties(lparURI string) (*LparProperties, *HmcError)
+	UpdateLparProperties(lparURI string, props *LparProperties) *HmcError
+	StartLPAR(lparURI string) (string, *HmcError)
+	StopLPAR(lparURI string) (string, *HmcError)
 
-	MountIsoImage(lparURI string, isoFile string, insFile string) error
-	UnmountIsoImage(lparURI string) error
+	MountIsoImage(lparURI string, isoFile string, insFile string) *HmcError
+	UnmountIsoImage(lparURI string) *HmcError
 
-	ListNics(lparURI string) ([]string, error)
+	ListNics(lparURI string) ([]string, *HmcError)
 }
 
 type LparManager struct {
@@ -55,13 +54,10 @@ func NewLparManager(client ClientAPI) *LparManager {
 * Return: 200 and LPARs array
 *     or: 400, 404, 409
  */
-func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, error) {
+func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/partitions")
-	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
-	if err != nil {
-		return nil, err
-	}
+	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -70,14 +66,14 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 
 	if status == http.StatusOK {
 		lpars := &LPARsArray{}
-		err = json.Unmarshal(responseBody, lpars)
+		err := json.Unmarshal(responseBody, lpars)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return lpars.LPARS, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -86,7 +82,7 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 * Return: 200 and LparProperties
 *     or: 400, 404,
  */
-func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, error) {
+func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
@@ -97,15 +93,15 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, error)
 
 	if status == http.StatusOK {
 		lparProps := LparProperties{}
-		err = json.Unmarshal(responseBody, &lparProps)
+		err := json.Unmarshal(responseBody, &lparProps)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 
 		return &lparProps, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -114,7 +110,7 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, error)
 * Return: 204
 *     or: 400, 403, 404, 409, 503,
  */
-func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties) error {
+func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
@@ -127,7 +123,7 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -137,7 +133,7 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 * Return: 202 and job-uri
 *     or: 400, 403, 404, 503,
  */
-func (m *LparManager) StartLPAR(lparURI string) (string, error) {
+func (m *LparManager) StartLPAR(lparURI string) (string, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/start")
 
@@ -148,17 +144,17 @@ func (m *LparManager) StartLPAR(lparURI string) (string, error) {
 
 	if status == http.StatusAccepted {
 		responseObj := StartStopLparResponse{}
-		err = json.Unmarshal(responseBody, &responseObj)
+		err := json.Unmarshal(responseBody, &responseObj)
 		if err != nil {
-			return "", err
+			return "", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
 			return responseObj.URI, nil
 		}
-		return "", errors.New("Succeeded start LPAR, but got empty job-uri.")
+		return "", getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
-	return "", GenerateErrorFromResponse(status, responseBody)
+	return "", GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -168,7 +164,7 @@ func (m *LparManager) StartLPAR(lparURI string) (string, error) {
 * Return: 202 and job-uri
 *     or: 400, 403, 404, 503,
  */
-func (m *LparManager) StopLPAR(lparURI string) (string, error) {
+func (m *LparManager) StopLPAR(lparURI string) (string, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/stop")
 
@@ -179,17 +175,17 @@ func (m *LparManager) StopLPAR(lparURI string) (string, error) {
 
 	if status == http.StatusAccepted {
 		responseObj := StartStopLparResponse{}
-		err = json.Unmarshal(responseBody, &responseObj)
+		err := json.Unmarshal(responseBody, &responseObj)
 		if err != nil {
-			return "", err
+			return "", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
 			return responseObj.URI, nil
 		}
-		return "", errors.New("Succeeded stop LPAR, but got empty job-uri.")
+		return "", getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
-	return "", GenerateErrorFromResponse(status, responseBody)
+	return "", GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -198,7 +194,7 @@ func (m *LparManager) StopLPAR(lparURI string) (string, error) {
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile string) error {
+func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile string) *HmcError {
 	pureIsoName := path.Base(isoFile)
 	pureInsName := path.Base(insFile)
 	query := map[string]string{
@@ -211,10 +207,7 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	}
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/mount-iso-image")
-	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
-	if err != nil {
-		return err
-	}
+	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
 	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, imageData)
 
@@ -225,7 +218,7 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	if status == http.StatusNoContent {
 		return nil
 	}
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -234,7 +227,7 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *LparManager) UnmountIsoImage(lparURI string) error {
+func (m *LparManager) UnmountIsoImage(lparURI string) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/unmount-iso-image")
 
@@ -247,13 +240,13 @@ func (m *LparManager) UnmountIsoImage(lparURI string) error {
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
 /**
 * get_property('nic-uris') from LPAR
  */
-func (m *LparManager) ListNics(lparURI string) ([]string, error) {
+func (m *LparManager) ListNics(lparURI string) ([]string, *HmcError) {
 	props, err := m.GetLparProperties(lparURI)
 	if err != nil {
 		return nil, err

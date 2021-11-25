@@ -15,7 +15,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -37,11 +36,11 @@ type ClientAPI interface {
 	TraceOn(outputStream io.Writer)
 	TraceOff()
 	SetSkipCertVerify(isSkipCert bool)
-	Logon() error
-	Logoff() error
+	Logon() *HmcError
+	Logoff() *HmcError
 	IsLogon(verify bool) bool
-	ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error)
-	UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err error)
+	ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
+	UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
 }
 
 // HTTP Client interface required for unit tests
@@ -87,7 +86,7 @@ type Client struct {
 	traceOutput    io.Writer
 }
 
-func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
+func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 	transport := &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: DEFAULT_DIAL_TIMEOUT,
@@ -133,15 +132,15 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, error) {
 	return client, nil
 }
 
-func GetEndpointURLFromString(endpoint string) (*url.URL, error) {
+func GetEndpointURLFromString(endpoint string) (*url.URL, *HmcError) {
 
 	if !strings.HasPrefix(strings.ToLower(endpoint), "https") {
-		return nil, errors.New("HTTPS is used for the client for secure reason.")
+		return nil, getHmcErrorFromMsg(ERR_CODE_HMC_INVALID_URL, ERR_MSG_INSECURE_URL)
 	}
 
 	url, err := url.Parse(endpoint)
 	if err != nil {
-		return nil, err
+		return nil, getHmcErrorFromErr(ERR_CODE_HMC_INVALID_URL, err)
 	}
 	return url, nil
 }
@@ -198,7 +197,7 @@ func (c *Client) clearSession() {
 	c.session = nil
 }
 
-func (c *Client) Logon() error {
+func (c *Client) Logon() *HmcError {
 	c.clearSession()
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions")
@@ -210,18 +209,18 @@ func (c *Client) Logon() error {
 
 	if status == http.StatusOK || status == http.StatusCreated {
 		session := &Session{}
-		err = json.Unmarshal(responseBody, session)
+		err := json.Unmarshal(responseBody, session)
 		if err != nil {
-			return err
+			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		c.session = session
 		return nil
 	}
 
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
-func (c *Client) Logoff() error {
+func (c *Client) Logoff() *HmcError {
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions/this-session")
 
@@ -233,7 +232,7 @@ func (c *Client) Logoff() error {
 		c.clearSession()
 		return nil
 	}
-	return GenerateErrorFromResponse(status, responseBody)
+	return GenerateErrorFromResponse(responseBody)
 }
 
 func (c *Client) IsLogon(verify bool) bool {
@@ -270,7 +269,7 @@ func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
 
 }
 
-func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
+func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
 	retries := DEFAULT_CONNECT_RETRIES
 	responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
 	if IsExpectedHttpStatus(responseStatusCode) {
@@ -278,7 +277,7 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	}
 
 	for retries > 0 {
-		if NeedLogon(responseStatusCode, GetErrorReason(responseBodyStream)) {
+		if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
 			c.Logon()
 			c.executeUpload(requestType, url.String(), requestData)
 		}
@@ -293,7 +292,7 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	return responseStatusCode, responseBodyStream, err
 }
 
-func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
+func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
 	var (
 		retries int
 	)
@@ -312,7 +311,7 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 
 	for retries > 0 {
 		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
-		if NeedLogon(responseStatusCode, GetErrorReason(responseBodyStream)) { // 1. invalid session, logon again
+		if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) { // 1. invalid session, logon again
 			c.Logon()
 			c.executeMethod(requestType, url.String(), requestData)
 		}
@@ -325,19 +324,20 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 	return responseStatusCode, responseBodyStream, err
 }
 
-func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err error) {
+func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, hmcErr *HmcError) {
 	var requestBody []byte
+	var err error
 
 	if requestData != nil {
 		requestBody, err = json.Marshal(requestData)
 		if err != nil {
-			return -1, nil, err
+			return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_MARSHAL_FAIL, err)
 		}
 	}
 
 	request, err := http.NewRequest(requestType, urlStr, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 	}
 
 	c.setRequestHeaders(request, APPLICATION_BODY_JSON)
@@ -345,34 +345,34 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 	response, err := c.httpClient.Do(request)
 
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_EXECUTE_FAIL, err)
 	}
 	if response == nil {
-		return -1, nil, errors.New("HTTP Response is empty.")
+		return -1, nil, getHmcErrorFromMsg(ERR_CODE_HMC_EMPTY_RESPONSE, ERR_MSG_EMPTY_RESPONSE)
 	}
 
 	defer response.Body.Close()
 
 	responseBodyStream, err = ioutil.ReadAll(response.Body)
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_READ_RESPONSE_FAIL, err)
 	}
 
 	if c.isTraceEnabled {
 		err = c.traceHTTP(request, response)
 		if err != nil {
-			return response.StatusCode, nil, err
+			return response.StatusCode, nil, getHmcErrorFromErr(ERR_CODE_HMC_TRACE_REQUEST_FAIL, err)
 		}
 	}
 
-	return response.StatusCode, responseBodyStream, err
+	return response.StatusCode, responseBodyStream, nil
 }
 
-func (c *Client) executeUpload(requestType string, urlStr string, requestBody []byte) (responseStatusCode int, responseBodyStream []byte, err error) {
+func (c *Client) executeUpload(requestType string, urlStr string, requestBody []byte) (responseStatusCode int, responseBodyStream []byte, hmcErr *HmcError) {
 
 	request, err := http.NewRequest(requestType, urlStr, bytes.NewReader(requestBody))
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 	}
 
 	c.setRequestHeaders(request, APPLICATION_BODY_OCTET_STREAM)
@@ -380,28 +380,28 @@ func (c *Client) executeUpload(requestType string, urlStr string, requestBody []
 	response, err := c.httpClient.Do(request)
 
 	if response == nil {
-		return -1, nil, errors.New("HTTP Response is empty.")
+		return -1, nil, getHmcErrorFromMsg(ERR_CODE_HMC_EMPTY_RESPONSE, ERR_MSG_EMPTY_RESPONSE)
 	}
 
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_EXECUTE_FAIL, err)
 	}
 
 	defer response.Body.Close()
 
 	responseBodyStream, err = ioutil.ReadAll(response.Body)
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_READ_RESPONSE_FAIL, err)
 	}
 
 	if c.isTraceEnabled {
 		err = c.traceHTTP(request, response)
 		if err != nil {
-			return response.StatusCode, nil, err
+			return response.StatusCode, nil, getHmcErrorFromErr(ERR_CODE_HMC_TRACE_REQUEST_FAIL, err)
 		}
 	}
 
-	return response.StatusCode, responseBodyStream, err
+	return response.StatusCode, responseBodyStream, nil
 }
 
 func (c *Client) traceHTTP(req *http.Request, resp *http.Response) error {

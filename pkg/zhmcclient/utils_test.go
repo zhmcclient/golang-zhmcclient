@@ -13,7 +13,6 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"os"
 
@@ -47,9 +46,7 @@ var _ = Describe("utils", func() {
 		Context("When nil query passed in", func() {
 			It("returns same uri", func() {
 				ret, _ := url.Parse(url.String())
-				ret, err := BuildUrlFromQuery(ret, nil)
-
-				Expect(err).To(BeNil())
+				ret = BuildUrlFromQuery(ret, nil)
 				Expect(ret.String()).To(Equal(url.String()))
 			})
 		})
@@ -57,9 +54,7 @@ var _ = Describe("utils", func() {
 		Context("When empty query passed in", func() {
 			It("returns same uri", func() {
 				ret, _ := url.Parse(url.String())
-				ret, err := BuildUrlFromQuery(ret, query0)
-
-				Expect(err).To(BeNil())
+				ret = BuildUrlFromQuery(ret, query0)
 				Expect(ret.String()).To(Equal(url.String()))
 			})
 		})
@@ -67,9 +62,7 @@ var _ = Describe("utils", func() {
 		Context("When 1 query passed in", func() {
 			It("returns correct uri", func() {
 				ret, _ := url.Parse(url.String())
-				ret, err := BuildUrlFromQuery(ret, query1)
-
-				Expect(err).To(BeNil())
+				ret = BuildUrlFromQuery(ret, query1)
 				Expect(ret.String()).To(Equal(url.String() + "?name=lpar1"))
 			})
 		})
@@ -77,9 +70,7 @@ var _ = Describe("utils", func() {
 		Context("When 2 query passed in", func() {
 			It("returns correct uri", func() {
 				ret, _ := url.Parse(url.String())
-				ret, err := BuildUrlFromQuery(ret, query2)
-
-				Expect(err).To(BeNil())
+				ret = BuildUrlFromQuery(ret, query2)
 				Expect(ret.String()).To(Equal(url.String() + "?name=lpar1&type=dpm"))
 			})
 		})
@@ -116,142 +107,42 @@ var _ = Describe("utils", func() {
 
 	Describe("GenerateErrorFromResponse", func() {
 		var (
-			status     int
-			errMessage string
-
-			errFull           *ErrorBody
-			errWithoutMessage *ErrorBody
-
-			errByte               []byte
-			errWithoutMessageByte []byte
+			errMessage          string
+			errFull, errUnknown *HmcError
+			errByte             []byte
 		)
 
 		BeforeEach(func() {
 			errMessage = "error message"
 
-			errFull = &ErrorBody{
+			errFull = &HmcError{
 				Reason:  1,
 				Message: errMessage,
 			}
-			errWithoutMessage = &ErrorBody{
-				Reason: 1,
+			errUnknown = &HmcError{
+				Reason:  -1,
+				Message: "Unknown error.",
 			}
+
 			errByte, _ = json.Marshal(errFull)
-			errWithoutMessageByte, _ = json.Marshal(errWithoutMessage)
 		})
 
-		Context("message is not empty", func() {
+		Context("message is normal", func() {
 			It("returns message directly", func() {
-				status = 400
-				rets := GenerateErrorFromResponse(status, errByte)
+				rets := GenerateErrorFromResponse(errByte)
 
 				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal(errMessage))
+				Expect(rets).To(Equal(errFull))
 			})
 		})
 
-		Context("message is empty", func() {
-			It("returns message according to reason for 400, 1", func() {
-				status = 400
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
+		Context("message is not valid", func() {
+			It("returns unknown error", func() {
+				rets := GenerateErrorFromResponse([]byte("test"))
 
 				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("The request included an unrecognized or unsupported query parameter."))
-			})
-
-			It("returns message according to reason for 403, 1", func() {
-				status = 403
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
-
-				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("The user under which the API request was authenticated does not have the required authority to perform the requested action."))
-			})
-
-			It("returns message according to reason for 404, 1", func() {
-				status = 404
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
-
-				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("The request URI does not designate an existing resource of the expected type, or designates a resource for which the API user does not have object-access permission. For URIs that contain object ID and/or element ID components, this reason code may be used for issues accessing the resource identified by the first (leftmost) such ID in the URI."))
-			})
-
-			It("returns message according to reason for 409, 1", func() {
-				status = 409
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
-
-				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("The operation cannot be performed because the object designated by the request URI is not in the correct state."))
-			})
-
-			It("returns message according to reason for 500", func() {
-				status = 500
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
-
-				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("An internal processing error has occurred and no additional details are documented."))
-			})
-
-			It("returns message according to reason for 503, 1", func() {
-				status = 503
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
-
-				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("The request could not be processed because the HMC is not currently communicating with an SE needed to perform the requested operation."))
-			})
-
-			It("returns message according to unknown reason or status code", func() {
-				status = 401
-				rets := GenerateErrorFromResponse(status, errWithoutMessageByte)
-
-				Expect(rets).ToNot(BeNil())
-				Expect(rets.Error()).To(Equal("HTTP Error: " + fmt.Sprint(status)))
+				Expect(*rets).To(Equal(*errUnknown))
 			})
 		})
-
-	})
-
-	Describe("GetErrorReason", func() {
-		var (
-			errFull          *ErrorBody
-			errWithoutReason *ErrorBody
-
-			errByte              []byte
-			errWithoutReasonByte []byte
-		)
-
-		BeforeEach(func() {
-			errFull = &ErrorBody{
-				Reason:  1,
-				Message: "errMessage",
-			}
-			errWithoutReason = &ErrorBody{
-				Message: "errMessage",
-			}
-			errByte, _ = json.Marshal(errFull)
-			errWithoutReasonByte, _ = json.Marshal(errWithoutReason)
-		})
-
-		Context("reason is not empty", func() {
-			It("returns reason directly", func() {
-				rets := GetErrorReason(errByte)
-				Expect(rets).To(Equal(1))
-			})
-		})
-
-		Context("reason is empty", func() {
-			It("returns -1", func() {
-				rets := GetErrorReason(errWithoutReasonByte)
-				Expect(rets).To(Equal(0))
-			})
-		})
-
-		Context("unmarshal err", func() {
-			str := "strstr"
-			It("returns -1", func() {
-				rets := GetErrorReason([]byte(str))
-				Expect(rets).To(Equal(-1))
-			})
-		})
-
 	})
 })
