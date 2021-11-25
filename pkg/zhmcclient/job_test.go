@@ -13,7 +13,6 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -38,6 +37,8 @@ var _ = Describe("JOB", func() {
 		nestedbytes []byte
 		bytes       []byte
 		jobid       string
+
+		hmcErr, unmarshalErr *HmcError
 	)
 
 	BeforeEach(func() {
@@ -62,6 +63,16 @@ var _ = Describe("JOB", func() {
 		url, _ = url.Parse("https://127.0.0.1:443")
 		bytes, _ = json.Marshal(job)
 		jobid = "jobid"
+
+		hmcErr = &HmcError{
+			Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+			Message: "error message",
+		}
+
+		unmarshalErr = &HmcError{
+			Reason:  int(ERR_CODE_HMC_UNMARSHAL_FAIL),
+			Message: "invalid character 'i' looking for beginning of value",
+		}
 	})
 
 	Describe("QueryJob", func() {
@@ -82,10 +93,10 @@ var _ = Describe("JOB", func() {
 		Context("When query job  and returns error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, hmcErr)
 				rets, err := manager.QueryJob(jobid)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -93,10 +104,10 @@ var _ = Describe("JOB", func() {
 		Context("When query job and unmarshal error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
 				rets, err := manager.QueryJob(jobid)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -128,10 +139,10 @@ var _ = Describe("JOB", func() {
 		Context("When delete job  and returns error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, hmcErr)
 				err := manager.DeleteJob(jobid)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 			})
 		})
 
@@ -161,10 +172,10 @@ var _ = Describe("JOB", func() {
 		Context("When cancel job  and returns error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, hmcErr)
 				err := manager.CancelJob(jobid)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 			})
 		})
 

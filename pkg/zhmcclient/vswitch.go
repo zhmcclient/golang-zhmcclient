@@ -21,8 +21,8 @@ import (
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
 type VirtualSwitchAPI interface {
-	ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, error)
-	GetVirtualSwitchProperties(vsSwitchURI string) (*VirtualSwitch, error)
+	ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError)
+	GetVirtualSwitchProperties(vsSwitchURI string) (*VirtualSwitch, *HmcError)
 }
 
 type VirtualSwitchManager struct {
@@ -42,7 +42,7 @@ func NewVirtualSwitchManager(client ClientAPI) *VirtualSwitchManager {
  * Return: 200 and Adapters array
  *     or: 400, 404, 409
  */
-func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, error) {
+func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "virtual-switches")
 	fmt.Println(requestUrl)
@@ -53,14 +53,14 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwit
 
 	if status == http.StatusOK {
 		virtualSwitches := &VirtualSwitchesArray{}
-		err = json.Unmarshal(responseBody, virtualSwitches)
+		err := json.Unmarshal(responseBody, virtualSwitches)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return virtualSwitches.VIRTUALSWITCHES, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -70,7 +70,7 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwit
  * Return: 200 and Adapters array
  *     or: 400, 404, 409
  */
-func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vsSwitchURI string) (*VirtualSwitch, error) {
+func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vsSwitchURI string) (*VirtualSwitch, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, vsSwitchURI)
 
@@ -81,12 +81,12 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vsSwitchURI string) (*
 
 	if status == http.StatusOK {
 		virtualSwitch := &VirtualSwitch{}
-		err = json.Unmarshal(responseBody, virtualSwitch)
+		err := json.Unmarshal(responseBody, virtualSwitch)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return virtualSwitch, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }

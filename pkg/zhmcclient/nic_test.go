@@ -13,7 +13,6 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -25,11 +24,12 @@ import (
 
 var _ = Describe("Nic", func() {
 	var (
-		manager    *NicManager
-		fakeClient *fakes.ClientAPI
-		lparid     string
-		nicid      string
-		url        *url.URL
+		manager              *NicManager
+		fakeClient           *fakes.ClientAPI
+		lparid               string
+		nicid                string
+		url                  *url.URL
+		hmcErr, unmarshalErr *HmcError
 	)
 
 	BeforeEach(func() {
@@ -39,6 +39,16 @@ var _ = Describe("Nic", func() {
 		url, _ = url.Parse("https://127.0.0.1:443")
 		lparid = "lparid"
 		nicid = "nicid"
+
+		hmcErr = &HmcError{
+			Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+			Message: "error message",
+		}
+
+		unmarshalErr = &HmcError{
+			Reason:  int(ERR_CODE_HMC_UNMARSHAL_FAIL),
+			Message: "invalid character 'i' looking for beginning of value",
+		}
 	})
 
 	Describe("CreateNic", func() {
@@ -97,10 +107,10 @@ var _ = Describe("Nic", func() {
 		Context("When CreateNic and ExecuteRequest error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
 				rets, err := manager.CreateNic(lparid, payload)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(Equal(""))
 			})
 		})
@@ -108,10 +118,10 @@ var _ = Describe("Nic", func() {
 		Context("When CreateNic and unmarshal error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
 				rets, err := manager.CreateNic(lparid, payload)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(Equal(""))
 			})
 		})
@@ -119,10 +129,10 @@ var _ = Describe("Nic", func() {
 		Context("When CreateNic and no URI responded", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, hmcErr)
 				rets, err := manager.CreateNic(lparid, payload)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(Equal(""))
 			})
 		})
@@ -143,10 +153,10 @@ var _ = Describe("Nic", func() {
 		Context("When DeleteNic and ExecuteRequest error", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, errors.New("error"))
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
 				err := manager.DeleteNic(nicid)
 
-				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*hmcErr))
 			})
 		})
 	})

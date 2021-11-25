@@ -53,75 +53,75 @@ func NewManagerFromClient(client ClientAPI) ZhmcAPI {
 }
 
 // CPC
-func (m *ZhmcManager) ListCPCs(query map[string]string) ([]CPC, error) {
+func (m *ZhmcManager) ListCPCs(query map[string]string) ([]CPC, *HmcError) {
 	return m.cpcManager.ListCPCs(query)
 }
 
 // LPAR
-func (m *ZhmcManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, error) {
+func (m *ZhmcManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, *HmcError) {
 	return m.lparManager.ListLPARs(cpcURI, query)
 }
-func (m *ZhmcManager) GetLparProperties(lparURI string) (*LparProperties, error) {
+func (m *ZhmcManager) GetLparProperties(lparURI string) (*LparProperties, *HmcError) {
 	return m.lparManager.GetLparProperties(lparURI)
 }
-func (m *ZhmcManager) UpdateLparProperties(lparURI string, props *LparProperties) error {
+func (m *ZhmcManager) UpdateLparProperties(lparURI string, props *LparProperties) *HmcError {
 	return m.lparManager.UpdateLparProperties(lparURI, props)
 }
-func (m *ZhmcManager) StartLPAR(lparURI string) (string, error) {
+func (m *ZhmcManager) StartLPAR(lparURI string) (string, *HmcError) {
 	return m.lparManager.StartLPAR(lparURI)
 }
-func (m *ZhmcManager) StopLPAR(lparURI string) (string, error) {
+func (m *ZhmcManager) StopLPAR(lparURI string) (string, *HmcError) {
 	return m.lparManager.StopLPAR(lparURI)
 }
-func (m *ZhmcManager) MountIsoImage(lparURI string, isoFile string, insFile string) error {
+func (m *ZhmcManager) MountIsoImage(lparURI string, isoFile string, insFile string) *HmcError {
 	return m.lparManager.MountIsoImage(lparURI, isoFile, insFile)
 }
-func (m *ZhmcManager) UnmountIsoImage(lparURI string) error {
+func (m *ZhmcManager) UnmountIsoImage(lparURI string) *HmcError {
 	return m.lparManager.UnmountIsoImage(lparURI)
 }
-func (m *ZhmcManager) ListNics(lparURI string) ([]string, error) {
+func (m *ZhmcManager) ListNics(lparURI string) ([]string, *HmcError) {
 	return m.lparManager.ListNics(lparURI)
 }
 
 // Adapter
-func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, error) {
+func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError) {
 	return m.adapterManager.ListAdapters(cpcURI, query)
 }
-func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, error) {
+func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, *HmcError) {
 	return m.adapterManager.CreateHipersocket(cpcURI, adaptor)
 }
-func (m *ZhmcManager) DeleteHipersocket(adapterURI string) error {
+func (m *ZhmcManager) DeleteHipersocket(adapterURI string) *HmcError {
 	return m.adapterManager.DeleteHipersocket(adapterURI)
 }
 
 // Virtual Switches
 
-func (m *ZhmcManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, error) {
+func (m *ZhmcManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError) {
 	return m.virtualSwitchManager.ListVirtualSwitches(cpcURI)
 }
 
-func (m *ZhmcManager) GetVirtualSwitchProperties(vsSwitchId string) (*VirtualSwitch, error) {
+func (m *ZhmcManager) GetVirtualSwitchProperties(vsSwitchId string) (*VirtualSwitch, *HmcError) {
 	return m.virtualSwitchManager.GetVirtualSwitchProperties(vsSwitchId)
 }
 
 // NIC
-func (m *ZhmcManager) CreateNic(lparURI string, nic *NIC) (string, error) {
+func (m *ZhmcManager) CreateNic(lparURI string, nic *NIC) (string, *HmcError) {
 	return m.nicManager.CreateNic(lparURI, nic)
 }
-func (m *ZhmcManager) DeleteNic(nicURI string) error {
+func (m *ZhmcManager) DeleteNic(nicURI string) *HmcError {
 	return m.nicManager.DeleteNic(nicURI)
 }
-func (m *ZhmcManager) GetNicProperties(nicURI string) (*NIC, error) {
+func (m *ZhmcManager) GetNicProperties(nicURI string) (*NIC, *HmcError) {
 	return m.nicManager.GetNicProperties(nicURI)
 }
 
 // JOB
-func (m *ZhmcManager) QueryJob(jobURI string) (*Job, error) {
+func (m *ZhmcManager) QueryJob(jobURI string) (*Job, *HmcError) {
 	return m.jobManager.QueryJob(jobURI)
 }
-func (m *ZhmcManager) DeleteJob(jobURI string) error {
+func (m *ZhmcManager) DeleteJob(jobURI string) *HmcError {
 	return m.jobManager.DeleteJob(jobURI)
 }
-func (m *ZhmcManager) CancelJob(jobURI string) error {
+func (m *ZhmcManager) CancelJob(jobURI string) *HmcError {
 	return m.jobManager.CancelJob(jobURI)
 }

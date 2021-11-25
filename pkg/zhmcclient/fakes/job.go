@@ -8,46 +8,46 @@ import (
 )
 
 type JobAPI struct {
-	CancelJobStub        func(string) error
+	CancelJobStub        func(string) *zhmcclient.HmcError
 	cancelJobMutex       sync.RWMutex
 	cancelJobArgsForCall []struct {
 		arg1 string
 	}
 	cancelJobReturns struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	cancelJobReturnsOnCall map[int]struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
-	DeleteJobStub        func(string) error
+	DeleteJobStub        func(string) *zhmcclient.HmcError
 	deleteJobMutex       sync.RWMutex
 	deleteJobArgsForCall []struct {
 		arg1 string
 	}
 	deleteJobReturns struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	deleteJobReturnsOnCall map[int]struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
-	QueryJobStub        func(string) (*zhmcclient.Job, error)
+	QueryJobStub        func(string) (*zhmcclient.Job, *zhmcclient.HmcError)
 	queryJobMutex       sync.RWMutex
 	queryJobArgsForCall []struct {
 		arg1 string
 	}
 	queryJobReturns struct {
 		result1 *zhmcclient.Job
-		result2 error
+		result2 *zhmcclient.HmcError
 	}
 	queryJobReturnsOnCall map[int]struct {
 		result1 *zhmcclient.Job
-		result2 error
+		result2 *zhmcclient.HmcError
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *JobAPI) CancelJob(arg1 string) error {
+func (fake *JobAPI) CancelJob(arg1 string) *zhmcclient.HmcError {
 	fake.cancelJobMutex.Lock()
 	ret, specificReturn := fake.cancelJobReturnsOnCall[len(fake.cancelJobArgsForCall)]
 	fake.cancelJobArgsForCall = append(fake.cancelJobArgsForCall, struct {
@@ -72,7 +72,7 @@ func (fake *JobAPI) CancelJobCallCount() int {
 	return len(fake.cancelJobArgsForCall)
 }
 
-func (fake *JobAPI) CancelJobCalls(stub func(string) error) {
+func (fake *JobAPI) CancelJobCalls(stub func(string) *zhmcclient.HmcError) {
 	fake.cancelJobMutex.Lock()
 	defer fake.cancelJobMutex.Unlock()
 	fake.CancelJobStub = stub
@@ -85,30 +85,30 @@ func (fake *JobAPI) CancelJobArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *JobAPI) CancelJobReturns(result1 error) {
+func (fake *JobAPI) CancelJobReturns(result1 *zhmcclient.HmcError) {
 	fake.cancelJobMutex.Lock()
 	defer fake.cancelJobMutex.Unlock()
 	fake.CancelJobStub = nil
 	fake.cancelJobReturns = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *JobAPI) CancelJobReturnsOnCall(i int, result1 error) {
+func (fake *JobAPI) CancelJobReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
 	fake.cancelJobMutex.Lock()
 	defer fake.cancelJobMutex.Unlock()
 	fake.CancelJobStub = nil
 	if fake.cancelJobReturnsOnCall == nil {
 		fake.cancelJobReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *zhmcclient.HmcError
 		})
 	}
 	fake.cancelJobReturnsOnCall[i] = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *JobAPI) DeleteJob(arg1 string) error {
+func (fake *JobAPI) DeleteJob(arg1 string) *zhmcclient.HmcError {
 	fake.deleteJobMutex.Lock()
 	ret, specificReturn := fake.deleteJobReturnsOnCall[len(fake.deleteJobArgsForCall)]
 	fake.deleteJobArgsForCall = append(fake.deleteJobArgsForCall, struct {
@@ -133,7 +133,7 @@ func (fake *JobAPI) DeleteJobCallCount() int {
 	return len(fake.deleteJobArgsForCall)
 }
 
-func (fake *JobAPI) DeleteJobCalls(stub func(string) error) {
+func (fake *JobAPI) DeleteJobCalls(stub func(string) *zhmcclient.HmcError) {
 	fake.deleteJobMutex.Lock()
 	defer fake.deleteJobMutex.Unlock()
 	fake.DeleteJobStub = stub
@@ -146,30 +146,30 @@ func (fake *JobAPI) DeleteJobArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *JobAPI) DeleteJobReturns(result1 error) {
+func (fake *JobAPI) DeleteJobReturns(result1 *zhmcclient.HmcError) {
 	fake.deleteJobMutex.Lock()
 	defer fake.deleteJobMutex.Unlock()
 	fake.DeleteJobStub = nil
 	fake.deleteJobReturns = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *JobAPI) DeleteJobReturnsOnCall(i int, result1 error) {
+func (fake *JobAPI) DeleteJobReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
 	fake.deleteJobMutex.Lock()
 	defer fake.deleteJobMutex.Unlock()
 	fake.DeleteJobStub = nil
 	if fake.deleteJobReturnsOnCall == nil {
 		fake.deleteJobReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *zhmcclient.HmcError
 		})
 	}
 	fake.deleteJobReturnsOnCall[i] = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *JobAPI) QueryJob(arg1 string) (*zhmcclient.Job, error) {
+func (fake *JobAPI) QueryJob(arg1 string) (*zhmcclient.Job, *zhmcclient.HmcError) {
 	fake.queryJobMutex.Lock()
 	ret, specificReturn := fake.queryJobReturnsOnCall[len(fake.queryJobArgsForCall)]
 	fake.queryJobArgsForCall = append(fake.queryJobArgsForCall, struct {
@@ -194,7 +194,7 @@ func (fake *JobAPI) QueryJobCallCount() int {
 	return len(fake.queryJobArgsForCall)
 }
 
-func (fake *JobAPI) QueryJobCalls(stub func(string) (*zhmcclient.Job, error)) {
+func (fake *JobAPI) QueryJobCalls(stub func(string) (*zhmcclient.Job, *zhmcclient.HmcError)) {
 	fake.queryJobMutex.Lock()
 	defer fake.queryJobMutex.Unlock()
 	fake.QueryJobStub = stub
@@ -207,29 +207,29 @@ func (fake *JobAPI) QueryJobArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *JobAPI) QueryJobReturns(result1 *zhmcclient.Job, result2 error) {
+func (fake *JobAPI) QueryJobReturns(result1 *zhmcclient.Job, result2 *zhmcclient.HmcError) {
 	fake.queryJobMutex.Lock()
 	defer fake.queryJobMutex.Unlock()
 	fake.QueryJobStub = nil
 	fake.queryJobReturns = struct {
 		result1 *zhmcclient.Job
-		result2 error
+		result2 *zhmcclient.HmcError
 	}{result1, result2}
 }
 
-func (fake *JobAPI) QueryJobReturnsOnCall(i int, result1 *zhmcclient.Job, result2 error) {
+func (fake *JobAPI) QueryJobReturnsOnCall(i int, result1 *zhmcclient.Job, result2 *zhmcclient.HmcError) {
 	fake.queryJobMutex.Lock()
 	defer fake.queryJobMutex.Unlock()
 	fake.QueryJobStub = nil
 	if fake.queryJobReturnsOnCall == nil {
 		fake.queryJobReturnsOnCall = make(map[int]struct {
 			result1 *zhmcclient.Job
-			result2 error
+			result2 *zhmcclient.HmcError
 		})
 	}
 	fake.queryJobReturnsOnCall[i] = struct {
 		result1 *zhmcclient.Job
-		result2 error
+		result2 *zhmcclient.HmcError
 	}{result1, result2}
 }
 

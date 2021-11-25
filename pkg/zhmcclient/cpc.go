@@ -20,7 +20,7 @@ import (
 // CpcAPI defines an interface for issuing CPC requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
-	ListCPCs(query map[string]string) ([]CPC, error)
+	ListCPCs(query map[string]string) ([]CPC, *HmcError)
 }
 
 type CpcManager struct {
@@ -39,13 +39,10 @@ func NewCpcManager(client ClientAPI) *CpcManager {
 * Return: 200 and CPCs array
 *     or: 400
  */
-func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, error) {
+func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs")
-	requestUrl, err := BuildUrlFromQuery(requestUrl, query)
-	if err != nil {
-		return nil, err
-	}
+	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -54,12 +51,12 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, error) {
 
 	if status == http.StatusOK {
 		cpcs := &CpcsArray{}
-		err = json.Unmarshal(responseBody, &cpcs)
+		err := json.Unmarshal(responseBody, &cpcs)
 		if err != nil {
-			return nil, err
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return cpcs.CPCS, nil
 	}
 
-	return nil, GenerateErrorFromResponse(status, responseBody)
+	return nil, GenerateErrorFromResponse(responseBody)
 }

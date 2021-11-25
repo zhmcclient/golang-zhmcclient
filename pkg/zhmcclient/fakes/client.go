@@ -20,7 +20,7 @@ type ClientAPI struct {
 	cloneEndpointURLReturnsOnCall map[int]struct {
 		result1 *url.URL
 	}
-	ExecuteRequestStub        func(string, *url.URL, interface{}) (int, []byte, error)
+	ExecuteRequestStub        func(string, *url.URL, interface{}) (int, []byte, *zhmcclient.HmcError)
 	executeRequestMutex       sync.RWMutex
 	executeRequestArgsForCall []struct {
 		arg1 string
@@ -30,12 +30,12 @@ type ClientAPI struct {
 	executeRequestReturns struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}
 	executeRequestReturnsOnCall map[int]struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}
 	IsLogonStub        func(bool) bool
 	isLogonMutex       sync.RWMutex
@@ -48,25 +48,25 @@ type ClientAPI struct {
 	isLogonReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	LogoffStub        func() error
+	LogoffStub        func() *zhmcclient.HmcError
 	logoffMutex       sync.RWMutex
 	logoffArgsForCall []struct {
 	}
 	logoffReturns struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	logoffReturnsOnCall map[int]struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
-	LogonStub        func() error
+	LogonStub        func() *zhmcclient.HmcError
 	logonMutex       sync.RWMutex
 	logonArgsForCall []struct {
 	}
 	logonReturns struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	logonReturnsOnCall map[int]struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	SetSkipCertVerifyStub        func(bool)
 	setSkipCertVerifyMutex       sync.RWMutex
@@ -82,7 +82,7 @@ type ClientAPI struct {
 	traceOnArgsForCall []struct {
 		arg1 io.Writer
 	}
-	UploadRequestStub        func(string, *url.URL, []byte) (int, []byte, error)
+	UploadRequestStub        func(string, *url.URL, []byte) (int, []byte, *zhmcclient.HmcError)
 	uploadRequestMutex       sync.RWMutex
 	uploadRequestArgsForCall []struct {
 		arg1 string
@@ -92,12 +92,12 @@ type ClientAPI struct {
 	uploadRequestReturns struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}
 	uploadRequestReturnsOnCall map[int]struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -156,7 +156,7 @@ func (fake *ClientAPI) CloneEndpointURLReturnsOnCall(i int, result1 *url.URL) {
 	}{result1}
 }
 
-func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 *url.URL, arg3 interface{}) (int, []byte, error) {
+func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 *url.URL, arg3 interface{}) (int, []byte, *zhmcclient.HmcError) {
 	fake.executeRequestMutex.Lock()
 	ret, specificReturn := fake.executeRequestReturnsOnCall[len(fake.executeRequestArgsForCall)]
 	fake.executeRequestArgsForCall = append(fake.executeRequestArgsForCall, struct {
@@ -183,7 +183,7 @@ func (fake *ClientAPI) ExecuteRequestCallCount() int {
 	return len(fake.executeRequestArgsForCall)
 }
 
-func (fake *ClientAPI) ExecuteRequestCalls(stub func(string, *url.URL, interface{}) (int, []byte, error)) {
+func (fake *ClientAPI) ExecuteRequestCalls(stub func(string, *url.URL, interface{}) (int, []byte, *zhmcclient.HmcError)) {
 	fake.executeRequestMutex.Lock()
 	defer fake.executeRequestMutex.Unlock()
 	fake.ExecuteRequestStub = stub
@@ -196,18 +196,18 @@ func (fake *ClientAPI) ExecuteRequestArgsForCall(i int) (string, *url.URL, inter
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *ClientAPI) ExecuteRequestReturns(result1 int, result2 []byte, result3 error) {
+func (fake *ClientAPI) ExecuteRequestReturns(result1 int, result2 []byte, result3 *zhmcclient.HmcError) {
 	fake.executeRequestMutex.Lock()
 	defer fake.executeRequestMutex.Unlock()
 	fake.ExecuteRequestStub = nil
 	fake.executeRequestReturns = struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
 }
 
-func (fake *ClientAPI) ExecuteRequestReturnsOnCall(i int, result1 int, result2 []byte, result3 error) {
+func (fake *ClientAPI) ExecuteRequestReturnsOnCall(i int, result1 int, result2 []byte, result3 *zhmcclient.HmcError) {
 	fake.executeRequestMutex.Lock()
 	defer fake.executeRequestMutex.Unlock()
 	fake.ExecuteRequestStub = nil
@@ -215,13 +215,13 @@ func (fake *ClientAPI) ExecuteRequestReturnsOnCall(i int, result1 int, result2 [
 		fake.executeRequestReturnsOnCall = make(map[int]struct {
 			result1 int
 			result2 []byte
-			result3 error
+			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.executeRequestReturnsOnCall[i] = struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
 }
 
@@ -286,7 +286,7 @@ func (fake *ClientAPI) IsLogonReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *ClientAPI) Logoff() error {
+func (fake *ClientAPI) Logoff() *zhmcclient.HmcError {
 	fake.logoffMutex.Lock()
 	ret, specificReturn := fake.logoffReturnsOnCall[len(fake.logoffArgsForCall)]
 	fake.logoffArgsForCall = append(fake.logoffArgsForCall, struct {
@@ -310,36 +310,36 @@ func (fake *ClientAPI) LogoffCallCount() int {
 	return len(fake.logoffArgsForCall)
 }
 
-func (fake *ClientAPI) LogoffCalls(stub func() error) {
+func (fake *ClientAPI) LogoffCalls(stub func() *zhmcclient.HmcError) {
 	fake.logoffMutex.Lock()
 	defer fake.logoffMutex.Unlock()
 	fake.LogoffStub = stub
 }
 
-func (fake *ClientAPI) LogoffReturns(result1 error) {
+func (fake *ClientAPI) LogoffReturns(result1 *zhmcclient.HmcError) {
 	fake.logoffMutex.Lock()
 	defer fake.logoffMutex.Unlock()
 	fake.LogoffStub = nil
 	fake.logoffReturns = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *ClientAPI) LogoffReturnsOnCall(i int, result1 error) {
+func (fake *ClientAPI) LogoffReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
 	fake.logoffMutex.Lock()
 	defer fake.logoffMutex.Unlock()
 	fake.LogoffStub = nil
 	if fake.logoffReturnsOnCall == nil {
 		fake.logoffReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *zhmcclient.HmcError
 		})
 	}
 	fake.logoffReturnsOnCall[i] = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *ClientAPI) Logon() error {
+func (fake *ClientAPI) Logon() *zhmcclient.HmcError {
 	fake.logonMutex.Lock()
 	ret, specificReturn := fake.logonReturnsOnCall[len(fake.logonArgsForCall)]
 	fake.logonArgsForCall = append(fake.logonArgsForCall, struct {
@@ -363,32 +363,32 @@ func (fake *ClientAPI) LogonCallCount() int {
 	return len(fake.logonArgsForCall)
 }
 
-func (fake *ClientAPI) LogonCalls(stub func() error) {
+func (fake *ClientAPI) LogonCalls(stub func() *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = stub
 }
 
-func (fake *ClientAPI) LogonReturns(result1 error) {
+func (fake *ClientAPI) LogonReturns(result1 *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = nil
 	fake.logonReturns = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 error) {
+func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = nil
 	if fake.logonReturnsOnCall == nil {
 		fake.logonReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *zhmcclient.HmcError
 		})
 	}
 	fake.logonReturnsOnCall[i] = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
@@ -480,7 +480,7 @@ func (fake *ClientAPI) TraceOnArgsForCall(i int) io.Writer {
 	return argsForCall.arg1
 }
 
-func (fake *ClientAPI) UploadRequest(arg1 string, arg2 *url.URL, arg3 []byte) (int, []byte, error) {
+func (fake *ClientAPI) UploadRequest(arg1 string, arg2 *url.URL, arg3 []byte) (int, []byte, *zhmcclient.HmcError) {
 	var arg3Copy []byte
 	if arg3 != nil {
 		arg3Copy = make([]byte, len(arg3))
@@ -512,7 +512,7 @@ func (fake *ClientAPI) UploadRequestCallCount() int {
 	return len(fake.uploadRequestArgsForCall)
 }
 
-func (fake *ClientAPI) UploadRequestCalls(stub func(string, *url.URL, []byte) (int, []byte, error)) {
+func (fake *ClientAPI) UploadRequestCalls(stub func(string, *url.URL, []byte) (int, []byte, *zhmcclient.HmcError)) {
 	fake.uploadRequestMutex.Lock()
 	defer fake.uploadRequestMutex.Unlock()
 	fake.UploadRequestStub = stub
@@ -525,18 +525,18 @@ func (fake *ClientAPI) UploadRequestArgsForCall(i int) (string, *url.URL, []byte
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *ClientAPI) UploadRequestReturns(result1 int, result2 []byte, result3 error) {
+func (fake *ClientAPI) UploadRequestReturns(result1 int, result2 []byte, result3 *zhmcclient.HmcError) {
 	fake.uploadRequestMutex.Lock()
 	defer fake.uploadRequestMutex.Unlock()
 	fake.UploadRequestStub = nil
 	fake.uploadRequestReturns = struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
 }
 
-func (fake *ClientAPI) UploadRequestReturnsOnCall(i int, result1 int, result2 []byte, result3 error) {
+func (fake *ClientAPI) UploadRequestReturnsOnCall(i int, result1 int, result2 []byte, result3 *zhmcclient.HmcError) {
 	fake.uploadRequestMutex.Lock()
 	defer fake.uploadRequestMutex.Unlock()
 	fake.UploadRequestStub = nil
@@ -544,13 +544,13 @@ func (fake *ClientAPI) UploadRequestReturnsOnCall(i int, result1 int, result2 []
 		fake.uploadRequestReturnsOnCall = make(map[int]struct {
 			result1 int
 			result2 []byte
-			result3 error
+			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.uploadRequestReturnsOnCall[i] = struct {
 		result1 int
 		result2 []byte
-		result3 error
+		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
 }
 
