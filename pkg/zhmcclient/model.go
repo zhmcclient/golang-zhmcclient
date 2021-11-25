@@ -159,12 +159,16 @@ const (
 	JOB_STATUS_COMPLETE                 = "complete"
 )
 
+type JobResults struct {
+	Message string `json:"message,omitempty"`
+}
+
 type Job struct {
 	URI           string
-	Status        JobStatus `json:"status,omitempty"`
-	JobStatusCode int       `json:"job-status-code,omitempty"`
-	JobReasonCode int       `json:"job-reason-code,omitempty"`
-	JobResults    []byte    `json:"job-results,omitempty"`
+	Status        JobStatus  `json:"status,omitempty"`
+	JobStatusCode int        `json:"job-status-code,omitempty"`
+	JobReasonCode int        `json:"job-reason-code,omitempty"`
+	JobResults    JobResults `json:"job-results,omitempty"`
 }
 
 //////////////////////////////////////////////////
