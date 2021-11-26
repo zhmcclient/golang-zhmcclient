@@ -164,7 +164,7 @@ type JobResults struct {
 }
 
 type Job struct {
-	URI           string
+	URI           string     `json:"job-uri,omitempty"`
 	Status        JobStatus  `json:"status,omitempty"`
 	JobStatusCode int        `json:"job-status-code,omitempty"`
 	JobReasonCode int        `json:"job-reason-code,omitempty"`

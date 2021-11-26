@@ -22,21 +22,15 @@ import (
 	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient/fakes"
 )
 
-type TempNestedObj struct {
-	aaa string
-	bbb string
-}
-
 var _ = Describe("JOB", func() {
 	var (
 		manager    *JobManager
 		fakeClient *fakes.ClientAPI
 
-		job         *Job
-		url         *url.URL
-		nestedbytes []byte
-		bytes       []byte
-		jobid       string
+		job   *Job
+		url   *url.URL
+		bytes []byte
+		jobid string
 
 		hmcErr, unmarshalErr *HmcError
 	)
@@ -45,19 +39,16 @@ var _ = Describe("JOB", func() {
 		fakeClient = &fakes.ClientAPI{}
 		manager = NewJobManager(fakeClient)
 
-		nested := &TempNestedObj{
-			aaa: "aaa",
-			bbb: "bbb",
+		jobResults := &JobResults{
+			Message: "aaa",
 		}
-
-		nestedbytes, _ = json.Marshal(nested)
 
 		job = &Job{
 			URI:           "uri",
 			Status:        JOB_STATUS_RUNNING,
 			JobStatusCode: 200,
 			JobReasonCode: 200,
-			JobResults:    nestedbytes,
+			JobResults:    *jobResults,
 		}
 
 		url, _ = url.Parse("https://127.0.0.1:443")
