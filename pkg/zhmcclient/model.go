@@ -420,6 +420,10 @@ type StorageVolumeArray struct {
 	STORAGEVOLUMES []StorageVolume `json:"storage-volumes"`
 }
 
+type StorageGroupPayload struct {
+	StorageGroupURI string `json:"storage-group-uri"`
+}
+
 // Storage group class specific properties
 type StorageGroupProperties struct {
 	Class                      string            `json:"class,omitempty"`

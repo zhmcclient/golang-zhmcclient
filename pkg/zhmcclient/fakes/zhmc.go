@@ -8,11 +8,11 @@ import (
 )
 
 type ZhmcAPI struct {
-	AttachStorageGroupToPartitionStub        func(string, *zhmcclient.LparProperties) *zhmcclient.HmcError
+	AttachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError
 	attachStorageGroupToPartitionMutex       sync.RWMutex
 	attachStorageGroupToPartitionArgsForCall []struct {
 		arg1 string
-		arg2 *zhmcclient.LparProperties
+		arg2 *zhmcclient.StorageGroupPayload
 	}
 	attachStorageGroupToPartitionReturns struct {
 		result1 *zhmcclient.HmcError
@@ -92,11 +92,11 @@ type ZhmcAPI struct {
 	deleteNicReturnsOnCall map[int]struct {
 		result1 *zhmcclient.HmcError
 	}
-	DetachStorageGroupToPartitionStub        func(string, *zhmcclient.LparProperties) *zhmcclient.HmcError
+	DetachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError
 	detachStorageGroupToPartitionMutex       sync.RWMutex
 	detachStorageGroupToPartitionArgsForCall []struct {
 		arg1 string
-		arg2 *zhmcclient.LparProperties
+		arg2 *zhmcclient.StorageGroupPayload
 	}
 	detachStorageGroupToPartitionReturns struct {
 		result1 *zhmcclient.HmcError
@@ -366,12 +366,12 @@ type ZhmcAPI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ZhmcAPI) AttachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.LparProperties) *zhmcclient.HmcError {
+func (fake *ZhmcAPI) AttachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError {
 	fake.attachStorageGroupToPartitionMutex.Lock()
 	ret, specificReturn := fake.attachStorageGroupToPartitionReturnsOnCall[len(fake.attachStorageGroupToPartitionArgsForCall)]
 	fake.attachStorageGroupToPartitionArgsForCall = append(fake.attachStorageGroupToPartitionArgsForCall, struct {
 		arg1 string
-		arg2 *zhmcclient.LparProperties
+		arg2 *zhmcclient.StorageGroupPayload
 	}{arg1, arg2})
 	stub := fake.AttachStorageGroupToPartitionStub
 	fakeReturns := fake.attachStorageGroupToPartitionReturns
@@ -392,13 +392,13 @@ func (fake *ZhmcAPI) AttachStorageGroupToPartitionCallCount() int {
 	return len(fake.attachStorageGroupToPartitionArgsForCall)
 }
 
-func (fake *ZhmcAPI) AttachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.LparProperties) *zhmcclient.HmcError) {
+func (fake *ZhmcAPI) AttachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError) {
 	fake.attachStorageGroupToPartitionMutex.Lock()
 	defer fake.attachStorageGroupToPartitionMutex.Unlock()
 	fake.AttachStorageGroupToPartitionStub = stub
 }
 
-func (fake *ZhmcAPI) AttachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.LparProperties) {
+func (fake *ZhmcAPI) AttachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.StorageGroupPayload) {
 	fake.attachStorageGroupToPartitionMutex.RLock()
 	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
 	argsForCall := fake.attachStorageGroupToPartitionArgsForCall[i]
@@ -802,12 +802,12 @@ func (fake *ZhmcAPI) DeleteNicReturnsOnCall(i int, result1 *zhmcclient.HmcError)
 	}{result1}
 }
 
-func (fake *ZhmcAPI) DetachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.LparProperties) *zhmcclient.HmcError {
+func (fake *ZhmcAPI) DetachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError {
 	fake.detachStorageGroupToPartitionMutex.Lock()
 	ret, specificReturn := fake.detachStorageGroupToPartitionReturnsOnCall[len(fake.detachStorageGroupToPartitionArgsForCall)]
 	fake.detachStorageGroupToPartitionArgsForCall = append(fake.detachStorageGroupToPartitionArgsForCall, struct {
 		arg1 string
-		arg2 *zhmcclient.LparProperties
+		arg2 *zhmcclient.StorageGroupPayload
 	}{arg1, arg2})
 	stub := fake.DetachStorageGroupToPartitionStub
 	fakeReturns := fake.detachStorageGroupToPartitionReturns
@@ -828,13 +828,13 @@ func (fake *ZhmcAPI) DetachStorageGroupToPartitionCallCount() int {
 	return len(fake.detachStorageGroupToPartitionArgsForCall)
 }
 
-func (fake *ZhmcAPI) DetachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.LparProperties) *zhmcclient.HmcError) {
+func (fake *ZhmcAPI) DetachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError) {
 	fake.detachStorageGroupToPartitionMutex.Lock()
 	defer fake.detachStorageGroupToPartitionMutex.Unlock()
 	fake.DetachStorageGroupToPartitionStub = stub
 }
 
-func (fake *ZhmcAPI) DetachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.LparProperties) {
+func (fake *ZhmcAPI) DetachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.StorageGroupPayload) {
 	fake.detachStorageGroupToPartitionMutex.RLock()
 	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
 	argsForCall := fake.detachStorageGroupToPartitionArgsForCall[i]

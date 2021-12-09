@@ -86,11 +86,11 @@ func (m *ZhmcManager) ListNics(lparURI string) ([]string, *HmcError) {
 	return m.lparManager.ListNics(lparURI)
 }
 
-func (m *ZhmcManager) AttachStorageGroupToPartition(lparURI string, request *LparProperties) *HmcError {
+func (m *ZhmcManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
 	return m.lparManager.AttachStorageGroupToPartition(lparURI, request)
 }
 
-func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *LparProperties) *HmcError {
+func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
 	return m.lparManager.DetachStorageGroupToPartition(lparURI, request)
 }
 

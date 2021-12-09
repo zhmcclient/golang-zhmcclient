@@ -283,8 +283,7 @@ func ListStorageVolumesforCPC(hmcManager zhmcclient.ZhmcAPI) {
 
 func AttachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	sgroupID := os.Getenv("SGROUP_ID")
-	storageGroupURI := []string{"/api/storage-groups/" + sgroupID}
-	props := &zhmcclient.LparProperties{StorageGroupURIs: storageGroupURI}
+	props := &zhmcclient.StorageGroupPayload{StorageGroupURI: "/api/storage-groups/" + sgroupID}
 	err := hmcManager.AttachStorageGroupToPartition(GetLPARURI(), props)
 	if err != nil {
 		fmt.Println("Attach storage group error: ", err.Message)
@@ -295,8 +294,7 @@ func AttachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 
 func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	sgroupID := os.Getenv("SGROUP_ID")
-	storageGroupURI := []string{"/api/storage-groups/" + sgroupID}
-	props := &zhmcclient.LparProperties{StorageGroupURIs: storageGroupURI}
+	props := &zhmcclient.StorageGroupPayload{StorageGroupURI: "/api/storage-groups/" + sgroupID}
 	err := hmcManager.DetachStorageGroupToPartition(GetLPARURI(), props)
 	if err != nil {
 		fmt.Println("Detach storage group error: ", err.Message)
