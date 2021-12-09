@@ -265,8 +265,7 @@ func (m *LparManager) ListNics(lparURI string) ([]string, *HmcError) {
  */
 func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "“/operations/attach-storage-group”")
-
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/attach-storage-group")
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
 
 	if err != nil {
