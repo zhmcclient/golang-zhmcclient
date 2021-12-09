@@ -22,6 +22,7 @@ func main() {
 	endpoint := os.Getenv("HMC_ENDPOINT") // "https://9.114.87.7:6794/", "https://192.168.195.118:6794"
 	username := os.Getenv("HMC_USERNAME")
 	password := os.Getenv("HMC_PASSWORD")
+	args := os.Args[1:]
 	//partitionId := os.Getenv("PAR_ID")
 	// isofile := os.Getenv("ISO_FILE")
 	// insfile := os.Getenv("INS_FILE")
@@ -30,75 +31,278 @@ func main() {
 		fmt.Println("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
 		os.Exit(1)
 	}
-	fmt.Println("HMC_ENDPOINT: ", endpoint)
-	fmt.Println("HMC_USERNAME: ", username)
-	fmt.Println("HMC_PASSWORD: xxxxxx")
-	client, err := zhmcclient.NewClient(endpoint, creds)
-	if err != nil {
-		fmt.Println("Error: ", err.Message)
-	}
-	if client != nil {
-		fmt.Println("client initialized.")
-		hmcManager := zhmcclient.NewManagerFromClient(client)
-		/*
-			Create LPAR Base URI
-			partitionId := os.Getenv("PAR_ID")
-			lparURI := "api/partitions/" + partitionId
-		*/
-		/*
-			### Usage Examples
+	if len(args) == 0 {
+		fmt.Println(`
+		    	Usage: sample <Command>
 
-			#List All usage
-			- List all LPAR's for the selected HMC endpoint
+			Please enter one of the below Command:
+
+				"StartPartitionforHmc":
+					- Starts the partition for the selected HMC
+				
+				"StopPartitionforHmc":
+					- Stops the partition for the selected HMC
+				
+				"UpdateBootDeviceProperty":
+					- Updates the partition as boot device="iso" for the selected HMC
+				
+				"MountIsoImageToPartition":
+					- Mounts the iso image on the partition for the selected HMC
+				
+				"UnmountIsoImageToPartition":
+					- Unmounts the iso image on the partition for the selected HMC					
+				
+				"ListStorageGroupsforCPC":
+					- List the storage groups of a given CPC for the selected HMC	
+
+			     "ListStorageVolumesforCPC":
+				 	- Get storage volumes of a given storage group for the selected HMC
+				
+				"AttachStorageGroupToPartitionofCPC":
+					- Attach storage group to selected partition
+				
+				"DetachStorageGroupToPartitionofCPC":
+					- Detach storage group from selected partition
+
+		}`)
+		os.Exit(1)
+	} else {
+		fmt.Println("HMC_ENDPOINT: ", endpoint)
+		fmt.Println("HMC_USERNAME: ", username)
+		fmt.Println("HMC_PASSWORD: xxxxxx")
+		client, err := zhmcclient.NewClient(endpoint, creds)
+		if err != nil {
+			fmt.Println("Error: ", err.Message)
+		}
+		if client != nil {
+			fmt.Println("client initialized.")
 			hmcManager := zhmcclient.NewManagerFromClient(client)
-			ListAll(hmcManager)
-		*/
-		/*
-			## Steps to update boot device for a partition
+			/*
+			 Create LPAR Base URI
+			 partitionId := os.Getenv("PAR_ID")
+			 lparURI := "api/partitions/" + partitionId
+			*/
+			/*
+			 ### Usage Examples
 
-				#1 Create a partition
-				- Following steps are done by ansible playbooks
-					- Create linux partition with resources reserved
-					- Create linux resources (storage group: boot vol, data vol)
-						- Create Storage group
-						- Create boot volume
-						- Create data volume
-						- Map Wwpns
-						- Create volumes on storage array (part of LUN sensing)
-					- Attach storage group to partition
+			 #List All usage
+			 - List all LPAR's for the selected HMC endpoint
+			 hmcManager := zhmcclient.NewManagerFromClient(client)
+			 ListAll(hmcManager)
+			*/
+			/*
+				 ## Steps to update boot device for a partition
 
-				#2 Mount Iso image Usage
-				- Mount Iso image on the partition
-				- isofile := os.Getenv("ISO_FILE")
-				- insfile := os.Getenv("INS_FILE")
-				@params:
-				- lparURI: Api endpoint for LPAR (type string)
-				- isofile: Iso file path to be mounted (type string)
-				- insfile: Ins file for the iso file (type string)
-				err := hmcManager.MountIsoImage(lparURI, isofile, insfile)
+					 #1 Create a partition
+					 - Following steps are done by ansible playbooks
+						 - Create linux partition with resources reserved
+						 - Create linux resources (storage group: boot vol, data vol)
+							 - Create Storage group
+							 - Create boot volume
+							 - Create data volume
+							 - Map Wwpns
+							 - Create volumes on storage array (part of LUN sensing)
+						 - Attach storage group to partition
 
-				#3 Update Lpar Properties
-				- Update the boot device property of the partition to 'iso-image' to bring up
-				the partition with the mounted iso image
-				@params:
-				- lparURI: Api endpoint for LPAR (type string)
-				- props: Lpar properties to update (type *zhmcclient.LparProperties)
-				usage:
-				var bootDevice zhmcclient.PartitionBootDevice = zhmcclient.BOOT_DEVICE_ISO_IMAGE
-				props := &zhmcclient.LparProperties{BootDevice: bootDevice}
-				err := hmcManager.UpdateLparProperties(lparURI, props)
+					 #2 Mount Iso image Usage
+					 - Mount Iso image on the partition
+					 - isofile := os.Getenv("ISO_FILE")
+					 - insfile := os.Getenv("INS_FILE")
+					 @params:
+					 - lparURI: Api endpoint for LPAR (type string)
+					 - isofile: Iso file path to be mounted (type string)
+					 - insfile: Ins file for the iso file (type string)
+					 err := hmcManager.MountIsoImage(lparURI, isofile, insfile)
 
-				#4 Start Partition
-				- Start the partition on the selected HMC endpoint with iso image
-				@params:
-				- lparURI: Api endpoint for LPAR (type string)
-				err := hmcManager.StartPartition(lparURI)
-		*/
-		/* #List All usage
-		- List all LPAR's for the selected HMC endpoint
-		*/
-		ListAll(hmcManager)
+					 #3 Update Lpar Properties
+					 - Update the boot device property of the partition to 'iso-image' to bring up
+					 the partition with the mounted iso image
+					 @params:
+					 - lparURI: Api endpoint for LPAR (type string)
+					 - props: Lpar properties to update (type *zhmcclient.LparProperties)
+					 usage:
+					 var bootDevice zhmcclient.PartitionBootDevice = zhmcclient.BOOT_DEVICE_ISO_IMAGE
+					 props := &zhmcclient.LparProperties{BootDevice: bootDevice}
+					 err := hmcManager.UpdateLparProperties(lparURI, props)
+
+					 #4 Start Partition
+					 - Start the partition on the selected HMC endpoint with iso image
+					 @params:
+					 - lparURI: Api endpoint for LPAR (type string)
+					 err := hmcManager.StartPartition(lparURI)
+
+					 printVirtualSwitches(hmcManager)
+
+					 printVirtualSwitcheProperties(hmcManager)
+			*/
+			/* #List All usage
+			- List all LPAR's for the selected HMC endpoint
+			*/
+			//ListAll(hmcManager)
+			for _, arg := range args {
+				switch arg {
+				case "StartPartitionforHmc":
+					StartPartitionforHmc(hmcManager)
+				case "StopPartitionforHmc":
+					StopPartitionforHmc(hmcManager)
+				case "UpdateBootDeviceProperty":
+					UpdateBootDeviceProperty(hmcManager)
+				case "MountIsoImageToPartition":
+					MountIsoImageToPartition(hmcManager)
+				case "ListStorageGroupsforCPC":
+					ListStorageGroupsforCPC(hmcManager)
+				case "ListStorageVolumesforCPC":
+					ListStorageVolumesforCPC(hmcManager)
+				case "DetachStorageGroupToPartitionofCPC":
+					DetachStorageGroupToPartitionofCPC(hmcManager)
+				case "AttachStorageGroupToPartitionofCPC":
+					AttachStorageGroupToPartitionofCPC(hmcManager)
+				}
+			}
+		}
 	}
+}
+
+func GetLPARURI() (lparURI string) {
+	partitionId := os.Getenv("PAR_ID")
+	lparURI = "api/partitions/" + partitionId
+	return
+}
+
+func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	_, err := hmcManager.StopLPAR(lparURI)
+	if err != nil {
+		fmt.Println("Stop Partition error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Stop partition successfull")
+}
+
+func MountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	isofile := os.Getenv("ISO_FILE")
+	insfile := os.Getenv("INS_FILE")
+	err := hmcManager.MountIsoImage(lparURI, isofile, insfile)
+	if err != nil {
+		fmt.Println("Mount iso error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Mount iso image successfull")
+}
+
+func UnmountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	err := hmcManager.UnmountIsoImage(lparURI)
+	if err != nil {
+		fmt.Println("Unmount iso error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Unmount iso image successfull")
+}
+
+func UpdateBootDeviceProperty(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	var bootDevice zhmcclient.PartitionBootDevice = zhmcclient.BOOT_DEVICE_ISO_IMAGE
+	props := &zhmcclient.LparProperties{BootDevice: bootDevice}
+	err := hmcManager.UpdateLparProperties(lparURI, props)
+	if err != nil {
+		fmt.Println("Update boot device error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Update boot device successfull")
+}
+
+func StartPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	_, err := hmcManager.StartLPAR(lparURI)
+	if err != nil {
+		fmt.Println("Stop Partition error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Start partition successfull")
+}
+
+/*
+	List all function
+*/
+func ListStorageGroupsforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	cpcID := os.Getenv("CPC_ID")
+	storageGroupURI := "api/storage-groups/"
+	storageGroups, err := hmcManager.ListStorageGroups(storageGroupURI, cpcID)
+	if err != nil {
+		fmt.Println("List Storage Group Error: ", err.Message)
+	}
+	for _, sg := range storageGroups {
+		fmt.Println("########################################")
+		fmt.Println("Storage group Name: ", sg.Name)
+		fmt.Println("Storage group URI: ", sg.ObjectURI)
+		fmt.Println("Storage group TYPE: ", sg.Type)
+		fmt.Println("Storage group Fullfillment state: ", sg.FulfillmentState)
+		sgroup, _ := hmcManager.GetStorageGroupProperties(sg.ObjectURI)
+		fmt.Println("Storage Group Properties")
+		fmt.Println("Storage group unassigned wwpns: ", sgroup.UnAssignedWWPNs)
+		fmt.Println("  - Storage Group Volumes: ", sgroup.StorageVolumesURIs)
+		fmt.Println("  - Storage Group ObjectID: ", sgroup.ObjectID)
+	}
+	fmt.Println("########################################")
+}
+
+func ListStorageVolumesforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	sgroupID := os.Getenv("SGROUP_ID")
+	storageGroupURI := "/api/storage-groups/" + sgroupID + "/storage-volumes"
+	storageVolumes, err := hmcManager.ListStorageVolumes(storageGroupURI)
+	if err != nil {
+		fmt.Println("List Storage Group Error: ", err.Message)
+	}
+	for _, sv := range storageVolumes {
+		fmt.Println("########################################")
+		fmt.Println("Storage Volume Name: ", sv.Name)
+		fmt.Println("Storage Volume Fullfillment state: ", sv.FulfillmentState)
+		fmt.Println("Storage volume usage: ", sv.Usage)
+		storageVolume, volErr := hmcManager.GetStorageVolumeProperties(sv.URI)
+		if volErr != nil {
+			fmt.Println(volErr.Message)
+			os.Exit(1)
+		}
+		fmt.Println("Storage Volume Properties")
+		fmt.Println("  - Storage Volume ECKD Type: ", storageVolume.EckdType)
+		fmt.Println("  - Storage Volume Active Size: ", storageVolume.ActiveSize)
+		fmt.Println("  - Storage Volume Device Number: ", storageVolume.DeviceNumber)
+		fmt.Println("  - Storage Volume Path Information: ")
+		for index, path := range storageVolume.Paths {
+			fmt.Println(" ", (index + 1), "*****************************************")
+			fmt.Println("\tPath Device Number: ", path.DeviceNumber)
+			fmt.Println("\n\tPath PartitionURI: ", path.PartitionURI)
+			fmt.Println("\n\tPath LUN: ", path.LogicalUnitNumber)
+			fmt.Println("\n\tPath Target WWPN: ", path.TargetWWPN)
+		}
+	}
+	fmt.Println("########################################")
+}
+
+func AttachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
+	sgroupID := os.Getenv("SGROUP_ID")
+	storageGroupURI := "/api/storage-groups/" + sgroupID + "/storage-volumes"
+	props := &zhmcclient.StorageGroupProperties{StorageGroupURI: storageGroupURI}
+	err := hmcManager.AttachStorageGroupToPartition(storageGroupURI, props)
+	if err != nil {
+		fmt.Println("Attach storage group error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Attach storage group operation successfull")
+}
+
+func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
+	sgroupID := os.Getenv("SGROUP_ID")
+	storageGroupURI := "/api/storage-groups/" + sgroupID + "/storage-volumes"
+	props := &zhmcclient.StorageGroupProperties{StorageGroupURI: storageGroupURI}
+	err := hmcManager.DetachStorageGroupToPartition(storageGroupURI, props)
+	if err != nil {
+		fmt.Println("Detach storage group error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Detach storage group operation successfull")
 }
 
 /*

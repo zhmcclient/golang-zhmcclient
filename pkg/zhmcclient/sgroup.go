@@ -13,7 +13,6 @@ package zhmcclient
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 )
@@ -22,10 +21,14 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/nic.go --fake-name StorageGroupAPI . StorageGroupAPI
 
 type StorageGroupAPI interface {
-	ListStorageGroups(storageGroupURI string, cpc string) ([]StorageGroup, error)
-	GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, error)
-	UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) error
-	FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) error
+	ListStorageGroups(storageGroupURI string, cpc string) ([]StorageGroup, *HmcError)
+	GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, *HmcError)
+	ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError)
+	GetStorageVolumeProperties(storageGroupURI string) (*StorageVolume, *HmcError)
+	UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
+	AttachStorageGroupToPartition(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
+	DetachStorageGroupToPartition(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
+	FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
 }
 
 type StorageGroupManager struct {
@@ -49,10 +52,9 @@ func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpc stri
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 	query := map[string]string{
-		"cpc-uri": cpc,
+		"cpc-uri": "/api/cpcs/" + cpc,
 	}
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
-
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -99,9 +101,61 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
 }
 
 /**
+ * GET /api/storage-groups/{storage-group-id}/storage-volumes
+ * @storage-group-id the Object id of the storage group
+ * @return storage volume array
+ * Return: 200 and Storage Group array
+ *     or: 400, 404, 409
+ */
+func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		storageVolumes := &StorageVolumeArray{}
+		err := json.Unmarshal(responseBody, storageVolumes)
+		if err != nil {
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		return storageVolumes.STORAGEVOLUMES, nil
+	}
+
+	return nil, GenerateErrorFromResponse(responseBody)
+}
+
+/**
+ * GET /api/storage-groups/{storage-group-id}/storage-volumes/{storage-volume-id}
+ * @return volume object
+ * Return: 200 and Storage Volume object
+ *     or: 400, 404, 409
+ */
+func (m *StorageGroupManager) GetStorageVolumeProperties(storageGroupURI string) (*StorageVolume, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		storageVolume := &StorageVolume{}
+		err := json.Unmarshal(responseBody, storageVolume)
+		if err != nil {
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		return storageVolume, nil
+	}
+
+	return nil, GenerateErrorFromResponse(responseBody)
+}
+
+/**
  * POST /api/storage-groups/{storage-group-id}/operations/modify
- * @cpcURI the ID of the virtual switch
- * @return adapter array
  * Return: 200
  *     or: 400, 404, 409
  */
@@ -110,8 +164,6 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, updateRequest)
-	fmt.Println("Status:", status)
-	fmt.Println("Update Response:", string(responseBody))
 	if err != nil {
 		return err
 	}
@@ -131,9 +183,7 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 /**
 * POST /api/storage-groups/{storage-group-id}/operations/accept-mismatched-
   storage-volumes
-* @cpcURI the ID of the virtual switch
-* @return adapter array
-* Return: 200 and Adapters array
+* Return: 200
 *     or: 400, 404, 409
 */
 func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, request *StorageGroupProperties) *HmcError {
@@ -141,7 +191,64 @@ func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, reques
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
-	fmt.Println(requestUrl)
+
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusOK {
+		storageGroup := &StorageGroup{}
+		err := json.Unmarshal(responseBody, storageGroup)
+		if err != nil {
+			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		return nil
+	}
+
+	return nil
+}
+
+// AttachStorageGroupToPartition
+
+/**
+* POST /api/storage-groups/{storage-group-id}/operations/attach-storage-group
+* Return: 200
+*     or: 400, 404, 409
+ */
+func (m *StorageGroupManager) AttachStorageGroupToPartition(storageGroupURI string, request *StorageGroupProperties) *HmcError {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusOK {
+		storageGroup := &StorageGroup{}
+		err := json.Unmarshal(responseBody, storageGroup)
+		if err != nil {
+			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		return nil
+	}
+
+	return nil
+}
+
+// DetachStorageGroupToPartition
+/**
+* POST /api/storage-groups/{storage-group-id}/operations/detach-storage-group
+* Return: 200
+*     or: 400, 404, 409
+ */
+func (m *StorageGroupManager) DetachStorageGroupToPartition(storageGroupURI string, request *StorageGroupProperties) *HmcError {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+
 	if err != nil {
 		return err
 	}

@@ -8,32 +8,69 @@ import (
 )
 
 type StorageGroupAPI struct {
-	FulfillStorageGroupStub        func(string, *zhmcclient.StorageGroupProperties) error
+	AttachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError
+	attachStorageGroupToPartitionMutex       sync.RWMutex
+	attachStorageGroupToPartitionArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupProperties
+	}
+	attachStorageGroupToPartitionReturns struct {
+		result1 *zhmcclient.HmcError
+	}
+	attachStorageGroupToPartitionReturnsOnCall map[int]struct {
+		result1 *zhmcclient.HmcError
+	}
+	DetachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError
+	detachStorageGroupToPartitionMutex       sync.RWMutex
+	detachStorageGroupToPartitionArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupProperties
+	}
+	detachStorageGroupToPartitionReturns struct {
+		result1 *zhmcclient.HmcError
+	}
+	detachStorageGroupToPartitionReturnsOnCall map[int]struct {
+		result1 *zhmcclient.HmcError
+	}
+	FulfillStorageGroupStub        func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError
 	fulfillStorageGroupMutex       sync.RWMutex
 	fulfillStorageGroupArgsForCall []struct {
 		arg1 string
 		arg2 *zhmcclient.StorageGroupProperties
 	}
 	fulfillStorageGroupReturns struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	fulfillStorageGroupReturnsOnCall map[int]struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
-	GetStorageGroupPropertiesStub        func(string) (*zhmcclient.StorageGroupProperties, error)
+	GetStorageGroupPropertiesStub        func(string) (*zhmcclient.StorageGroupProperties, *zhmcclient.HmcError)
 	getStorageGroupPropertiesMutex       sync.RWMutex
 	getStorageGroupPropertiesArgsForCall []struct {
 		arg1 string
 	}
 	getStorageGroupPropertiesReturns struct {
 		result1 *zhmcclient.StorageGroupProperties
-		result2 error
+		result2 *zhmcclient.HmcError
 	}
 	getStorageGroupPropertiesReturnsOnCall map[int]struct {
 		result1 *zhmcclient.StorageGroupProperties
-		result2 error
+		result2 *zhmcclient.HmcError
 	}
-	ListStorageGroupsStub        func(string, string) ([]zhmcclient.StorageGroup, error)
+	GetStorageVolumePropertiesStub        func(string) (*zhmcclient.StorageVolume, *zhmcclient.HmcError)
+	getStorageVolumePropertiesMutex       sync.RWMutex
+	getStorageVolumePropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getStorageVolumePropertiesReturns struct {
+		result1 *zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}
+	getStorageVolumePropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}
+	ListStorageGroupsStub        func(string, string) ([]zhmcclient.StorageGroup, *zhmcclient.HmcError)
 	listStorageGroupsMutex       sync.RWMutex
 	listStorageGroupsArgsForCall []struct {
 		arg1 string
@@ -41,29 +78,166 @@ type StorageGroupAPI struct {
 	}
 	listStorageGroupsReturns struct {
 		result1 []zhmcclient.StorageGroup
-		result2 error
+		result2 *zhmcclient.HmcError
 	}
 	listStorageGroupsReturnsOnCall map[int]struct {
 		result1 []zhmcclient.StorageGroup
-		result2 error
+		result2 *zhmcclient.HmcError
 	}
-	UpdateStorageGroupPropertiesStub        func(string, *zhmcclient.StorageGroupProperties) error
+	ListStorageVolumesStub        func(string) ([]zhmcclient.StorageVolume, *zhmcclient.HmcError)
+	listStorageVolumesMutex       sync.RWMutex
+	listStorageVolumesArgsForCall []struct {
+		arg1 string
+	}
+	listStorageVolumesReturns struct {
+		result1 []zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}
+	listStorageVolumesReturnsOnCall map[int]struct {
+		result1 []zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}
+	UpdateStorageGroupPropertiesStub        func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError
 	updateStorageGroupPropertiesMutex       sync.RWMutex
 	updateStorageGroupPropertiesArgsForCall []struct {
 		arg1 string
 		arg2 *zhmcclient.StorageGroupProperties
 	}
 	updateStorageGroupPropertiesReturns struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	updateStorageGroupPropertiesReturnsOnCall map[int]struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *StorageGroupAPI) FulfillStorageGroup(arg1 string, arg2 *zhmcclient.StorageGroupProperties) error {
+func (fake *StorageGroupAPI) AttachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	ret, specificReturn := fake.attachStorageGroupToPartitionReturnsOnCall[len(fake.attachStorageGroupToPartitionArgsForCall)]
+	fake.attachStorageGroupToPartitionArgsForCall = append(fake.attachStorageGroupToPartitionArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupProperties
+	}{arg1, arg2})
+	stub := fake.AttachStorageGroupToPartitionStub
+	fakeReturns := fake.attachStorageGroupToPartitionReturns
+	fake.recordInvocation("AttachStorageGroupToPartition", []interface{}{arg1, arg2})
+	fake.attachStorageGroupToPartitionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *StorageGroupAPI) AttachStorageGroupToPartitionCallCount() int {
+	fake.attachStorageGroupToPartitionMutex.RLock()
+	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	return len(fake.attachStorageGroupToPartitionArgsForCall)
+}
+
+func (fake *StorageGroupAPI) AttachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError) {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	defer fake.attachStorageGroupToPartitionMutex.Unlock()
+	fake.AttachStorageGroupToPartitionStub = stub
+}
+
+func (fake *StorageGroupAPI) AttachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.StorageGroupProperties) {
+	fake.attachStorageGroupToPartitionMutex.RLock()
+	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	argsForCall := fake.attachStorageGroupToPartitionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *StorageGroupAPI) AttachStorageGroupToPartitionReturns(result1 *zhmcclient.HmcError) {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	defer fake.attachStorageGroupToPartitionMutex.Unlock()
+	fake.AttachStorageGroupToPartitionStub = nil
+	fake.attachStorageGroupToPartitionReturns = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *StorageGroupAPI) AttachStorageGroupToPartitionReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	defer fake.attachStorageGroupToPartitionMutex.Unlock()
+	fake.AttachStorageGroupToPartitionStub = nil
+	if fake.attachStorageGroupToPartitionReturnsOnCall == nil {
+		fake.attachStorageGroupToPartitionReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.HmcError
+		})
+	}
+	fake.attachStorageGroupToPartitionReturnsOnCall[i] = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *StorageGroupAPI) DetachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	ret, specificReturn := fake.detachStorageGroupToPartitionReturnsOnCall[len(fake.detachStorageGroupToPartitionArgsForCall)]
+	fake.detachStorageGroupToPartitionArgsForCall = append(fake.detachStorageGroupToPartitionArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupProperties
+	}{arg1, arg2})
+	stub := fake.DetachStorageGroupToPartitionStub
+	fakeReturns := fake.detachStorageGroupToPartitionReturns
+	fake.recordInvocation("DetachStorageGroupToPartition", []interface{}{arg1, arg2})
+	fake.detachStorageGroupToPartitionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *StorageGroupAPI) DetachStorageGroupToPartitionCallCount() int {
+	fake.detachStorageGroupToPartitionMutex.RLock()
+	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
+	return len(fake.detachStorageGroupToPartitionArgsForCall)
+}
+
+func (fake *StorageGroupAPI) DetachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError) {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	defer fake.detachStorageGroupToPartitionMutex.Unlock()
+	fake.DetachStorageGroupToPartitionStub = stub
+}
+
+func (fake *StorageGroupAPI) DetachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.StorageGroupProperties) {
+	fake.detachStorageGroupToPartitionMutex.RLock()
+	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
+	argsForCall := fake.detachStorageGroupToPartitionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *StorageGroupAPI) DetachStorageGroupToPartitionReturns(result1 *zhmcclient.HmcError) {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	defer fake.detachStorageGroupToPartitionMutex.Unlock()
+	fake.DetachStorageGroupToPartitionStub = nil
+	fake.detachStorageGroupToPartitionReturns = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *StorageGroupAPI) DetachStorageGroupToPartitionReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	defer fake.detachStorageGroupToPartitionMutex.Unlock()
+	fake.DetachStorageGroupToPartitionStub = nil
+	if fake.detachStorageGroupToPartitionReturnsOnCall == nil {
+		fake.detachStorageGroupToPartitionReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.HmcError
+		})
+	}
+	fake.detachStorageGroupToPartitionReturnsOnCall[i] = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *StorageGroupAPI) FulfillStorageGroup(arg1 string, arg2 *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError {
 	fake.fulfillStorageGroupMutex.Lock()
 	ret, specificReturn := fake.fulfillStorageGroupReturnsOnCall[len(fake.fulfillStorageGroupArgsForCall)]
 	fake.fulfillStorageGroupArgsForCall = append(fake.fulfillStorageGroupArgsForCall, struct {
@@ -89,7 +263,7 @@ func (fake *StorageGroupAPI) FulfillStorageGroupCallCount() int {
 	return len(fake.fulfillStorageGroupArgsForCall)
 }
 
-func (fake *StorageGroupAPI) FulfillStorageGroupCalls(stub func(string, *zhmcclient.StorageGroupProperties) error) {
+func (fake *StorageGroupAPI) FulfillStorageGroupCalls(stub func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError) {
 	fake.fulfillStorageGroupMutex.Lock()
 	defer fake.fulfillStorageGroupMutex.Unlock()
 	fake.FulfillStorageGroupStub = stub
@@ -102,30 +276,30 @@ func (fake *StorageGroupAPI) FulfillStorageGroupArgsForCall(i int) (string, *zhm
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *StorageGroupAPI) FulfillStorageGroupReturns(result1 error) {
+func (fake *StorageGroupAPI) FulfillStorageGroupReturns(result1 *zhmcclient.HmcError) {
 	fake.fulfillStorageGroupMutex.Lock()
 	defer fake.fulfillStorageGroupMutex.Unlock()
 	fake.FulfillStorageGroupStub = nil
 	fake.fulfillStorageGroupReturns = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *StorageGroupAPI) FulfillStorageGroupReturnsOnCall(i int, result1 error) {
+func (fake *StorageGroupAPI) FulfillStorageGroupReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
 	fake.fulfillStorageGroupMutex.Lock()
 	defer fake.fulfillStorageGroupMutex.Unlock()
 	fake.FulfillStorageGroupStub = nil
 	if fake.fulfillStorageGroupReturnsOnCall == nil {
 		fake.fulfillStorageGroupReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *zhmcclient.HmcError
 		})
 	}
 	fake.fulfillStorageGroupReturnsOnCall[i] = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *StorageGroupAPI) GetStorageGroupProperties(arg1 string) (*zhmcclient.StorageGroupProperties, error) {
+func (fake *StorageGroupAPI) GetStorageGroupProperties(arg1 string) (*zhmcclient.StorageGroupProperties, *zhmcclient.HmcError) {
 	fake.getStorageGroupPropertiesMutex.Lock()
 	ret, specificReturn := fake.getStorageGroupPropertiesReturnsOnCall[len(fake.getStorageGroupPropertiesArgsForCall)]
 	fake.getStorageGroupPropertiesArgsForCall = append(fake.getStorageGroupPropertiesArgsForCall, struct {
@@ -150,7 +324,7 @@ func (fake *StorageGroupAPI) GetStorageGroupPropertiesCallCount() int {
 	return len(fake.getStorageGroupPropertiesArgsForCall)
 }
 
-func (fake *StorageGroupAPI) GetStorageGroupPropertiesCalls(stub func(string) (*zhmcclient.StorageGroupProperties, error)) {
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesCalls(stub func(string) (*zhmcclient.StorageGroupProperties, *zhmcclient.HmcError)) {
 	fake.getStorageGroupPropertiesMutex.Lock()
 	defer fake.getStorageGroupPropertiesMutex.Unlock()
 	fake.GetStorageGroupPropertiesStub = stub
@@ -163,33 +337,97 @@ func (fake *StorageGroupAPI) GetStorageGroupPropertiesArgsForCall(i int) string 
 	return argsForCall.arg1
 }
 
-func (fake *StorageGroupAPI) GetStorageGroupPropertiesReturns(result1 *zhmcclient.StorageGroupProperties, result2 error) {
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesReturns(result1 *zhmcclient.StorageGroupProperties, result2 *zhmcclient.HmcError) {
 	fake.getStorageGroupPropertiesMutex.Lock()
 	defer fake.getStorageGroupPropertiesMutex.Unlock()
 	fake.GetStorageGroupPropertiesStub = nil
 	fake.getStorageGroupPropertiesReturns = struct {
 		result1 *zhmcclient.StorageGroupProperties
-		result2 error
+		result2 *zhmcclient.HmcError
 	}{result1, result2}
 }
 
-func (fake *StorageGroupAPI) GetStorageGroupPropertiesReturnsOnCall(i int, result1 *zhmcclient.StorageGroupProperties, result2 error) {
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesReturnsOnCall(i int, result1 *zhmcclient.StorageGroupProperties, result2 *zhmcclient.HmcError) {
 	fake.getStorageGroupPropertiesMutex.Lock()
 	defer fake.getStorageGroupPropertiesMutex.Unlock()
 	fake.GetStorageGroupPropertiesStub = nil
 	if fake.getStorageGroupPropertiesReturnsOnCall == nil {
 		fake.getStorageGroupPropertiesReturnsOnCall = make(map[int]struct {
 			result1 *zhmcclient.StorageGroupProperties
-			result2 error
+			result2 *zhmcclient.HmcError
 		})
 	}
 	fake.getStorageGroupPropertiesReturnsOnCall[i] = struct {
 		result1 *zhmcclient.StorageGroupProperties
-		result2 error
+		result2 *zhmcclient.HmcError
 	}{result1, result2}
 }
 
-func (fake *StorageGroupAPI) ListStorageGroups(arg1 string, arg2 string) ([]zhmcclient.StorageGroup, error) {
+func (fake *StorageGroupAPI) GetStorageVolumeProperties(arg1 string) (*zhmcclient.StorageVolume, *zhmcclient.HmcError) {
+	fake.getStorageVolumePropertiesMutex.Lock()
+	ret, specificReturn := fake.getStorageVolumePropertiesReturnsOnCall[len(fake.getStorageVolumePropertiesArgsForCall)]
+	fake.getStorageVolumePropertiesArgsForCall = append(fake.getStorageVolumePropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetStorageVolumePropertiesStub
+	fakeReturns := fake.getStorageVolumePropertiesReturns
+	fake.recordInvocation("GetStorageVolumeProperties", []interface{}{arg1})
+	fake.getStorageVolumePropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *StorageGroupAPI) GetStorageVolumePropertiesCallCount() int {
+	fake.getStorageVolumePropertiesMutex.RLock()
+	defer fake.getStorageVolumePropertiesMutex.RUnlock()
+	return len(fake.getStorageVolumePropertiesArgsForCall)
+}
+
+func (fake *StorageGroupAPI) GetStorageVolumePropertiesCalls(stub func(string) (*zhmcclient.StorageVolume, *zhmcclient.HmcError)) {
+	fake.getStorageVolumePropertiesMutex.Lock()
+	defer fake.getStorageVolumePropertiesMutex.Unlock()
+	fake.GetStorageVolumePropertiesStub = stub
+}
+
+func (fake *StorageGroupAPI) GetStorageVolumePropertiesArgsForCall(i int) string {
+	fake.getStorageVolumePropertiesMutex.RLock()
+	defer fake.getStorageVolumePropertiesMutex.RUnlock()
+	argsForCall := fake.getStorageVolumePropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *StorageGroupAPI) GetStorageVolumePropertiesReturns(result1 *zhmcclient.StorageVolume, result2 *zhmcclient.HmcError) {
+	fake.getStorageVolumePropertiesMutex.Lock()
+	defer fake.getStorageVolumePropertiesMutex.Unlock()
+	fake.GetStorageVolumePropertiesStub = nil
+	fake.getStorageVolumePropertiesReturns = struct {
+		result1 *zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *StorageGroupAPI) GetStorageVolumePropertiesReturnsOnCall(i int, result1 *zhmcclient.StorageVolume, result2 *zhmcclient.HmcError) {
+	fake.getStorageVolumePropertiesMutex.Lock()
+	defer fake.getStorageVolumePropertiesMutex.Unlock()
+	fake.GetStorageVolumePropertiesStub = nil
+	if fake.getStorageVolumePropertiesReturnsOnCall == nil {
+		fake.getStorageVolumePropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.StorageVolume
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.getStorageVolumePropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *StorageGroupAPI) ListStorageGroups(arg1 string, arg2 string) ([]zhmcclient.StorageGroup, *zhmcclient.HmcError) {
 	fake.listStorageGroupsMutex.Lock()
 	ret, specificReturn := fake.listStorageGroupsReturnsOnCall[len(fake.listStorageGroupsArgsForCall)]
 	fake.listStorageGroupsArgsForCall = append(fake.listStorageGroupsArgsForCall, struct {
@@ -215,7 +453,7 @@ func (fake *StorageGroupAPI) ListStorageGroupsCallCount() int {
 	return len(fake.listStorageGroupsArgsForCall)
 }
 
-func (fake *StorageGroupAPI) ListStorageGroupsCalls(stub func(string, string) ([]zhmcclient.StorageGroup, error)) {
+func (fake *StorageGroupAPI) ListStorageGroupsCalls(stub func(string, string) ([]zhmcclient.StorageGroup, *zhmcclient.HmcError)) {
 	fake.listStorageGroupsMutex.Lock()
 	defer fake.listStorageGroupsMutex.Unlock()
 	fake.ListStorageGroupsStub = stub
@@ -228,33 +466,97 @@ func (fake *StorageGroupAPI) ListStorageGroupsArgsForCall(i int) (string, string
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *StorageGroupAPI) ListStorageGroupsReturns(result1 []zhmcclient.StorageGroup, result2 error) {
+func (fake *StorageGroupAPI) ListStorageGroupsReturns(result1 []zhmcclient.StorageGroup, result2 *zhmcclient.HmcError) {
 	fake.listStorageGroupsMutex.Lock()
 	defer fake.listStorageGroupsMutex.Unlock()
 	fake.ListStorageGroupsStub = nil
 	fake.listStorageGroupsReturns = struct {
 		result1 []zhmcclient.StorageGroup
-		result2 error
+		result2 *zhmcclient.HmcError
 	}{result1, result2}
 }
 
-func (fake *StorageGroupAPI) ListStorageGroupsReturnsOnCall(i int, result1 []zhmcclient.StorageGroup, result2 error) {
+func (fake *StorageGroupAPI) ListStorageGroupsReturnsOnCall(i int, result1 []zhmcclient.StorageGroup, result2 *zhmcclient.HmcError) {
 	fake.listStorageGroupsMutex.Lock()
 	defer fake.listStorageGroupsMutex.Unlock()
 	fake.ListStorageGroupsStub = nil
 	if fake.listStorageGroupsReturnsOnCall == nil {
 		fake.listStorageGroupsReturnsOnCall = make(map[int]struct {
 			result1 []zhmcclient.StorageGroup
-			result2 error
+			result2 *zhmcclient.HmcError
 		})
 	}
 	fake.listStorageGroupsReturnsOnCall[i] = struct {
 		result1 []zhmcclient.StorageGroup
-		result2 error
+		result2 *zhmcclient.HmcError
 	}{result1, result2}
 }
 
-func (fake *StorageGroupAPI) UpdateStorageGroupProperties(arg1 string, arg2 *zhmcclient.StorageGroupProperties) error {
+func (fake *StorageGroupAPI) ListStorageVolumes(arg1 string) ([]zhmcclient.StorageVolume, *zhmcclient.HmcError) {
+	fake.listStorageVolumesMutex.Lock()
+	ret, specificReturn := fake.listStorageVolumesReturnsOnCall[len(fake.listStorageVolumesArgsForCall)]
+	fake.listStorageVolumesArgsForCall = append(fake.listStorageVolumesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.ListStorageVolumesStub
+	fakeReturns := fake.listStorageVolumesReturns
+	fake.recordInvocation("ListStorageVolumes", []interface{}{arg1})
+	fake.listStorageVolumesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *StorageGroupAPI) ListStorageVolumesCallCount() int {
+	fake.listStorageVolumesMutex.RLock()
+	defer fake.listStorageVolumesMutex.RUnlock()
+	return len(fake.listStorageVolumesArgsForCall)
+}
+
+func (fake *StorageGroupAPI) ListStorageVolumesCalls(stub func(string) ([]zhmcclient.StorageVolume, *zhmcclient.HmcError)) {
+	fake.listStorageVolumesMutex.Lock()
+	defer fake.listStorageVolumesMutex.Unlock()
+	fake.ListStorageVolumesStub = stub
+}
+
+func (fake *StorageGroupAPI) ListStorageVolumesArgsForCall(i int) string {
+	fake.listStorageVolumesMutex.RLock()
+	defer fake.listStorageVolumesMutex.RUnlock()
+	argsForCall := fake.listStorageVolumesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *StorageGroupAPI) ListStorageVolumesReturns(result1 []zhmcclient.StorageVolume, result2 *zhmcclient.HmcError) {
+	fake.listStorageVolumesMutex.Lock()
+	defer fake.listStorageVolumesMutex.Unlock()
+	fake.ListStorageVolumesStub = nil
+	fake.listStorageVolumesReturns = struct {
+		result1 []zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *StorageGroupAPI) ListStorageVolumesReturnsOnCall(i int, result1 []zhmcclient.StorageVolume, result2 *zhmcclient.HmcError) {
+	fake.listStorageVolumesMutex.Lock()
+	defer fake.listStorageVolumesMutex.Unlock()
+	fake.ListStorageVolumesStub = nil
+	if fake.listStorageVolumesReturnsOnCall == nil {
+		fake.listStorageVolumesReturnsOnCall = make(map[int]struct {
+			result1 []zhmcclient.StorageVolume
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.listStorageVolumesReturnsOnCall[i] = struct {
+		result1 []zhmcclient.StorageVolume
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *StorageGroupAPI) UpdateStorageGroupProperties(arg1 string, arg2 *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError {
 	fake.updateStorageGroupPropertiesMutex.Lock()
 	ret, specificReturn := fake.updateStorageGroupPropertiesReturnsOnCall[len(fake.updateStorageGroupPropertiesArgsForCall)]
 	fake.updateStorageGroupPropertiesArgsForCall = append(fake.updateStorageGroupPropertiesArgsForCall, struct {
@@ -280,7 +582,7 @@ func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesCallCount() int {
 	return len(fake.updateStorageGroupPropertiesArgsForCall)
 }
 
-func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesCalls(stub func(string, *zhmcclient.StorageGroupProperties) error) {
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesCalls(stub func(string, *zhmcclient.StorageGroupProperties) *zhmcclient.HmcError) {
 	fake.updateStorageGroupPropertiesMutex.Lock()
 	defer fake.updateStorageGroupPropertiesMutex.Unlock()
 	fake.UpdateStorageGroupPropertiesStub = stub
@@ -293,38 +595,46 @@ func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesArgsForCall(i int) (str
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesReturns(result1 error) {
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesReturns(result1 *zhmcclient.HmcError) {
 	fake.updateStorageGroupPropertiesMutex.Lock()
 	defer fake.updateStorageGroupPropertiesMutex.Unlock()
 	fake.UpdateStorageGroupPropertiesStub = nil
 	fake.updateStorageGroupPropertiesReturns = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
-func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesReturnsOnCall(i int, result1 error) {
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
 	fake.updateStorageGroupPropertiesMutex.Lock()
 	defer fake.updateStorageGroupPropertiesMutex.Unlock()
 	fake.UpdateStorageGroupPropertiesStub = nil
 	if fake.updateStorageGroupPropertiesReturnsOnCall == nil {
 		fake.updateStorageGroupPropertiesReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *zhmcclient.HmcError
 		})
 	}
 	fake.updateStorageGroupPropertiesReturnsOnCall[i] = struct {
-		result1 error
+		result1 *zhmcclient.HmcError
 	}{result1}
 }
 
 func (fake *StorageGroupAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.attachStorageGroupToPartitionMutex.RLock()
+	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	fake.detachStorageGroupToPartitionMutex.RLock()
+	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
 	fake.fulfillStorageGroupMutex.RLock()
 	defer fake.fulfillStorageGroupMutex.RUnlock()
 	fake.getStorageGroupPropertiesMutex.RLock()
 	defer fake.getStorageGroupPropertiesMutex.RUnlock()
+	fake.getStorageVolumePropertiesMutex.RLock()
+	defer fake.getStorageVolumePropertiesMutex.RUnlock()
 	fake.listStorageGroupsMutex.RLock()
 	defer fake.listStorageGroupsMutex.RUnlock()
+	fake.listStorageVolumesMutex.RLock()
+	defer fake.listStorageVolumesMutex.RUnlock()
 	fake.updateStorageGroupPropertiesMutex.RLock()
 	defer fake.updateStorageGroupPropertiesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
