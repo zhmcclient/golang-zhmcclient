@@ -320,6 +320,7 @@ type LparProperties struct {
 	VirtualFunctionUris              []string                      `json:"virtual-function-uris,omitempty"`
 	NicUris                          []string                      `json:"nic-uris,omitempty"`
 	HbaUris                          []string                      `json:"hba-uris,omitempty"`
+	StorageGroupURIs                 []string                      `json:"storage-group-uris,omitempty"`
 	CryptoConfiguration              []byte                        `json:"crypto-configuration,omitempty"`
 	SscHostName                      string                        `json:"ssc-host-name,omitempty"`
 	SscBootSelection                 SscBootSelection              `json:"ssc-boot-selection,omitempty"`
@@ -387,4 +388,130 @@ type NIC struct {
 
 type NicCreateResponse struct {
 	URI string `json:"element-uri"`
+}
+
+//////////////////////////////////////////////////
+// Storage Groups
+//////////////////////////////////////////////////
+
+type StorageGroupOperation string
+
+const (
+	STORAGE_GROUP_MODIFY = "modify"
+)
+
+type StorageGroupState string
+
+const (
+	STORAGE_GROUP_COMPLETE                StorageGroupState = "complete"
+	STORAGE_GROUP_PENDING                                   = "pending"
+	STORAGE_GROUP_INCOMPLETE                                = "incomplete"
+	STORAGE_GROUP_PENDING_WITH_MISMATCHES                   = "pending-with-mismatches"
+	STORAGE_GROUP_OVERPROVISIONED                           = "overprovisioned"
+	STORAGE_GROUP_CHECKING_MIGRATION                        = "checking-migration"
+	STORAGE_GROUP_CONFIGURATION_ERROR                       = "configuration-error"
+)
+
+type StorageGroupArray struct {
+	STORAGEGROUPS []StorageGroup `json:"storage-groups"`
+}
+
+type StorageVolumeArray struct {
+	STORAGEVOLUMES []StorageVolume `json:"storage-volumes"`
+}
+
+type StorageGroupPayload struct {
+	StorageGroupURI string `json:"storage-group-uri"`
+}
+
+// Storage group class specific properties
+type StorageGroupProperties struct {
+	Class                      string            `json:"class,omitempty"`
+	Connectivity               int               `json:"connectivity,omitempty"`
+	ActiveConnectivity         int               `json:"active-connectivity,omitempty"`
+	CpcURI                     string            `json:"cpc-uri,omitempty"`
+	CandidatePortURIs          []string          `json:"candidate-port-uris,omitempty"`
+	Description                string            `json:"description,omitempty"`
+	DirectConnectionCount      string            `json:direct-connection-count,omitempty`
+	FulfillmentState           StorageGroupState `json:"fulfillment-state,omitempty"`
+	MaxPartitions              int               `json:max-partitions,omitempty`
+	ActiveMaxPartitions        int               `json:active-max-partitions,omitempty`
+	Name                       string            `json:"name,omitempty"`
+	ObjectID                   string            `json:"object-id,omitempty"`
+	ObjectURI                  string            `json:"object-uri,omitempty"`
+	Parent                     string            `json:"parent,omitempty"`
+	Shared                     bool              `json:"shared,omitempty"`
+	StorageVolumes             []StorageVolume   `json:"storage-volumes,omitempty"`
+	StorageVolumesURIs         []string          `json:"storage-volume-uris,omitempty"`
+	UnAssignedWWPNs            []WWPN            `json:"unassigned-world- wide-port-names,omitempty"`
+	VirtualStorageResourceURIs []string          `json:"virtual-storage-resource-uris,omitempty"`
+	Type                       string            `json:"type,omitempty"`
+}
+
+type WWPN struct {
+	Name          string    `json:"world-wide-port,omitempty"`
+	ZonedAdapters []Adapter `json:"zoned-adapters,omitempty"`
+}
+
+// Storage group object
+type StorageGroup struct {
+	ObjectID         string            `json:"object-id,omitempty"`
+	Parent           string            `json:"parent,omitempty"`
+	CpcURI           string            `json:"cpc-uri,omitempty"`
+	Description      string            `json:"description,omitempty"`
+	FulfillmentState StorageGroupState `json:"fulfillment-state,omitempty"`
+	Name             string            `json:"name,omitempty"`
+	ObjectURI        string            `json:"object-uri,omitempty"`
+	Type             string            `json:"type,omitempty"`
+}
+
+type StorageGroupModel string
+
+const (
+	STORAGE_GROUP_MODEL_1   StorageGroupModel = "1"
+	STORAGE_GROUP_MODEL_2                     = "2"
+	STORAGE_GROUP_MODEL_3                     = "3"
+	STORAGE_GROUP_MODEL_9                     = "9"
+	STORAGE_GROUP_MODEL_27                    = "27"
+	STORAGE_GROUP_MODEL_54                    = "54"
+	STORAGE_GROUP_MODEL_EAV                   = "EAV"
+)
+
+type EckdVolumetype string
+
+const (
+	STORAGE_VOLUME_ECKDTYPE_BASE  EckdVolumetype = "base"
+	STORAGE_VOLUME_ECKDTYPE_ALIAS EckdVolumetype = "alias"
+)
+
+type StorageVolume struct {
+	Operation        StorageGroupOperation `json:"operation,omitempty"`
+	Class            string                `json:"class,omitempty"`
+	Parent           string                `json:"parent,omitempty"`
+	URI              string                `json:"element-uri,omitempty"`
+	Name             string                `json:"name,omitempty"`
+	Description      string                `json:"description,omitempty"`
+	Size             float64               `json:"size,omitempty"`
+	ActiveSize       float64               `json:"active-size,omitempty"`
+	UUID             string                `json:"uuid,omitempty"`
+	Model            string                `json:"model,omitempty"`
+	ActiveModel      string                `json:"acitve-model,omitempty"`
+	Usage            string                `json:"usage,omitempty"`
+	FulfillmentState StorageGroupState     `json:"fulfillment-state,omitempty"`
+	Cylinders        int                   `json:"cylinders,omitempty"`
+	DeviceNumber     string                `json:"device-number,omitempty"`
+	ControlUnitURI   string                `json:"control-unit-uri,omitempty"`
+	EckdType         string                `json:"eckd-type,omitempty"`
+	UnitAddress      string                `json:"unit-address,omitempty"`
+	Paths            []VolumePath          `json:"paths,omitempty"`
+	AdapterURI       string                `json:"adapter-uri,omitempty"`
+	SerialNumber     string                `json:"serial-number,omitempty"`
+	FID              string                `json:"fid,omitempty"`
+}
+
+type VolumePath struct {
+	PartitionURI      string `json:"partition-uri,omitempty"`
+	DeviceNumber      string `json:"device-number,omitempty"`
+	TargetWWPN        string `json:"target-world-wide-port-name,omitempty"`
+	LogicalUnitNumber string `json:"logical-unit-number,omitempty"`
 }

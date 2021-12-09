@@ -18,6 +18,7 @@ type ZhmcAPI interface {
 	LparAPI
 	NicAPI
 	AdapterAPI
+	StorageGroupAPI
 	VirtualSwitchAPI
 	JobAPI
 }
@@ -27,6 +28,7 @@ type ZhmcManager struct {
 	cpcManager           CpcAPI
 	lparManager          LparAPI
 	adapterManager       AdapterAPI
+	storageGroupManager  StorageGroupAPI
 	virtualSwitchManager VirtualSwitchAPI
 	nicManager           NicAPI
 	jobManager           JobAPI
@@ -46,6 +48,7 @@ func NewManagerFromClient(client ClientAPI) ZhmcAPI {
 		cpcManager:           NewCpcManager(client),
 		lparManager:          NewLparManager(client),
 		adapterManager:       NewAdapterManager(client),
+		storageGroupManager:  NewStorageGroupManager(client),
 		virtualSwitchManager: NewVirtualSwitchManager(client),
 		nicManager:           NewNicManager(client),
 		jobManager:           NewJobManager(client),
@@ -83,6 +86,14 @@ func (m *ZhmcManager) ListNics(lparURI string) ([]string, *HmcError) {
 	return m.lparManager.ListNics(lparURI)
 }
 
+func (m *ZhmcManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
+	return m.lparManager.AttachStorageGroupToPartition(lparURI, request)
+}
+
+func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
+	return m.lparManager.DetachStorageGroupToPartition(lparURI, request)
+}
+
 // Adapter
 func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError) {
 	return m.adapterManager.ListAdapters(cpcURI, query)
@@ -92,6 +103,32 @@ func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPaylo
 }
 func (m *ZhmcManager) DeleteHipersocket(adapterURI string) *HmcError {
 	return m.adapterManager.DeleteHipersocket(adapterURI)
+}
+
+// Storage groups
+
+func (m *ZhmcManager) ListStorageGroups(storageGroupURI string, cpc string) ([]StorageGroup, *HmcError) {
+	return m.storageGroupManager.ListStorageGroups(storageGroupURI, cpc)
+}
+
+func (m *ZhmcManager) GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, *HmcError) {
+	return m.storageGroupManager.GetStorageGroupProperties(storageGroupURI)
+}
+
+func (m *ZhmcManager) ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError) {
+	return m.storageGroupManager.ListStorageVolumes(storageGroupURI)
+}
+
+func (m *ZhmcManager) GetStorageVolumeProperties(storageGroupURI string) (*StorageVolume, *HmcError) {
+	return m.storageGroupManager.GetStorageVolumeProperties(storageGroupURI)
+}
+
+func (m *ZhmcManager) UpdateStorageGroupProperties(storageGroupURI string, uploadRequest *StorageGroupProperties) *HmcError {
+	return m.storageGroupManager.UpdateStorageGroupProperties(storageGroupURI, uploadRequest)
+}
+
+func (m *ZhmcManager) FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError {
+	return m.storageGroupManager.FulfillStorageGroup(storageGroupURI, updateRequest)
 }
 
 // Virtual Switches

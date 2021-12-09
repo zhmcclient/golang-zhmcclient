@@ -8,6 +8,30 @@ import (
 )
 
 type LparAPI struct {
+	AttachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError
+	attachStorageGroupToPartitionMutex       sync.RWMutex
+	attachStorageGroupToPartitionArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupPayload
+	}
+	attachStorageGroupToPartitionReturns struct {
+		result1 *zhmcclient.HmcError
+	}
+	attachStorageGroupToPartitionReturnsOnCall map[int]struct {
+		result1 *zhmcclient.HmcError
+	}
+	DetachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError
+	detachStorageGroupToPartitionMutex       sync.RWMutex
+	detachStorageGroupToPartitionArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupPayload
+	}
+	detachStorageGroupToPartitionReturns struct {
+		result1 *zhmcclient.HmcError
+	}
+	detachStorageGroupToPartitionReturnsOnCall map[int]struct {
+		result1 *zhmcclient.HmcError
+	}
 	GetLparPropertiesStub        func(string) (*zhmcclient.LparProperties, *zhmcclient.HmcError)
 	getLparPropertiesMutex       sync.RWMutex
 	getLparPropertiesArgsForCall []struct {
@@ -112,6 +136,130 @@ type LparAPI struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *LparAPI) AttachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	ret, specificReturn := fake.attachStorageGroupToPartitionReturnsOnCall[len(fake.attachStorageGroupToPartitionArgsForCall)]
+	fake.attachStorageGroupToPartitionArgsForCall = append(fake.attachStorageGroupToPartitionArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupPayload
+	}{arg1, arg2})
+	stub := fake.AttachStorageGroupToPartitionStub
+	fakeReturns := fake.attachStorageGroupToPartitionReturns
+	fake.recordInvocation("AttachStorageGroupToPartition", []interface{}{arg1, arg2})
+	fake.attachStorageGroupToPartitionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *LparAPI) AttachStorageGroupToPartitionCallCount() int {
+	fake.attachStorageGroupToPartitionMutex.RLock()
+	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	return len(fake.attachStorageGroupToPartitionArgsForCall)
+}
+
+func (fake *LparAPI) AttachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError) {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	defer fake.attachStorageGroupToPartitionMutex.Unlock()
+	fake.AttachStorageGroupToPartitionStub = stub
+}
+
+func (fake *LparAPI) AttachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.StorageGroupPayload) {
+	fake.attachStorageGroupToPartitionMutex.RLock()
+	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	argsForCall := fake.attachStorageGroupToPartitionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *LparAPI) AttachStorageGroupToPartitionReturns(result1 *zhmcclient.HmcError) {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	defer fake.attachStorageGroupToPartitionMutex.Unlock()
+	fake.AttachStorageGroupToPartitionStub = nil
+	fake.attachStorageGroupToPartitionReturns = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *LparAPI) AttachStorageGroupToPartitionReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+	fake.attachStorageGroupToPartitionMutex.Lock()
+	defer fake.attachStorageGroupToPartitionMutex.Unlock()
+	fake.AttachStorageGroupToPartitionStub = nil
+	if fake.attachStorageGroupToPartitionReturnsOnCall == nil {
+		fake.attachStorageGroupToPartitionReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.HmcError
+		})
+	}
+	fake.attachStorageGroupToPartitionReturnsOnCall[i] = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *LparAPI) DetachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	ret, specificReturn := fake.detachStorageGroupToPartitionReturnsOnCall[len(fake.detachStorageGroupToPartitionArgsForCall)]
+	fake.detachStorageGroupToPartitionArgsForCall = append(fake.detachStorageGroupToPartitionArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupPayload
+	}{arg1, arg2})
+	stub := fake.DetachStorageGroupToPartitionStub
+	fakeReturns := fake.detachStorageGroupToPartitionReturns
+	fake.recordInvocation("DetachStorageGroupToPartition", []interface{}{arg1, arg2})
+	fake.detachStorageGroupToPartitionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *LparAPI) DetachStorageGroupToPartitionCallCount() int {
+	fake.detachStorageGroupToPartitionMutex.RLock()
+	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
+	return len(fake.detachStorageGroupToPartitionArgsForCall)
+}
+
+func (fake *LparAPI) DetachStorageGroupToPartitionCalls(stub func(string, *zhmcclient.StorageGroupPayload) *zhmcclient.HmcError) {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	defer fake.detachStorageGroupToPartitionMutex.Unlock()
+	fake.DetachStorageGroupToPartitionStub = stub
+}
+
+func (fake *LparAPI) DetachStorageGroupToPartitionArgsForCall(i int) (string, *zhmcclient.StorageGroupPayload) {
+	fake.detachStorageGroupToPartitionMutex.RLock()
+	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
+	argsForCall := fake.detachStorageGroupToPartitionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *LparAPI) DetachStorageGroupToPartitionReturns(result1 *zhmcclient.HmcError) {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	defer fake.detachStorageGroupToPartitionMutex.Unlock()
+	fake.DetachStorageGroupToPartitionStub = nil
+	fake.detachStorageGroupToPartitionReturns = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *LparAPI) DetachStorageGroupToPartitionReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+	fake.detachStorageGroupToPartitionMutex.Lock()
+	defer fake.detachStorageGroupToPartitionMutex.Unlock()
+	fake.DetachStorageGroupToPartitionStub = nil
+	if fake.detachStorageGroupToPartitionReturnsOnCall == nil {
+		fake.detachStorageGroupToPartitionReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.HmcError
+		})
+	}
+	fake.detachStorageGroupToPartitionReturnsOnCall[i] = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
 }
 
 func (fake *LparAPI) GetLparProperties(arg1 string) (*zhmcclient.LparProperties, *zhmcclient.HmcError) {
@@ -624,6 +772,10 @@ func (fake *LparAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 *zhmcclien
 func (fake *LparAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.attachStorageGroupToPartitionMutex.RLock()
+	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	fake.detachStorageGroupToPartitionMutex.RLock()
+	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
 	fake.getLparPropertiesMutex.RLock()
 	defer fake.getLparPropertiesMutex.RUnlock()
 	fake.listLPARsMutex.RLock()

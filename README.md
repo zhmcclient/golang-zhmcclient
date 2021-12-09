@@ -7,6 +7,7 @@ zhmcclient - A golang client library for the IBM Z HMC Web Services API
 ```bash
 cd ./pkg/zhmcclient
 go get github.com/maxbrunsfeld/counterfeiter/v6
+export COUNTERFEITER_NO_GENERATE_WARNING=true
 go generate ./...
 ```
 
