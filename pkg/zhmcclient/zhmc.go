@@ -86,6 +86,14 @@ func (m *ZhmcManager) ListNics(lparURI string) ([]string, *HmcError) {
 	return m.lparManager.ListNics(lparURI)
 }
 
+func (m *ZhmcManager) AttachStorageGroupToPartition(lparURI string, request *LparProperties) *HmcError {
+	return m.lparManager.AttachStorageGroupToPartition(lparURI, request)
+}
+
+func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *LparProperties) *HmcError {
+	return m.lparManager.DetachStorageGroupToPartition(lparURI, request)
+}
+
 // Adapter
 func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError) {
 	return m.adapterManager.ListAdapters(cpcURI, query)
@@ -116,14 +124,6 @@ func (m *ZhmcManager) GetStorageVolumeProperties(storageGroupURI string) (*Stora
 }
 
 func (m *ZhmcManager) UpdateStorageGroupProperties(storageGroupURI string, uploadRequest *StorageGroupProperties) *HmcError {
-	return m.storageGroupManager.UpdateStorageGroupProperties(storageGroupURI, uploadRequest)
-}
-
-func (m *ZhmcManager) AttachStorageGroupToPartition(storageGroupURI string, uploadRequest *StorageGroupProperties) *HmcError {
-	return m.storageGroupManager.UpdateStorageGroupProperties(storageGroupURI, uploadRequest)
-}
-
-func (m *ZhmcManager) DetachStorageGroupToPartition(storageGroupURI string, uploadRequest *StorageGroupProperties) *HmcError {
 	return m.storageGroupManager.UpdateStorageGroupProperties(storageGroupURI, uploadRequest)
 }
 

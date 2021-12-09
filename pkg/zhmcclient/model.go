@@ -320,6 +320,7 @@ type LparProperties struct {
 	VirtualFunctionUris              []string                      `json:"virtual-function-uris,omitempty"`
 	NicUris                          []string                      `json:"nic-uris,omitempty"`
 	HbaUris                          []string                      `json:"hba-uris,omitempty"`
+	StorageGroupURIs                 []string                      `json:"storage-group-uris,omitempty"`
 	CryptoConfiguration              []byte                        `json:"crypto-configuration,omitempty"`
 	SscHostName                      string                        `json:"ssc-host-name,omitempty"`
 	SscBootSelection                 SscBootSelection              `json:"ssc-boot-selection,omitempty"`
@@ -434,7 +435,6 @@ type StorageGroupProperties struct {
 	Name                       string            `json:"name,omitempty"`
 	ObjectID                   string            `json:"object-id,omitempty"`
 	ObjectURI                  string            `json:"object-uri,omitempty"`
-	StorageGroupURI            string            `json:"storage-group-uri,omitempty"`
 	Parent                     string            `json:"parent,omitempty"`
 	Shared                     bool              `json:"shared,omitempty"`
 	StorageVolumes             []StorageVolume   `json:"storage-volumes,omitempty"`

@@ -26,7 +26,8 @@ type LparAPI interface {
 	UpdateLparProperties(lparURI string, props *LparProperties) *HmcError
 	StartLPAR(lparURI string) (string, *HmcError)
 	StopLPAR(lparURI string) (string, *HmcError)
-
+	AttachStorageGroupToPartition(storageGroupURI string, request *LparProperties) *HmcError
+	DetachStorageGroupToPartition(storageGroupURI string, request *LparProperties) *HmcError
 	MountIsoImage(lparURI string, isoFile string, insFile string) *HmcError
 	UnmountIsoImage(lparURI string) *HmcError
 
@@ -253,4 +254,51 @@ func (m *LparManager) ListNics(lparURI string) ([]string, *HmcError) {
 	}
 
 	return props.NicUris, nil
+}
+
+// AttachStorageGroupToPartition
+
+/**
+* POST /api/partitions/{partition-id}/operations/attach-storage-group
+* Return: 200
+*     or: 400, 404, 409
+ */
+func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *LparProperties) *HmcError {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(responseBody)
+}
+
+// DetachStorageGroupToPartition
+/**
+* POST /api/partitions/{partition-id}/operations/detach-storage-group
+* Return: 200
+*     or: 400, 404, 409
+ */
+func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *LparProperties) *HmcError {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		return nil
+	}
+
+	return GenerateErrorFromResponse(responseBody)
 }
