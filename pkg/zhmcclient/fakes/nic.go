@@ -7,60 +7,199 @@ import (
 	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
 )
 
-type NicAPI struct {
-	CreateNicStub        func(string, *zhmcclient.NIC) (string, *zhmcclient.HmcError)
-	createNicMutex       sync.RWMutex
-	createNicArgsForCall []struct {
+type StorageGroupAPI struct {
+	FulfillStorageGroupStub        func(string, *zhmcclient.StorageGroupProperties) error
+	fulfillStorageGroupMutex       sync.RWMutex
+	fulfillStorageGroupArgsForCall []struct {
 		arg1 string
-		arg2 *zhmcclient.NIC
+		arg2 *zhmcclient.StorageGroupProperties
 	}
-	createNicReturns struct {
-		result1 string
-		result2 *zhmcclient.HmcError
+	fulfillStorageGroupReturns struct {
+		result1 error
 	}
-	createNicReturnsOnCall map[int]struct {
-		result1 string
-		result2 *zhmcclient.HmcError
+	fulfillStorageGroupReturnsOnCall map[int]struct {
+		result1 error
 	}
-	DeleteNicStub        func(string) *zhmcclient.HmcError
-	deleteNicMutex       sync.RWMutex
-	deleteNicArgsForCall []struct {
+	GetStorageGroupPropertiesStub        func(string) (*zhmcclient.StorageGroupProperties, error)
+	getStorageGroupPropertiesMutex       sync.RWMutex
+	getStorageGroupPropertiesArgsForCall []struct {
 		arg1 string
 	}
-	deleteNicReturns struct {
-		result1 *zhmcclient.HmcError
+	getStorageGroupPropertiesReturns struct {
+		result1 *zhmcclient.StorageGroupProperties
+		result2 error
 	}
-	deleteNicReturnsOnCall map[int]struct {
-		result1 *zhmcclient.HmcError
+	getStorageGroupPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.StorageGroupProperties
+		result2 error
 	}
-	GetNicPropertiesStub        func(string) (*zhmcclient.NIC, *zhmcclient.HmcError)
-	getNicPropertiesMutex       sync.RWMutex
-	getNicPropertiesArgsForCall []struct {
+	ListStorageGroupsStub        func(string, string) ([]zhmcclient.StorageGroup, error)
+	listStorageGroupsMutex       sync.RWMutex
+	listStorageGroupsArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
-	getNicPropertiesReturns struct {
-		result1 *zhmcclient.NIC
-		result2 *zhmcclient.HmcError
+	listStorageGroupsReturns struct {
+		result1 []zhmcclient.StorageGroup
+		result2 error
 	}
-	getNicPropertiesReturnsOnCall map[int]struct {
-		result1 *zhmcclient.NIC
-		result2 *zhmcclient.HmcError
+	listStorageGroupsReturnsOnCall map[int]struct {
+		result1 []zhmcclient.StorageGroup
+		result2 error
+	}
+	UpdateStorageGroupPropertiesStub        func(string, *zhmcclient.StorageGroupProperties) error
+	updateStorageGroupPropertiesMutex       sync.RWMutex
+	updateStorageGroupPropertiesArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.StorageGroupProperties
+	}
+	updateStorageGroupPropertiesReturns struct {
+		result1 error
+	}
+	updateStorageGroupPropertiesReturnsOnCall map[int]struct {
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *NicAPI) CreateNic(arg1 string, arg2 *zhmcclient.NIC) (string, *zhmcclient.HmcError) {
-	fake.createNicMutex.Lock()
-	ret, specificReturn := fake.createNicReturnsOnCall[len(fake.createNicArgsForCall)]
-	fake.createNicArgsForCall = append(fake.createNicArgsForCall, struct {
+func (fake *StorageGroupAPI) FulfillStorageGroup(arg1 string, arg2 *zhmcclient.StorageGroupProperties) error {
+	fake.fulfillStorageGroupMutex.Lock()
+	ret, specificReturn := fake.fulfillStorageGroupReturnsOnCall[len(fake.fulfillStorageGroupArgsForCall)]
+	fake.fulfillStorageGroupArgsForCall = append(fake.fulfillStorageGroupArgsForCall, struct {
 		arg1 string
-		arg2 *zhmcclient.NIC
+		arg2 *zhmcclient.StorageGroupProperties
 	}{arg1, arg2})
-	stub := fake.CreateNicStub
-	fakeReturns := fake.createNicReturns
-	fake.recordInvocation("CreateNic", []interface{}{arg1, arg2})
-	fake.createNicMutex.Unlock()
+	stub := fake.FulfillStorageGroupStub
+	fakeReturns := fake.fulfillStorageGroupReturns
+	fake.recordInvocation("FulfillStorageGroup", []interface{}{arg1, arg2})
+	fake.fulfillStorageGroupMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *StorageGroupAPI) FulfillStorageGroupCallCount() int {
+	fake.fulfillStorageGroupMutex.RLock()
+	defer fake.fulfillStorageGroupMutex.RUnlock()
+	return len(fake.fulfillStorageGroupArgsForCall)
+}
+
+func (fake *StorageGroupAPI) FulfillStorageGroupCalls(stub func(string, *zhmcclient.StorageGroupProperties) error) {
+	fake.fulfillStorageGroupMutex.Lock()
+	defer fake.fulfillStorageGroupMutex.Unlock()
+	fake.FulfillStorageGroupStub = stub
+}
+
+func (fake *StorageGroupAPI) FulfillStorageGroupArgsForCall(i int) (string, *zhmcclient.StorageGroupProperties) {
+	fake.fulfillStorageGroupMutex.RLock()
+	defer fake.fulfillStorageGroupMutex.RUnlock()
+	argsForCall := fake.fulfillStorageGroupArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *StorageGroupAPI) FulfillStorageGroupReturns(result1 error) {
+	fake.fulfillStorageGroupMutex.Lock()
+	defer fake.fulfillStorageGroupMutex.Unlock()
+	fake.FulfillStorageGroupStub = nil
+	fake.fulfillStorageGroupReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *StorageGroupAPI) FulfillStorageGroupReturnsOnCall(i int, result1 error) {
+	fake.fulfillStorageGroupMutex.Lock()
+	defer fake.fulfillStorageGroupMutex.Unlock()
+	fake.FulfillStorageGroupStub = nil
+	if fake.fulfillStorageGroupReturnsOnCall == nil {
+		fake.fulfillStorageGroupReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.fulfillStorageGroupReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *StorageGroupAPI) GetStorageGroupProperties(arg1 string) (*zhmcclient.StorageGroupProperties, error) {
+	fake.getStorageGroupPropertiesMutex.Lock()
+	ret, specificReturn := fake.getStorageGroupPropertiesReturnsOnCall[len(fake.getStorageGroupPropertiesArgsForCall)]
+	fake.getStorageGroupPropertiesArgsForCall = append(fake.getStorageGroupPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetStorageGroupPropertiesStub
+	fakeReturns := fake.getStorageGroupPropertiesReturns
+	fake.recordInvocation("GetStorageGroupProperties", []interface{}{arg1})
+	fake.getStorageGroupPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesCallCount() int {
+	fake.getStorageGroupPropertiesMutex.RLock()
+	defer fake.getStorageGroupPropertiesMutex.RUnlock()
+	return len(fake.getStorageGroupPropertiesArgsForCall)
+}
+
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesCalls(stub func(string) (*zhmcclient.StorageGroupProperties, error)) {
+	fake.getStorageGroupPropertiesMutex.Lock()
+	defer fake.getStorageGroupPropertiesMutex.Unlock()
+	fake.GetStorageGroupPropertiesStub = stub
+}
+
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesArgsForCall(i int) string {
+	fake.getStorageGroupPropertiesMutex.RLock()
+	defer fake.getStorageGroupPropertiesMutex.RUnlock()
+	argsForCall := fake.getStorageGroupPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesReturns(result1 *zhmcclient.StorageGroupProperties, result2 error) {
+	fake.getStorageGroupPropertiesMutex.Lock()
+	defer fake.getStorageGroupPropertiesMutex.Unlock()
+	fake.GetStorageGroupPropertiesStub = nil
+	fake.getStorageGroupPropertiesReturns = struct {
+		result1 *zhmcclient.StorageGroupProperties
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *StorageGroupAPI) GetStorageGroupPropertiesReturnsOnCall(i int, result1 *zhmcclient.StorageGroupProperties, result2 error) {
+	fake.getStorageGroupPropertiesMutex.Lock()
+	defer fake.getStorageGroupPropertiesMutex.Unlock()
+	fake.GetStorageGroupPropertiesStub = nil
+	if fake.getStorageGroupPropertiesReturnsOnCall == nil {
+		fake.getStorageGroupPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.StorageGroupProperties
+			result2 error
+		})
+	}
+	fake.getStorageGroupPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.StorageGroupProperties
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *StorageGroupAPI) ListStorageGroups(arg1 string, arg2 string) ([]zhmcclient.StorageGroup, error) {
+	fake.listStorageGroupsMutex.Lock()
+	ret, specificReturn := fake.listStorageGroupsReturnsOnCall[len(fake.listStorageGroupsArgsForCall)]
+	fake.listStorageGroupsArgsForCall = append(fake.listStorageGroupsArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.ListStorageGroupsStub
+	fakeReturns := fake.listStorageGroupsReturns
+	fake.recordInvocation("ListStorageGroups", []interface{}{arg1, arg2})
+	fake.listStorageGroupsMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -70,63 +209,64 @@ func (fake *NicAPI) CreateNic(arg1 string, arg2 *zhmcclient.NIC) (string, *zhmcc
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *NicAPI) CreateNicCallCount() int {
-	fake.createNicMutex.RLock()
-	defer fake.createNicMutex.RUnlock()
-	return len(fake.createNicArgsForCall)
+func (fake *StorageGroupAPI) ListStorageGroupsCallCount() int {
+	fake.listStorageGroupsMutex.RLock()
+	defer fake.listStorageGroupsMutex.RUnlock()
+	return len(fake.listStorageGroupsArgsForCall)
 }
 
-func (fake *NicAPI) CreateNicCalls(stub func(string, *zhmcclient.NIC) (string, *zhmcclient.HmcError)) {
-	fake.createNicMutex.Lock()
-	defer fake.createNicMutex.Unlock()
-	fake.CreateNicStub = stub
+func (fake *StorageGroupAPI) ListStorageGroupsCalls(stub func(string, string) ([]zhmcclient.StorageGroup, error)) {
+	fake.listStorageGroupsMutex.Lock()
+	defer fake.listStorageGroupsMutex.Unlock()
+	fake.ListStorageGroupsStub = stub
 }
 
-func (fake *NicAPI) CreateNicArgsForCall(i int) (string, *zhmcclient.NIC) {
-	fake.createNicMutex.RLock()
-	defer fake.createNicMutex.RUnlock()
-	argsForCall := fake.createNicArgsForCall[i]
+func (fake *StorageGroupAPI) ListStorageGroupsArgsForCall(i int) (string, string) {
+	fake.listStorageGroupsMutex.RLock()
+	defer fake.listStorageGroupsMutex.RUnlock()
+	argsForCall := fake.listStorageGroupsArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *NicAPI) CreateNicReturns(result1 string, result2 *zhmcclient.HmcError) {
-	fake.createNicMutex.Lock()
-	defer fake.createNicMutex.Unlock()
-	fake.CreateNicStub = nil
-	fake.createNicReturns = struct {
-		result1 string
-		result2 *zhmcclient.HmcError
+func (fake *StorageGroupAPI) ListStorageGroupsReturns(result1 []zhmcclient.StorageGroup, result2 error) {
+	fake.listStorageGroupsMutex.Lock()
+	defer fake.listStorageGroupsMutex.Unlock()
+	fake.ListStorageGroupsStub = nil
+	fake.listStorageGroupsReturns = struct {
+		result1 []zhmcclient.StorageGroup
+		result2 error
 	}{result1, result2}
 }
 
-func (fake *NicAPI) CreateNicReturnsOnCall(i int, result1 string, result2 *zhmcclient.HmcError) {
-	fake.createNicMutex.Lock()
-	defer fake.createNicMutex.Unlock()
-	fake.CreateNicStub = nil
-	if fake.createNicReturnsOnCall == nil {
-		fake.createNicReturnsOnCall = make(map[int]struct {
-			result1 string
-			result2 *zhmcclient.HmcError
+func (fake *StorageGroupAPI) ListStorageGroupsReturnsOnCall(i int, result1 []zhmcclient.StorageGroup, result2 error) {
+	fake.listStorageGroupsMutex.Lock()
+	defer fake.listStorageGroupsMutex.Unlock()
+	fake.ListStorageGroupsStub = nil
+	if fake.listStorageGroupsReturnsOnCall == nil {
+		fake.listStorageGroupsReturnsOnCall = make(map[int]struct {
+			result1 []zhmcclient.StorageGroup
+			result2 error
 		})
 	}
-	fake.createNicReturnsOnCall[i] = struct {
-		result1 string
-		result2 *zhmcclient.HmcError
+	fake.listStorageGroupsReturnsOnCall[i] = struct {
+		result1 []zhmcclient.StorageGroup
+		result2 error
 	}{result1, result2}
 }
 
-func (fake *NicAPI) DeleteNic(arg1 string) *zhmcclient.HmcError {
-	fake.deleteNicMutex.Lock()
-	ret, specificReturn := fake.deleteNicReturnsOnCall[len(fake.deleteNicArgsForCall)]
-	fake.deleteNicArgsForCall = append(fake.deleteNicArgsForCall, struct {
+func (fake *StorageGroupAPI) UpdateStorageGroupProperties(arg1 string, arg2 *zhmcclient.StorageGroupProperties) error {
+	fake.updateStorageGroupPropertiesMutex.Lock()
+	ret, specificReturn := fake.updateStorageGroupPropertiesReturnsOnCall[len(fake.updateStorageGroupPropertiesArgsForCall)]
+	fake.updateStorageGroupPropertiesArgsForCall = append(fake.updateStorageGroupPropertiesArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	stub := fake.DeleteNicStub
-	fakeReturns := fake.deleteNicReturns
-	fake.recordInvocation("DeleteNic", []interface{}{arg1})
-	fake.deleteNicMutex.Unlock()
+		arg2 *zhmcclient.StorageGroupProperties
+	}{arg1, arg2})
+	stub := fake.UpdateStorageGroupPropertiesStub
+	fakeReturns := fake.updateStorageGroupPropertiesReturns
+	fake.recordInvocation("UpdateStorageGroupProperties", []interface{}{arg1, arg2})
+	fake.updateStorageGroupPropertiesMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
@@ -134,121 +274,59 @@ func (fake *NicAPI) DeleteNic(arg1 string) *zhmcclient.HmcError {
 	return fakeReturns.result1
 }
 
-func (fake *NicAPI) DeleteNicCallCount() int {
-	fake.deleteNicMutex.RLock()
-	defer fake.deleteNicMutex.RUnlock()
-	return len(fake.deleteNicArgsForCall)
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesCallCount() int {
+	fake.updateStorageGroupPropertiesMutex.RLock()
+	defer fake.updateStorageGroupPropertiesMutex.RUnlock()
+	return len(fake.updateStorageGroupPropertiesArgsForCall)
 }
 
-func (fake *NicAPI) DeleteNicCalls(stub func(string) *zhmcclient.HmcError) {
-	fake.deleteNicMutex.Lock()
-	defer fake.deleteNicMutex.Unlock()
-	fake.DeleteNicStub = stub
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesCalls(stub func(string, *zhmcclient.StorageGroupProperties) error) {
+	fake.updateStorageGroupPropertiesMutex.Lock()
+	defer fake.updateStorageGroupPropertiesMutex.Unlock()
+	fake.UpdateStorageGroupPropertiesStub = stub
 }
 
-func (fake *NicAPI) DeleteNicArgsForCall(i int) string {
-	fake.deleteNicMutex.RLock()
-	defer fake.deleteNicMutex.RUnlock()
-	argsForCall := fake.deleteNicArgsForCall[i]
-	return argsForCall.arg1
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesArgsForCall(i int) (string, *zhmcclient.StorageGroupProperties) {
+	fake.updateStorageGroupPropertiesMutex.RLock()
+	defer fake.updateStorageGroupPropertiesMutex.RUnlock()
+	argsForCall := fake.updateStorageGroupPropertiesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *NicAPI) DeleteNicReturns(result1 *zhmcclient.HmcError) {
-	fake.deleteNicMutex.Lock()
-	defer fake.deleteNicMutex.Unlock()
-	fake.DeleteNicStub = nil
-	fake.deleteNicReturns = struct {
-		result1 *zhmcclient.HmcError
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesReturns(result1 error) {
+	fake.updateStorageGroupPropertiesMutex.Lock()
+	defer fake.updateStorageGroupPropertiesMutex.Unlock()
+	fake.UpdateStorageGroupPropertiesStub = nil
+	fake.updateStorageGroupPropertiesReturns = struct {
+		result1 error
 	}{result1}
 }
 
-func (fake *NicAPI) DeleteNicReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
-	fake.deleteNicMutex.Lock()
-	defer fake.deleteNicMutex.Unlock()
-	fake.DeleteNicStub = nil
-	if fake.deleteNicReturnsOnCall == nil {
-		fake.deleteNicReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.HmcError
+func (fake *StorageGroupAPI) UpdateStorageGroupPropertiesReturnsOnCall(i int, result1 error) {
+	fake.updateStorageGroupPropertiesMutex.Lock()
+	defer fake.updateStorageGroupPropertiesMutex.Unlock()
+	fake.UpdateStorageGroupPropertiesStub = nil
+	if fake.updateStorageGroupPropertiesReturnsOnCall == nil {
+		fake.updateStorageGroupPropertiesReturnsOnCall = make(map[int]struct {
+			result1 error
 		})
 	}
-	fake.deleteNicReturnsOnCall[i] = struct {
-		result1 *zhmcclient.HmcError
+	fake.updateStorageGroupPropertiesReturnsOnCall[i] = struct {
+		result1 error
 	}{result1}
 }
 
-func (fake *NicAPI) GetNicProperties(arg1 string) (*zhmcclient.NIC, *zhmcclient.HmcError) {
-	fake.getNicPropertiesMutex.Lock()
-	ret, specificReturn := fake.getNicPropertiesReturnsOnCall[len(fake.getNicPropertiesArgsForCall)]
-	fake.getNicPropertiesArgsForCall = append(fake.getNicPropertiesArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	stub := fake.GetNicPropertiesStub
-	fakeReturns := fake.getNicPropertiesReturns
-	fake.recordInvocation("GetNicProperties", []interface{}{arg1})
-	fake.getNicPropertiesMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *NicAPI) GetNicPropertiesCallCount() int {
-	fake.getNicPropertiesMutex.RLock()
-	defer fake.getNicPropertiesMutex.RUnlock()
-	return len(fake.getNicPropertiesArgsForCall)
-}
-
-func (fake *NicAPI) GetNicPropertiesCalls(stub func(string) (*zhmcclient.NIC, *zhmcclient.HmcError)) {
-	fake.getNicPropertiesMutex.Lock()
-	defer fake.getNicPropertiesMutex.Unlock()
-	fake.GetNicPropertiesStub = stub
-}
-
-func (fake *NicAPI) GetNicPropertiesArgsForCall(i int) string {
-	fake.getNicPropertiesMutex.RLock()
-	defer fake.getNicPropertiesMutex.RUnlock()
-	argsForCall := fake.getNicPropertiesArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *NicAPI) GetNicPropertiesReturns(result1 *zhmcclient.NIC, result2 *zhmcclient.HmcError) {
-	fake.getNicPropertiesMutex.Lock()
-	defer fake.getNicPropertiesMutex.Unlock()
-	fake.GetNicPropertiesStub = nil
-	fake.getNicPropertiesReturns = struct {
-		result1 *zhmcclient.NIC
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
-}
-
-func (fake *NicAPI) GetNicPropertiesReturnsOnCall(i int, result1 *zhmcclient.NIC, result2 *zhmcclient.HmcError) {
-	fake.getNicPropertiesMutex.Lock()
-	defer fake.getNicPropertiesMutex.Unlock()
-	fake.GetNicPropertiesStub = nil
-	if fake.getNicPropertiesReturnsOnCall == nil {
-		fake.getNicPropertiesReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.NIC
-			result2 *zhmcclient.HmcError
-		})
-	}
-	fake.getNicPropertiesReturnsOnCall[i] = struct {
-		result1 *zhmcclient.NIC
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
-}
-
-func (fake *NicAPI) Invocations() map[string][][]interface{} {
+func (fake *StorageGroupAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createNicMutex.RLock()
-	defer fake.createNicMutex.RUnlock()
-	fake.deleteNicMutex.RLock()
-	defer fake.deleteNicMutex.RUnlock()
-	fake.getNicPropertiesMutex.RLock()
-	defer fake.getNicPropertiesMutex.RUnlock()
+	fake.fulfillStorageGroupMutex.RLock()
+	defer fake.fulfillStorageGroupMutex.RUnlock()
+	fake.getStorageGroupPropertiesMutex.RLock()
+	defer fake.getStorageGroupPropertiesMutex.RUnlock()
+	fake.listStorageGroupsMutex.RLock()
+	defer fake.listStorageGroupsMutex.RUnlock()
+	fake.updateStorageGroupPropertiesMutex.RLock()
+	defer fake.updateStorageGroupPropertiesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
@@ -256,7 +334,7 @@ func (fake *NicAPI) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *NicAPI) recordInvocation(key string, args []interface{}) {
+func (fake *StorageGroupAPI) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -268,4 +346,4 @@ func (fake *NicAPI) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ zhmcclient.NicAPI = new(NicAPI)
+var _ zhmcclient.StorageGroupAPI = new(StorageGroupAPI)

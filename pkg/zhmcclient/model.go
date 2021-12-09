@@ -388,3 +388,51 @@ type NIC struct {
 type NicCreateResponse struct {
 	URI string `json:"element-uri"`
 }
+
+//////////////////////////////////////////////////
+// Storage Groups
+//////////////////////////////////////////////////
+
+type StorageGroupOperation string
+
+const (
+	STORAGE_GROUP_MODIFY = "modify"
+)
+
+type StorageGroupArray struct {
+	STORAGEGROUPS []StorageGroup `json:"storage-groups"`
+}
+
+type StorageGroupProperties struct {
+	Class              string          `json:"class,omitempty"`
+	Connectivity       int             `json:"connectivity,omitempty"`
+	CpcURI             string          `json:"cpc-uri,omitempty"`
+	Description        string          `json:"description,omitempty"`
+	FulfillmentState   string          `json:"fulfillment-state,omitempty"`
+	Name               string          `json:"name,omitempty"`
+	ObjectID           string          `json:"object-id,omitempty"`
+	ObjectURI          string          `json:"object-uri,omitempty"`
+	Parent             string          `json:"parent,omitempty"`
+	Shared             bool            `json:"shared,omitempty"`
+	StorageVolumes     []StorageVolume `json:"storage-volumes,omitempty"`
+	StorageVolumesURIs []string        `json:"storage-volume-uris,omitempty"`
+	Type               string          `json:"type,omitempty"`
+}
+
+type StorageGroup struct {
+	CpcURI           string `json:"cpc-uri,omitempty"`
+	Description      string `json:"description,omitempty"`
+	FulfillmentState string `json:"fulfillment-state,omitempty"`
+	Name             string `json:"name,omitempty"`
+	ObjectURI        string `json:"object-uri,omitempty"`
+	Type             string `json:"type,omitempty"`
+}
+
+type StorageVolume struct {
+	Operation   StorageGroupOperation `json:"operation,omitempty"`
+	URI         string                `json:"element-uri,omitempty"`
+	Name        string                `json:"name,omitempty"`
+	Description string                `json:"description,omitempty"`
+	Size        int                   `json:"size,omitempty"`
+	Usage       string                `json:"usage,omitempty"`
+}
