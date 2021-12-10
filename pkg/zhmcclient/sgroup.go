@@ -21,7 +21,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/sgroup.go --fake-name StorageGroupAPI . StorageGroupAPI
 
 type StorageGroupAPI interface {
-	ListStorageGroups(storageGroupURI string, cpc string) ([]StorageGroup, *HmcError)
+	ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, *HmcError)
 	GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, *HmcError)
 	ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError)
 	GetStorageVolumeProperties(storageGroupURI string) (*StorageVolume, *HmcError)
@@ -46,11 +46,11 @@ func NewStorageGroupManager(client ClientAPI) *StorageGroupManager {
  * Return: 200 and Storage Group array
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpc string) ([]StorageGroup, *HmcError) {
+func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 	query := map[string]string{
-		"cpc-uri": "/api/cpcs/" + cpc,
+		"cpc-uri": cpcUri,
 	}
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
