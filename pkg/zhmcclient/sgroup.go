@@ -24,7 +24,7 @@ type StorageGroupAPI interface {
 	ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, *HmcError)
 	GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, *HmcError)
 	ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError)
-	GetStorageVolumeProperties(storageGroupURI string) (*StorageVolume, *HmcError)
+	GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, *HmcError)
 	UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
 	FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
 }
@@ -131,9 +131,9 @@ func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]Stor
  * Return: 200 and Storage Volume object
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) GetStorageVolumeProperties(storageGroupURI string) (*StorageVolume, *HmcError) {
+func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+	requestUrl.Path = path.Join(requestUrl.Path, storageVolumeURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {

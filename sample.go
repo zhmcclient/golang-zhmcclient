@@ -229,7 +229,7 @@ func StartPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 func ListStorageGroupsforCPC(hmcManager zhmcclient.ZhmcAPI) {
 	cpcID := os.Getenv("CPC_ID")
 	storageGroupURI := "api/storage-groups/"
-	storageGroups, err := hmcManager.ListStorageGroups(storageGroupURI, cpcID)
+	storageGroups, err := hmcManager.ListStorageGroups(storageGroupURI, "/api/cpcs/"+cpcID)
 	if err != nil {
 		fmt.Println("List Storage Group Error: ", err.Message)
 	}
