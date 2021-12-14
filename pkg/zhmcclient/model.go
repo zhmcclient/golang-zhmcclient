@@ -382,7 +382,7 @@ type NIC struct {
 	ID     string `json:"element-id,omitempty"`
 	URI    string `json:"element-uri,omitempty"`
 	Parent string `json:"parent,omitempty"`
-	Class  string `default:"nic,omitempty"`
+	Class  string `json:"class,omitempty"`
 	/* below are payloads when create a new Nic */
 	Name                  string           `json:"name,omitempty"`
 	Description           string           `json:"description,omitempty"`
