@@ -22,7 +22,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
 type VirtualSwitchAPI interface {
 	ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError)
-	GetVirtualSwitchProperties(vsSwitchURI string) (*VirtualSwitch, *HmcError)
+	GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError)
 }
 
 type VirtualSwitchManager struct {
@@ -70,9 +70,9 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwit
  * Return: 200 and Adapters array
  *     or: 400, 404, 409
  */
-func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vsSwitchURI string) (*VirtualSwitch, *HmcError) {
+func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
-	requestUrl.Path = path.Join(requestUrl.Path, vsSwitchURI)
+	requestUrl.Path = path.Join(requestUrl.Path, vSwitchURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
@@ -80,7 +80,7 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vsSwitchURI string) (*
 	}
 
 	if status == http.StatusOK {
-		virtualSwitch := &VirtualSwitch{}
+		virtualSwitch := &VirtualSwitchProperties{}
 		err := json.Unmarshal(responseBody, virtualSwitch)
 		if err != nil {
 			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)

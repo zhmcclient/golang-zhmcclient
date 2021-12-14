@@ -137,8 +137,8 @@ func (m *ZhmcManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcE
 	return m.virtualSwitchManager.ListVirtualSwitches(cpcURI)
 }
 
-func (m *ZhmcManager) GetVirtualSwitchProperties(vsSwitchId string) (*VirtualSwitch, *HmcError) {
-	return m.virtualSwitchManager.GetVirtualSwitchProperties(vsSwitchId)
+func (m *ZhmcManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError) {
+	return m.virtualSwitchManager.GetVirtualSwitchProperties(vSwitchURI)
 }
 
 // NIC

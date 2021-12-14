@@ -126,15 +126,22 @@ var _ = Describe("Virtual Switch", func() {
 
 	Describe("GetVirtualSwitchProperties", func() {
 		var (
-			virtualSwitch VirtualSwitch
+			virtualSwitch VirtualSwitchProperties
 			bytes         []byte
 		)
 
 		BeforeEach(func() {
-			virtualSwitch = VirtualSwitch{
-				URI:  "uri1",
-				Name: "name1",
-				Type: VIRTUALSWITCH_TYPE_HIPERSOCKET,
+			virtualSwitch = VirtualSwitchProperties{
+				URI:         "uri1",
+				Name:        "name1",
+				Type:        VIRTUALSWITCH_TYPE_HIPERSOCKET,
+				ID:          "id",
+				Parent:      "parent",
+				Class:       "virtual-switch",
+				Description: "This is a test hipersocket",
+				AdapterURI:  "adapter_uri",
+				Port:        1234567,
+				VNicUris:    []string{"uri1", "uri2"},
 			}
 			bytes, _ = json.Marshal(virtualSwitch)
 		})

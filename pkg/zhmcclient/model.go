@@ -91,6 +91,7 @@ type VirtualSwitchType string
 
 const (
 	VIRTUALSWITCH_TYPE_HIPERSOCKET VirtualSwitchType = "hipersockets"
+	VIRTUALSWITCH_TYPE_OSD                           = "osd"
 )
 
 type VirtualSwitchesArray struct {
@@ -101,6 +102,19 @@ type VirtualSwitch struct {
 	URI  string            `json:"object-uri,omitempty"`
 	Name string            `json:"name,omitempty"`
 	Type VirtualSwitchType `json:"type,omitempty"`
+}
+
+type VirtualSwitchProperties struct {
+	URI         string            `json:"object-uri,omitempty"`
+	Name        string            `json:"name,omitempty"`
+	Type        VirtualSwitchType `json:"type,omitempty"`
+	ID          string            `json:"object-id,omitempty"`
+	Parent      string            `json:"parent,omitempty"`
+	Class       string            `json:"class,omitempty"` // "virtual-switch"
+	Description string            `json:"description,omitempty"`
+	AdapterURI  string            `json:"backing-adapter-uri,omitempty"`
+	Port        int               `json:"port,omitempty"`
+	VNicUris    []string          `json:"connected-vnic-uris,omitempty"`
 }
 
 //////////////////////////////////////////////////
