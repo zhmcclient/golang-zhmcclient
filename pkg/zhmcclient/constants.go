@@ -31,7 +31,7 @@ const (
 
 	DEFAULT_DIAL_TIMEOUT      = 10 * time.Second
 	DEFAULT_HANDSHAKE_TIMEOUT = 10 * time.Second
-	DEFAULT_CONNECT_TIMEOUT   = 30 * time.Second
+	DEFAULT_CONNECT_TIMEOUT   = 90 * time.Second
 	DEFAULT_READ_TIMEOUT      = 3600 * time.Second
 	DEFAULT_MAX_REDIRECTS     = 30 * time.Second
 	DEFAULT_OPERATION_TIMEOUT = 3600 * time.Second
