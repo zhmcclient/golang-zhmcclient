@@ -21,10 +21,11 @@ type VirtualSwitchAPI struct {
 		result1 *zhmcclient.VirtualSwitchProperties
 		result2 *zhmcclient.HmcError
 	}
-	ListVirtualSwitchesStub        func(string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError)
+	ListVirtualSwitchesStub        func(string, map[string]string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError)
 	listVirtualSwitchesMutex       sync.RWMutex
 	listVirtualSwitchesArgsForCall []struct {
 		arg1 string
+		arg2 map[string]string
 	}
 	listVirtualSwitchesReturns struct {
 		result1 []zhmcclient.VirtualSwitch
@@ -102,18 +103,19 @@ func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitches(arg1 string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) ListVirtualSwitches(arg1 string, arg2 map[string]string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError) {
 	fake.listVirtualSwitchesMutex.Lock()
 	ret, specificReturn := fake.listVirtualSwitchesReturnsOnCall[len(fake.listVirtualSwitchesArgsForCall)]
 	fake.listVirtualSwitchesArgsForCall = append(fake.listVirtualSwitchesArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 map[string]string
+	}{arg1, arg2})
 	stub := fake.ListVirtualSwitchesStub
 	fakeReturns := fake.listVirtualSwitchesReturns
-	fake.recordInvocation("ListVirtualSwitches", []interface{}{arg1})
+	fake.recordInvocation("ListVirtualSwitches", []interface{}{arg1, arg2})
 	fake.listVirtualSwitchesMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -127,17 +129,17 @@ func (fake *VirtualSwitchAPI) ListVirtualSwitchesCallCount() int {
 	return len(fake.listVirtualSwitchesArgsForCall)
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitchesCalls(stub func(string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError)) {
+func (fake *VirtualSwitchAPI) ListVirtualSwitchesCalls(stub func(string, map[string]string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError)) {
 	fake.listVirtualSwitchesMutex.Lock()
 	defer fake.listVirtualSwitchesMutex.Unlock()
 	fake.ListVirtualSwitchesStub = stub
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitchesArgsForCall(i int) string {
+func (fake *VirtualSwitchAPI) ListVirtualSwitchesArgsForCall(i int) (string, map[string]string) {
 	fake.listVirtualSwitchesMutex.RLock()
 	defer fake.listVirtualSwitchesMutex.RUnlock()
 	argsForCall := fake.listVirtualSwitchesArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *VirtualSwitchAPI) ListVirtualSwitchesReturns(result1 []zhmcclient.VirtualSwitch, result2 *zhmcclient.HmcError) {

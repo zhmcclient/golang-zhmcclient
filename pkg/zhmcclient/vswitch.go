@@ -13,7 +13,6 @@ package zhmcclient
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 )
@@ -21,7 +20,7 @@ import (
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
 type VirtualSwitchAPI interface {
-	ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError)
+	ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, *HmcError)
 	GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError)
 }
 
@@ -39,13 +38,14 @@ func NewVirtualSwitchManager(client ClientAPI) *VirtualSwitchManager {
  * GET /api/cpcs/{cpc-id}/virtual-switches
  * @cpcURI the URI of the CPC
  * @return adapter array
- * Return: 200 and Adapters array
+ * Return: 200 and VirtualSwitches array
  *     or: 400, 404, 409
  */
-func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError) {
+func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "virtual-switches")
-	fmt.Println(requestUrl)
+	requestUrl = BuildUrlFromQuery(requestUrl, query)
+
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwit
  * GET /api/virtual-switches/{vswitch-id}
  * @cpcURI the ID of the virtual switch
  * @return adapter array
- * Return: 200 and Adapters array
+ * Return: 200 and VirtualSwitchProperties
  *     or: 400, 404, 409
  */
 func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError) {

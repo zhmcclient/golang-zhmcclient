@@ -133,8 +133,8 @@ func (m *ZhmcManager) FulfillStorageGroup(storageGroupURI string, updateRequest 
 
 // Virtual Switches
 
-func (m *ZhmcManager) ListVirtualSwitches(cpcURI string) ([]VirtualSwitch, *HmcError) {
-	return m.virtualSwitchManager.ListVirtualSwitches(cpcURI)
+func (m *ZhmcManager) ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, *HmcError) {
+	return m.virtualSwitchManager.ListVirtualSwitches(cpcURI, query)
 }
 
 func (m *ZhmcManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError) {
