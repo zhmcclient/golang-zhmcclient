@@ -272,15 +272,15 @@ func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
 func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
 	retries := DEFAULT_CONNECT_RETRIES
 	responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
+	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
+		c.Logon()
+		c.executeUpload(requestType, url.String(), requestData)
+	}
 	if IsExpectedHttpStatus(responseStatusCode) {
 		return
 	}
 
 	for retries > 0 {
-		if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-			c.Logon()
-			c.executeUpload(requestType, url.String(), requestData)
-		}
 		if IsExpectedHttpStatus(responseStatusCode) {
 			break
 		} else {
@@ -305,16 +305,16 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 	}
 
 	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
-	if IsExpectedHttpStatus(responseStatusCode) || err == nil { // Known error, don't retry
+	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
+		c.Logon()
+		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
+	}
+	if IsExpectedHttpStatus(responseStatusCode) { // Known error, don't retry
 		return responseStatusCode, responseBodyStream, err
 	}
 
 	for retries > 0 {
 		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
-		if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) { // 1. invalid session, logon again
-			c.Logon()
-			c.executeMethod(requestType, url.String(), requestData)
-		}
 		if IsExpectedHttpStatus(responseStatusCode) || err == nil { // 2. Known error, don't retry
 			break
 		} else { // 3. Retry
