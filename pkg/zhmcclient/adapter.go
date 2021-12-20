@@ -21,6 +21,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
 	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError)
+	GetAdapterProperties(adapterURI string) (*AdapterProperties, *HmcError)
 	CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, *HmcError)
 	DeleteHipersocket(adapterURI string) *HmcError
 }
@@ -65,6 +66,35 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return adapters.ADAPTERS, nil
+	}
+
+	return nil, GenerateErrorFromResponse(responseBody)
+}
+
+/**
+* GET /api/adapters/{adapter-id}
+* GET /api/adapters/{adapter-id}/network-ports/{network-port-id}
+* @adapterURI the adapter ID, network-port-id for which properties need to be fetched
+* @return adapter properties
+* Return: 200 and Adapters properties
+*     or: 400, 404, 409
+ */
+func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProperties, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == http.StatusOK {
+		adapterProps := &AdapterProperties{}
+		err := json.Unmarshal(responseBody, adapterProps)
+		if err != nil {
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		return adapterProps, nil
 	}
 
 	return nil, GenerateErrorFromResponse(responseBody)

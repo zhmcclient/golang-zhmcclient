@@ -49,6 +49,85 @@ const (
 	ADAPTER_STATUS_EXCEPTIONS                 = "exceptions"
 )
 
+type AdapterCardType string
+
+const (
+	ADPATER_CARD_HIPERSOCKETS              AdapterCardType = "hipersockets"
+	ADPATER_CARD_OSA_EXPRESS_4S_1GB                        = "osa-express-4s-1gb"
+	ADPATER_CARD_OSA_EXPRESS_4S_10GB                       = "osa-express-4s-10gb"
+	ADPATER_CARD_OSA_EXPRESS_4S_1000BASE_T                 = "osa-express-4s-1000base-t"
+	ADPATER_CARD_OSA_EXPRESS_5S_1GB                        = "osa-express-5s-1gb"
+	ADPATER_CARD_OSA_EXPRESS_5S_10GB                       = "osa-express-5s-10gb"
+	ADPATER_CARD_OSA_EXPRESS_5G_1000BASE_T                 = "osa-express-5s-1000base-t"
+	ADPATER_CARD_OSA_EXPRESS_6S_1GB                        = "osa-express-6s-1gb"
+	ADPATER_CARD_OSA_EXPRESS_6S_10GB                       = "osa-express-6s-10gb"
+	ADPATER_CARD_OSA_EXPRESS_6G_1000BASE_T                 = "osa-express-6s-1000base-t"
+	ADPATER_CARD_OSA_EXPRESS_7S_25GB                       = "osa-express-7s-25gb"
+	ADPATER_CARD_10GBE_ROCE_EXPRESS                        = "10gbe-roce-express"
+	ADPATER_CARD_ROCE_EXPRESS_2                            = "roce-express-2"
+	ADAPTER_CARD_ROCE_EXPRESS_2_25GB                       = "roce-express-2-25gb"
+	ADAPTER_CARD_CRYPTO_EXPRESS_5S                         = "crypto-express-5s"
+	ADAPTER_CARD_CRYPTO_EXPRESS_6S                         = "crypto-express-6s"
+	ADAPTER_CARD_FICON_EXPRESS_8                           = "ficon-express-8"
+	ADAPTER_CARD_FICON_EXPRESS_8S                          = "ficon-express-8s"
+	ADAPTER_CARD_FICON_EXPRESS_16S                         = "ficon-express-16s"
+	ADAPTER_CARD_FICON_EXPRESS_16S_PLUS                    = "ficon-express-16s-plus"
+	ADAPTER_CARD_FICON_EXPRESS_16SA                        = "ficon-express-16sa"
+	ADAPTER_CARD_FCP_EXPRESS_32S                           = "fcp-express-32s"
+	ADAPTER_CARD_ZEDC_EXPRESS                              = "zedc-express"
+	ADAPTER_CARD_CLOUD_NETWORK_X5                          = "cloud-network-x5"
+	ADAPTER_CARD_UNKNOWN                                   = "unknown"
+)
+
+type AdapterState string
+
+const (
+	ADAPTER_STATE_ONLINE   AdapterState = "online"
+	ADAPTER_STATE_STAND_BY              = "stand-by"
+	ADAPTER_STATE_RESERVED              = "reserved"
+	ADAPTER_STATE_UNKNOWN               = "unknown"
+)
+
+type AdapterTransmissionUnit int
+
+const (
+	ADAPTER_TRANSMISSION_UNIT_8  AdapterTransmissionUnit = 8
+	ADAPTER_TRANSMISSION_UNIT_16                         = 16
+	ADAPTER_TRANSMISSION_UNIT_32                         = 32
+	ADAPTER_TRANSMISSION_UNIT_56                         = 56
+)
+
+// Physical adapter channel connection status
+type AdapterChannelStatus string
+
+const (
+	ADAPTER_CHANNEL_OPERATING                         AdapterChannelStatus = "operating"
+	ADAPTER_CHANNEL_NO_POWER                                               = "no-power"
+	ADAPTER_CHANNEL_SERVICE                                                = "service"
+	ADAPTER_CHANNEL_STOPPED                                                = "stopped"
+	ADAPTER_CHANNEL_NOT_DEFINED                                            = "not-defined"
+	ADAPTER_CHANNEL_SUSPENDED                                              = "suspended"
+	ADAPTER_CHANNEL_CHECK_STOPPED                                          = "check-stopped"
+	ADAPTER_CHANNEL_WRAP_BLOCK                                             = "wrap-block"
+	ADAPTER_CHANNEL_PERMANENT_ERROR                                        = "permanent-error"
+	ADAPTER_CHANNEL_INITIALIZING                                           = "initializing"
+	ADAPTER_CHANNEL_LOSS_OF_SIGNAL                                         = "loss-of-signal"
+	ADAPTER_CHANNEL_LOSS_OF_SYNCHRONIZATION                                = "loss-of-synchronization"
+	ADAPTER_CHANNEL_NOT_OPERATIONAL_LINK                                   = "not-operational-link"
+	ADAPTER_CHANNEL_SEQUENCE_TIME_OUT                                      = "sequence-time-out"
+	ADAPTER_CHANNEL_SEQUENCE_NOT_PERMITTED                                 = "sequence-not-permitted"
+	ADAPTER_CHANNEL_TERMINAL_CONDITION                                     = "terminal-condition"
+	ADAPTER_CHANNEL_OFFLINE_SIGNAL_RECEIVED                                = "offline-signal-received"
+	ADAPTER_CHANNEL_FABRIC_LOGIN_SEQUENCE_FAILURE                          = "fabric-login-sequence-failure"
+	ADAPTER_CHANNEL_POST_LOGIN_SEQUENCE_FAILURE                            = "post-login-sequence-failure"
+	ADAPTER_CHANNEL_STATE_CHANGE_REGISTRATION_FAILURE                      = "state-change-registration-failure"
+	ADAPTER_CHANNEL_INVALID_ATTACHMENT_FAILURE                             = "invalid-attachment-failure"
+	ADAPTER_CHANNEL_TEST_MODE                                              = "test-mode"
+	ADAPTER_CHANNEL_BIT_ERROR_THRESHOLD_EXCEEDED                           = "bit-error-threshold-exceeded"
+	ADAPTER_CHANNEL_IFCC_THRESHOLD_EXCEEDED                                = "ifcc-threshold-exceeded"
+	ADAPTER_CHANNEL_IO_SUPRESSED                                           = "io-supressed"
+)
+
 type Adapter struct {
 	URI    string        `json:"object-uri,omitempty"`
 	Name   string        `json:"name,omitempty"`
@@ -60,6 +139,29 @@ type Adapter struct {
 
 type AdaptersArray struct {
 	ADAPTERS []Adapter `json:"adapters"`
+}
+
+type AdapterProperties struct {
+	URI                        string                  `json:"object-uri,omitempty"`
+	Name                       string                  `json:"name,omitempty"`
+	ID                         string                  `json:"adapter-id,omitempty"`
+	ObjectID                   string                  `json:"object-id,omitempty"`
+	Description                string                  `json:"description,omitempty"`
+	Family                     AdapterFamily           `json:"adapter-family,omitempty"`
+	Type                       AdapterType             `json:"type,omitempty"`
+	Status                     AdapterStatus           `json:"status,omitempty"`
+	DetectedCardType           AdapterCardType         `json:"detected-card-type,omitempty"`
+	CardLocation               string                  `json:"card-location,omitempty"`
+	PortCount                  int                     `json:"port-count,omitempty"`
+	NetworkAdapterPortURIs     []string                `json:"network-port-uris,omitempty"`
+	StoragePortURIs            []string                `json:"storage-port-uris,omitempty"`
+	State                      AdapterState            `json:"state,omitempty"`
+	MAX_TRANSMISSION_UNIT_SIZE AdapterTransmissionUnit `json:"maximum-transmission-unit-size,omitempty"`
+	PHYSICALCHANNELSTATUS      AdapterChannelStatus    `json:"physical-channel-status,omitempty"`
+	USED_CAPACITY              int                     `json:"used-capacity,omitempty"`
+	ALLOWED_CAPACITY           int                     `json:"allowed-capacity,omitempty"`
+	MAXIMUM_TOTAL_CAPACITY     int                     `json:"maximum-total-capacity,omitempty"`
+	CHANNEL_PATH_ID            string                  `json:"channel-path-id,omitempty"`
 }
 
 /**
