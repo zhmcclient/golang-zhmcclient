@@ -63,6 +63,12 @@ func main() {
 				
 				"DetachStorageGroupToPartitionofCPC":
 					- Detach storage group from selected partition
+				
+				"GetAdapterPropsforCPC"
+					- Get Adpater properties for adapter of given CPC
+
+				"ListAdaptersofCPC"
+					- List Adpaters for given CPC
 
 		}`)
 		os.Exit(1)
@@ -157,7 +163,12 @@ func main() {
 					DetachStorageGroupToPartitionofCPC(hmcManager)
 				case "AttachStorageGroupToPartitionofCPC":
 					AttachStorageGroupToPartitionofCPC(hmcManager)
+				case "GetAdapterPropsforCPC":
+					GetAdapterPropsforCPC(hmcManager)
+				case "ListAdaptersofCPC":
+					ListAdaptersofCPC(hmcManager)
 				}
+
 			}
 		}
 	}
@@ -167,6 +178,73 @@ func GetLPARURI() (lparURI string) {
 	partitionId := os.Getenv("PAR_ID")
 	lparURI = "api/partitions/" + partitionId
 	return
+}
+
+func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
+	query := map[string]string{}
+	CPCURI := "api/cpcs/" + os.Getenv("CPC_ID")
+	adapters,
+		err := hmcManager.ListAdapters(CPCURI, query)
+
+	if err != nil {
+		fmt.Println("List Adapters error: ", err.Message)
+		os.Exit(1)
+	} else {
+		fmt.Println("-----------------------")
+		for _, adapter := range adapters {
+			fmt.Println("++++++++++++++++++++++++")
+			fmt.Println("Adapter Name:", adapter.Name)
+			fmt.Println("Adapter Type:", adapter.Type)
+			fmt.Println("Adapter Family:", adapter.Family)
+			fmt.Println("Adapter Status:", adapter.Status)
+			fmt.Println("Adapter URI:", adapter.URI)
+			adapter, _ := hmcManager.GetAdapterProperties(adapter.URI)
+			fmt.Println("********* Adapter properties **************")
+			fmt.Println("\n- NAME: " + adapter.Name)
+			fmt.Println("\n- Status: " + adapter.Status)
+			fmt.Println("\n- State: " + adapter.State)
+			fmt.Println("\n- Detected Card Type: " + adapter.DetectedCardType)
+			fmt.Println("\n- Port Count: ", adapter.PortCount)
+			fmt.Println("\n- Adapter Family: " + adapter.Family)
+			fmt.Println("\n- PHYSICAL CONNECTION STATUS: " + adapter.PHYSICALCHANNELSTATUS)
+			fmt.Println("\n- Network Port URIS: ", adapter.NetworkAdapterPortURIs)
+			fmt.Println("\n- Storage Port URIS: ", adapter.StoragePortURIs)
+			fmt.Println("*********************************************")
+		}
+		fmt.Println("\n-----------------------")
+	}
+}
+
+func GetAdapterPropsforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	adapterID := os.Getenv("ADAPTER_ID")
+	adapterURI := "api/adapters/" + adapterID
+	adapter, err := hmcManager.GetAdapterProperties(adapterURI)
+	if err != nil {
+		fmt.Println("Get Adapter properties error: ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("Get properties operation successfull")
+	fmt.Println("********* Adapter properties **************")
+	fmt.Println("\n- NAME: " + adapter.Name)
+	fmt.Println("\n- Status: " + adapter.Status)
+	fmt.Println("\n- State: " + adapter.State)
+	fmt.Println("\n- Detected Card Type: " + adapter.DetectedCardType)
+	fmt.Println("\n- Port Count: ", adapter.PortCount)
+	fmt.Println("\n- Adapter Family: " + adapter.Family)
+	fmt.Println("\n- PHYSICAL CONNECTION STATUS: " + adapter.PHYSICALCHANNELSTATUS)
+	for i, v := range adapter.NetworkAdapterPortURIs {
+		fmt.Println(i+1, " Network Port URI: ", v)
+		networkProps, err := hmcManager.GetAdapterProperties(v)
+		if err != nil {
+			fmt.Println("Get Network Port properties error: ", err.Message)
+			os.Exit(1)
+		}
+		fmt.Println("Network Port Name: ", networkProps.Name)
+		fmt.Println("Network Port Description: ", networkProps.Description)
+
+	}
+	fmt.Println("*********************************************")
+
 }
 
 func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {

@@ -98,6 +98,9 @@ func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, *HmcError) {
 	return m.adapterManager.ListAdapters(cpcURI, query)
 }
+func (m *ZhmcManager) GetAdapterProperties(adapterURI string) (*AdapterProperties, *HmcError) {
+	return m.adapterManager.GetAdapterProperties(adapterURI)
+}
 func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, *HmcError) {
 	return m.adapterManager.CreateHipersocket(cpcURI, adaptor)
 }

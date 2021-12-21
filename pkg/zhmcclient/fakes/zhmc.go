@@ -116,6 +116,19 @@ type ZhmcAPI struct {
 	fulfillStorageGroupReturnsOnCall map[int]struct {
 		result1 *zhmcclient.HmcError
 	}
+	GetAdapterPropertiesStub        func(string) (*zhmcclient.AdapterProperties, *zhmcclient.HmcError)
+	getAdapterPropertiesMutex       sync.RWMutex
+	getAdapterPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getAdapterPropertiesReturns struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}
+	getAdapterPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}
 	GetLparPropertiesStub        func(string) (*zhmcclient.LparProperties, *zhmcclient.HmcError)
 	getLparPropertiesMutex       sync.RWMutex
 	getLparPropertiesArgsForCall []struct {
@@ -925,6 +938,70 @@ func (fake *ZhmcAPI) FulfillStorageGroupReturnsOnCall(i int, result1 *zhmcclient
 	fake.fulfillStorageGroupReturnsOnCall[i] = struct {
 		result1 *zhmcclient.HmcError
 	}{result1}
+}
+
+func (fake *ZhmcAPI) GetAdapterProperties(arg1 string) (*zhmcclient.AdapterProperties, *zhmcclient.HmcError) {
+	fake.getAdapterPropertiesMutex.Lock()
+	ret, specificReturn := fake.getAdapterPropertiesReturnsOnCall[len(fake.getAdapterPropertiesArgsForCall)]
+	fake.getAdapterPropertiesArgsForCall = append(fake.getAdapterPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetAdapterPropertiesStub
+	fakeReturns := fake.getAdapterPropertiesReturns
+	fake.recordInvocation("GetAdapterProperties", []interface{}{arg1})
+	fake.getAdapterPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ZhmcAPI) GetAdapterPropertiesCallCount() int {
+	fake.getAdapterPropertiesMutex.RLock()
+	defer fake.getAdapterPropertiesMutex.RUnlock()
+	return len(fake.getAdapterPropertiesArgsForCall)
+}
+
+func (fake *ZhmcAPI) GetAdapterPropertiesCalls(stub func(string) (*zhmcclient.AdapterProperties, *zhmcclient.HmcError)) {
+	fake.getAdapterPropertiesMutex.Lock()
+	defer fake.getAdapterPropertiesMutex.Unlock()
+	fake.GetAdapterPropertiesStub = stub
+}
+
+func (fake *ZhmcAPI) GetAdapterPropertiesArgsForCall(i int) string {
+	fake.getAdapterPropertiesMutex.RLock()
+	defer fake.getAdapterPropertiesMutex.RUnlock()
+	argsForCall := fake.getAdapterPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) GetAdapterPropertiesReturns(result1 *zhmcclient.AdapterProperties, result2 *zhmcclient.HmcError) {
+	fake.getAdapterPropertiesMutex.Lock()
+	defer fake.getAdapterPropertiesMutex.Unlock()
+	fake.GetAdapterPropertiesStub = nil
+	fake.getAdapterPropertiesReturns = struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) GetAdapterPropertiesReturnsOnCall(i int, result1 *zhmcclient.AdapterProperties, result2 *zhmcclient.HmcError) {
+	fake.getAdapterPropertiesMutex.Lock()
+	defer fake.getAdapterPropertiesMutex.Unlock()
+	fake.GetAdapterPropertiesStub = nil
+	if fake.getAdapterPropertiesReturnsOnCall == nil {
+		fake.getAdapterPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.AdapterProperties
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.getAdapterPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
 }
 
 func (fake *ZhmcAPI) GetLparProperties(arg1 string) (*zhmcclient.LparProperties, *zhmcclient.HmcError) {
@@ -2160,6 +2237,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
 	fake.fulfillStorageGroupMutex.RLock()
 	defer fake.fulfillStorageGroupMutex.RUnlock()
+	fake.getAdapterPropertiesMutex.RLock()
+	defer fake.getAdapterPropertiesMutex.RUnlock()
 	fake.getLparPropertiesMutex.RLock()
 	defer fake.getLparPropertiesMutex.RUnlock()
 	fake.getNicPropertiesMutex.RLock()

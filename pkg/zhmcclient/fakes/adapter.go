@@ -33,6 +33,19 @@ type AdapterAPI struct {
 	deleteHipersocketReturnsOnCall map[int]struct {
 		result1 *zhmcclient.HmcError
 	}
+	GetAdapterPropertiesStub        func(string) (*zhmcclient.AdapterProperties, *zhmcclient.HmcError)
+	getAdapterPropertiesMutex       sync.RWMutex
+	getAdapterPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getAdapterPropertiesReturns struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}
+	getAdapterPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}
 	ListAdaptersStub        func(string, map[string]string) ([]zhmcclient.Adapter, *zhmcclient.HmcError)
 	listAdaptersMutex       sync.RWMutex
 	listAdaptersArgsForCall []struct {
@@ -177,6 +190,70 @@ func (fake *AdapterAPI) DeleteHipersocketReturnsOnCall(i int, result1 *zhmcclien
 	}{result1}
 }
 
+func (fake *AdapterAPI) GetAdapterProperties(arg1 string) (*zhmcclient.AdapterProperties, *zhmcclient.HmcError) {
+	fake.getAdapterPropertiesMutex.Lock()
+	ret, specificReturn := fake.getAdapterPropertiesReturnsOnCall[len(fake.getAdapterPropertiesArgsForCall)]
+	fake.getAdapterPropertiesArgsForCall = append(fake.getAdapterPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetAdapterPropertiesStub
+	fakeReturns := fake.getAdapterPropertiesReturns
+	fake.recordInvocation("GetAdapterProperties", []interface{}{arg1})
+	fake.getAdapterPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *AdapterAPI) GetAdapterPropertiesCallCount() int {
+	fake.getAdapterPropertiesMutex.RLock()
+	defer fake.getAdapterPropertiesMutex.RUnlock()
+	return len(fake.getAdapterPropertiesArgsForCall)
+}
+
+func (fake *AdapterAPI) GetAdapterPropertiesCalls(stub func(string) (*zhmcclient.AdapterProperties, *zhmcclient.HmcError)) {
+	fake.getAdapterPropertiesMutex.Lock()
+	defer fake.getAdapterPropertiesMutex.Unlock()
+	fake.GetAdapterPropertiesStub = stub
+}
+
+func (fake *AdapterAPI) GetAdapterPropertiesArgsForCall(i int) string {
+	fake.getAdapterPropertiesMutex.RLock()
+	defer fake.getAdapterPropertiesMutex.RUnlock()
+	argsForCall := fake.getAdapterPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *AdapterAPI) GetAdapterPropertiesReturns(result1 *zhmcclient.AdapterProperties, result2 *zhmcclient.HmcError) {
+	fake.getAdapterPropertiesMutex.Lock()
+	defer fake.getAdapterPropertiesMutex.Unlock()
+	fake.GetAdapterPropertiesStub = nil
+	fake.getAdapterPropertiesReturns = struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *AdapterAPI) GetAdapterPropertiesReturnsOnCall(i int, result1 *zhmcclient.AdapterProperties, result2 *zhmcclient.HmcError) {
+	fake.getAdapterPropertiesMutex.Lock()
+	defer fake.getAdapterPropertiesMutex.Unlock()
+	fake.GetAdapterPropertiesStub = nil
+	if fake.getAdapterPropertiesReturnsOnCall == nil {
+		fake.getAdapterPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.AdapterProperties
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.getAdapterPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.AdapterProperties
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
 func (fake *AdapterAPI) ListAdapters(arg1 string, arg2 map[string]string) ([]zhmcclient.Adapter, *zhmcclient.HmcError) {
 	fake.listAdaptersMutex.Lock()
 	ret, specificReturn := fake.listAdaptersReturnsOnCall[len(fake.listAdaptersArgsForCall)]
@@ -249,6 +326,8 @@ func (fake *AdapterAPI) Invocations() map[string][][]interface{} {
 	defer fake.createHipersocketMutex.RUnlock()
 	fake.deleteHipersocketMutex.RLock()
 	defer fake.deleteHipersocketMutex.RUnlock()
+	fake.getAdapterPropertiesMutex.RLock()
+	defer fake.getAdapterPropertiesMutex.RUnlock()
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
