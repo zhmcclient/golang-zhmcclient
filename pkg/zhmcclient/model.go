@@ -378,7 +378,7 @@ type LparProperties struct {
 	OsName                           string                        `json:"os-name,omitempty"`
 	OsType                           string                        `json:"os-type,omitempty"`
 	OsVersion                        string                        `json:"os-version,omitempty"`
-	ReserveResourves                 bool                          `json:"reserve-resources,omitempty"`
+	ReserveResources                 bool                          `json:"reserve-resources,omitempty"`
 	DegradedAdapters                 []string                      `json:"degraded-adapters,omitempty"`
 	ProcessorMode                    PartitionProcessorMode        `json:"processor-mode,omitempty"`
 	CpProcessors                     int                           `json:"cp-processors,omitempty"`
