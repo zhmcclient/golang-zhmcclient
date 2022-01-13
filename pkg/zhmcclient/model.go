@@ -446,6 +446,7 @@ type LparProperties struct {
 	SscMasterUserid                  string                        `json:"ssc-master-userid,omitempty"`
 	SscMasterPw                      string                        `json:"ssc-master-pw,omitempty"`
 	AvailableFeaturesList            []PartitionFeatureInfo        `json:"available-features-list,omitempty"`
+	Secureboot                       bool                          `json:"secure-boot,omitempty"`
 }
 
 type StartStopLparResponse struct {
