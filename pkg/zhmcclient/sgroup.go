@@ -21,12 +21,12 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/sgroup.go --fake-name StorageGroupAPI . StorageGroupAPI
 
 type StorageGroupAPI interface {
-	ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, *HmcError)
-	GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, *HmcError)
-	ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError)
-	GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, *HmcError)
-	UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
-	FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError
+	ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, int, *HmcError)
+	GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, int, *HmcError)
+	ListStorageVolumes(storageGroupURI string) ([]StorageVolume, int, *HmcError)
+	GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, int, *HmcError)
+	UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) (int, *HmcError)
+	FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) (int, *HmcError)
 }
 
 type StorageGroupManager struct {
@@ -46,7 +46,7 @@ func NewStorageGroupManager(client ClientAPI) *StorageGroupManager {
  * Return: 200 and Storage Group array
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, *HmcError) {
+func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 	query := map[string]string{
@@ -55,19 +55,19 @@ func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri s
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		storageGroups := &StorageGroupArray{}
 		err := json.Unmarshal(responseBody, storageGroups)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return storageGroups.STORAGEGROUPS, nil
+		return storageGroups.STORAGEGROUPS, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -77,25 +77,25 @@ func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri s
  * Return: 200 and Storage Group object
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, *HmcError) {
+func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) (*StorageGroupProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		storageGroup := &StorageGroupProperties{}
 		err := json.Unmarshal(responseBody, storageGroup)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return storageGroup, nil
+		return storageGroup, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -105,24 +105,24 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
  * Return: 200 and Storage Group array
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]StorageVolume, *HmcError) {
+func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]StorageVolume, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		storageVolumes := &StorageVolumeArray{}
 		err := json.Unmarshal(responseBody, storageVolumes)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return storageVolumes.STORAGEVOLUMES, nil
+		return storageVolumes.STORAGEVOLUMES, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -131,25 +131,25 @@ func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]Stor
  * Return: 200 and Storage Volume object
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, *HmcError) {
+func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageVolumeURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		storageVolume := &StorageVolume{}
 		err := json.Unmarshal(responseBody, storageVolume)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return storageVolume, nil
+		return storageVolume, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -157,25 +157,25 @@ func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string
  * Return: 200
  *     or: 400, 404, 409
  */
-func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) *HmcError {
+func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, updateRequest)
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusOK {
 		storageGroup := &StorageGroup{}
 		err := json.Unmarshal(responseBody, storageGroup)
 		if err != nil {
-			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return nil
+		return status, nil
 	}
 
-	return nil
+	return status, nil
 }
 
 /**
@@ -184,24 +184,24 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 * Return: 200
 *     or: 400, 404, 409
 */
-func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, request *StorageGroupProperties) *HmcError {
+func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, request *StorageGroupProperties) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
 
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusOK {
 		storageGroup := &StorageGroup{}
 		err := json.Unmarshal(responseBody, storageGroup)
 		if err != nil {
-			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return nil
+		return status, nil
 	}
 
-	return nil
+	return status, nil
 }

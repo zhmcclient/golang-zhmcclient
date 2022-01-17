@@ -20,8 +20,8 @@ import (
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
 type VirtualSwitchAPI interface {
-	ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, *HmcError)
-	GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError)
+	ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, int, *HmcError)
+	GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, int, *HmcError)
 }
 
 type VirtualSwitchManager struct {
@@ -41,26 +41,26 @@ func NewVirtualSwitchManager(client ClientAPI) *VirtualSwitchManager {
  * Return: 200 and VirtualSwitches array
  *     or: 400, 404, 409
  */
-func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, *HmcError) {
+func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "virtual-switches")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		virtualSwitches := &VirtualSwitchesArray{}
 		err := json.Unmarshal(responseBody, virtualSwitches)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return virtualSwitches.VIRTUALSWITCHES, nil
+		return virtualSwitches.VIRTUALSWITCHES, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -70,23 +70,23 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
  * Return: 200 and VirtualSwitchProperties
  *     or: 400, 404, 409
  */
-func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, *HmcError) {
+func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, vSwitchURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		virtualSwitch := &VirtualSwitchProperties{}
 		err := json.Unmarshal(responseBody, virtualSwitch)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return virtualSwitch, nil
+		return virtualSwitch, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }

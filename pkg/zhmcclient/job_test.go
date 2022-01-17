@@ -72,7 +72,7 @@ var _ = Describe("JOB", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
-				rets, err := manager.QueryJob(jobid)
+				rets, _, err := manager.QueryJob(jobid)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
@@ -85,7 +85,7 @@ var _ = Describe("JOB", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, hmcErr)
-				rets, err := manager.QueryJob(jobid)
+				rets, _, err := manager.QueryJob(jobid)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
@@ -96,7 +96,7 @@ var _ = Describe("JOB", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, err := manager.QueryJob(jobid)
+				rets, _, err := manager.QueryJob(jobid)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
@@ -107,7 +107,7 @@ var _ = Describe("JOB", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, nil)
-				rets, err := manager.QueryJob(jobid)
+				rets, _, err := manager.QueryJob(jobid)
 
 				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())
@@ -121,7 +121,7 @@ var _ = Describe("JOB", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
-				err := manager.DeleteJob(jobid)
+				_, err := manager.DeleteJob(jobid)
 
 				Expect(err).To(BeNil())
 			})
@@ -131,7 +131,7 @@ var _ = Describe("JOB", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, hmcErr)
-				err := manager.DeleteJob(jobid)
+				_, err := manager.DeleteJob(jobid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})
@@ -141,7 +141,7 @@ var _ = Describe("JOB", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)
-				err := manager.DeleteJob(jobid)
+				_, err := manager.DeleteJob(jobid)
 
 				Expect(err).ToNot(BeNil())
 			})
@@ -154,7 +154,7 @@ var _ = Describe("JOB", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
-				err := manager.CancelJob(jobid)
+				_, err := manager.CancelJob(jobid)
 
 				Expect(err).To(BeNil())
 			})
@@ -164,7 +164,7 @@ var _ = Describe("JOB", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, hmcErr)
-				err := manager.CancelJob(jobid)
+				_, err := manager.CancelJob(jobid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})
@@ -174,7 +174,7 @@ var _ = Describe("JOB", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)
-				err := manager.CancelJob(jobid)
+				_, err := manager.CancelJob(jobid)
 
 				Expect(err).ToNot(BeNil())
 			})

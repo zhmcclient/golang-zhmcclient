@@ -82,7 +82,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
-				rets, err := manager.ListVirtualSwitches(cpcid, nil)
+				rets, _, err := manager.ListVirtualSwitches(cpcid, nil)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
@@ -94,7 +94,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
-				rets, err := manager.ListVirtualSwitches(cpcid, nil)
+				rets, _, err := manager.ListVirtualSwitches(cpcid, nil)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
@@ -105,7 +105,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, err := manager.ListVirtualSwitches(cpcid, nil)
+				rets, _, err := manager.ListVirtualSwitches(cpcid, nil)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
@@ -116,7 +116,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
-				rets, err := manager.ListVirtualSwitches(cpcid, nil)
+				rets, _, err := manager.ListVirtualSwitches(cpcid, nil)
 
 				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())
@@ -150,7 +150,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
-				rets, err := manager.GetVirtualSwitchProperties(vswitchId)
+				rets, _, err := manager.GetVirtualSwitchProperties(vswitchId)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
@@ -162,7 +162,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
-				rets, err := manager.GetVirtualSwitchProperties(vswitchId)
+				rets, _, err := manager.GetVirtualSwitchProperties(vswitchId)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
@@ -173,7 +173,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, err := manager.ListVirtualSwitches(vswitchId, nil)
+				rets, _, err := manager.ListVirtualSwitches(vswitchId, nil)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
@@ -184,7 +184,7 @@ var _ = Describe("Virtual Switch", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
-				rets, err := manager.ListVirtualSwitches(vswitchId, nil)
+				rets, _, err := manager.ListVirtualSwitches(vswitchId, nil)
 
 				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())

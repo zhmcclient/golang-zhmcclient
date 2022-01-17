@@ -96,7 +96,7 @@ var _ = Describe("Nic", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, bytesResponse, nil)
-				rets, err := manager.CreateNic(lparid, payload)
+				rets, _, err := manager.CreateNic(lparid, payload)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(Equal(""))
@@ -108,7 +108,7 @@ var _ = Describe("Nic", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
-				rets, err := manager.CreateNic(lparid, payload)
+				rets, _, err := manager.CreateNic(lparid, payload)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(Equal(""))
@@ -119,7 +119,7 @@ var _ = Describe("Nic", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
-				rets, err := manager.CreateNic(lparid, payload)
+				rets, _, err := manager.CreateNic(lparid, payload)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(Equal(""))
@@ -130,7 +130,7 @@ var _ = Describe("Nic", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, hmcErr)
-				rets, err := manager.CreateNic(lparid, payload)
+				rets, _, err := manager.CreateNic(lparid, payload)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(Equal(""))
@@ -144,7 +144,7 @@ var _ = Describe("Nic", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
-				err := manager.DeleteNic(nicid)
+				_, err := manager.DeleteNic(nicid)
 
 				Expect(err).To(BeNil())
 			})
@@ -154,7 +154,7 @@ var _ = Describe("Nic", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
-				err := manager.DeleteNic(nicid)
+				_, err := manager.DeleteNic(nicid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})

@@ -81,7 +81,7 @@ var _ = Describe("CPC", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
-				rets, err := manager.ListCPCs(nil)
+				rets, _, err := manager.ListCPCs(nil)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
@@ -93,7 +93,7 @@ var _ = Describe("CPC", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
-				rets, err := manager.ListCPCs(nil)
+				rets, _, err := manager.ListCPCs(nil)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
@@ -104,7 +104,7 @@ var _ = Describe("CPC", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, err := manager.ListCPCs(nil)
+				rets, _, err := manager.ListCPCs(nil)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
@@ -115,7 +115,7 @@ var _ = Describe("CPC", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
-				rets, err := manager.ListCPCs(nil)
+				rets, _, err := manager.ListCPCs(nil)
 
 				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())

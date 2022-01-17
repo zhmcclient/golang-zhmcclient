@@ -83,7 +83,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
-				rets, err := manager.ListStorageGroups(sgroupid, cpcid)
+				rets, _, err := manager.ListStorageGroups(sgroupid, cpcid)
 
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
@@ -95,7 +95,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
-				rets, err := manager.ListStorageGroups(sgroupid, cpcid)
+				rets, _, err := manager.ListStorageGroups(sgroupid, cpcid)
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
@@ -112,8 +112,9 @@ var _ = Describe("Storage Group", func() {
 		)
 
 		BeforeEach(func() {
-			storageVolumeURIs[0] = "Volume1-URI"
-			storageVolumeURIs[1] = "Volume2-URI"
+			storageVolumeURIs = make([]string, 0)
+			storageVolumeURIs = append(storageVolumeURIs, "Volume1-URI")
+			storageVolumeURIs = append(storageVolumeURIs, "Volume2-URI")
 
 			response = &StorageGroupProperties{
 				Class:                      "class",
@@ -136,7 +137,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
-				rets, err := manager.GetStorageGroupProperties(sgroupid)
+				rets, _, err := manager.GetStorageGroupProperties(sgroupid)
 
 				Expect(rets.Class).To(Equal("class"))
 				Expect(rets.MaxPartitions).To(Equal(2))
@@ -150,7 +151,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
-				_, err := manager.GetStorageGroupProperties(sgroupid)
+				_, _, err := manager.GetStorageGroupProperties(sgroupid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})
@@ -160,8 +161,9 @@ var _ = Describe("Storage Group", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, err := manager.GetStorageGroupProperties(sgroupid)
+				rets, _, err := manager.GetStorageGroupProperties(sgroupid)
 
+				Expect(err).ToNot(BeNil())
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
 			})
@@ -203,10 +205,10 @@ var _ = Describe("Storage Group", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
-				rets, err := manager.GetStorageVolumeProperties(sgroupid)
+				rets, _, err := manager.GetStorageVolumeProperties(sgroupid)
 
 				Expect(rets.Class).To(Equal("class"))
-				Expect(rets.FulfillmentState).To(Equal("complete"))
+				Expect(string(rets.FulfillmentState)).To(Equal("complete"))
 				Expect(err).To(BeNil())
 				Expect(rets).ToNot(BeNil())
 			})
@@ -216,7 +218,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
-				_, err := manager.GetStorageGroupProperties(sgroupid)
+				_, _, err := manager.GetStorageGroupProperties(sgroupid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})
@@ -226,7 +228,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, err := manager.GetStorageGroupProperties(sgroupid)
+				rets, _, err := manager.GetStorageGroupProperties(sgroupid)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
@@ -261,8 +263,8 @@ var _ = Describe("Storage Group", func() {
 		Context("When list stoarge volumes request and returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
-				_, err := manager.ListStorageVolumes(sgroupid)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
+				_, _, err := manager.ListStorageVolumes(sgroupid)
 
 				Expect(err).To(BeNil())
 			})
@@ -272,7 +274,7 @@ var _ = Describe("Storage Group", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
-				_, err := manager.ListStorageVolumes(sgroupid)
+				_, _, err := manager.ListStorageVolumes(sgroupid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})

@@ -21,17 +21,17 @@ import (
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
-	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, *HmcError)
-	GetLparProperties(lparURI string) (*LparProperties, *HmcError)
-	UpdateLparProperties(lparURI string, props *LparProperties) *HmcError
-	StartLPAR(lparURI string) (string, *HmcError)
-	StopLPAR(lparURI string) (string, *HmcError)
-	AttachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) *HmcError
-	DetachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) *HmcError
-	MountIsoImage(lparURI string, isoFile string, insFile string) *HmcError
-	UnmountIsoImage(lparURI string) *HmcError
+	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError)
+	GetLparProperties(lparURI string) (*LparProperties, int, *HmcError)
+	UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError)
+	StartLPAR(lparURI string) (string, int, *HmcError)
+	StopLPAR(lparURI string) (string, int, *HmcError)
+	AttachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) (int, *HmcError)
+	DetachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) (int, *HmcError)
+	MountIsoImage(lparURI string, isoFile string, insFile string) (int, *HmcError)
+	UnmountIsoImage(lparURI string) (int, *HmcError)
 
-	ListNics(lparURI string) ([]string, *HmcError)
+	ListNics(lparURI string) ([]string, int, *HmcError)
 }
 
 type LparManager struct {
@@ -55,26 +55,26 @@ func NewLparManager(client ClientAPI) *LparManager {
 * Return: 200 and LPARs array
 *     or: 400, 404, 409
  */
-func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, *HmcError) {
+func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/partitions")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		lpars := &LPARsArray{}
 		err := json.Unmarshal(responseBody, lpars)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		return lpars.LPARS, nil
+		return lpars.LPARS, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -83,26 +83,26 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 * Return: 200 and LparProperties
 *     or: 400, 404,
  */
-func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, *HmcError) {
+func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
 	if status == http.StatusOK {
 		lparProps := LparProperties{}
 		err := json.Unmarshal(responseBody, &lparProps)
 		if err != nil {
-			return nil, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 
-		return &lparProps, nil
+		return &lparProps, status, nil
 	}
 
-	return nil, GenerateErrorFromResponse(responseBody)
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -111,20 +111,20 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, *HmcEr
 * Return: 204
 *     or: 400, 403, 404, 409, 503,
  */
-func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties) *HmcError {
+func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props)
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		return nil
+		return status, nil
 	}
 
-	return GenerateErrorFromResponse(responseBody)
+	return status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -134,28 +134,28 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 * Return: 202 and job-uri
 *     or: 400, 403, 404, 503,
  */
-func (m *LparManager) StartLPAR(lparURI string) (string, *HmcError) {
+func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/start")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return "", err
+		return "", status, err
 	}
 
 	if status == http.StatusAccepted {
 		responseObj := StartStopLparResponse{}
 		err := json.Unmarshal(responseBody, &responseObj)
 		if err != nil {
-			return "", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
-			return responseObj.URI, nil
+			return responseObj.URI, status, nil
 		}
-		return "", getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
+		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
-	return "", GenerateErrorFromResponse(responseBody)
+	return "", status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -165,28 +165,28 @@ func (m *LparManager) StartLPAR(lparURI string) (string, *HmcError) {
 * Return: 202 and job-uri
 *     or: 400, 403, 404, 503,
  */
-func (m *LparManager) StopLPAR(lparURI string) (string, *HmcError) {
+func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/stop")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return "", err
+		return "", status, err
 	}
 
 	if status == http.StatusAccepted {
 		responseObj := StartStopLparResponse{}
 		err := json.Unmarshal(responseBody, &responseObj)
 		if err != nil {
-			return "", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
-			return responseObj.URI, nil
+			return responseObj.URI, status, nil
 		}
-		return "", getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
+		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
-	return "", GenerateErrorFromResponse(responseBody)
+	return "", status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -195,7 +195,7 @@ func (m *LparManager) StopLPAR(lparURI string) (string, *HmcError) {
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile string) *HmcError {
+func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile string) (int, *HmcError) {
 	pureIsoName := path.Base(isoFile)
 	pureInsName := path.Base(insFile)
 	query := map[string]string{
@@ -213,13 +213,13 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, imageData)
 
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		return nil
+		return status, nil
 	}
-	return GenerateErrorFromResponse(responseBody)
+	return status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -228,32 +228,32 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 * Return: 204
 *     or: 400, 403, 404, 409, 503
  */
-func (m *LparManager) UnmountIsoImage(lparURI string) *HmcError {
+func (m *LparManager) UnmountIsoImage(lparURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/unmount-iso-image")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		return nil
+		return status, nil
 	}
 
-	return GenerateErrorFromResponse(responseBody)
+	return status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
 * get_property('nic-uris') from LPAR
  */
-func (m *LparManager) ListNics(lparURI string) ([]string, *HmcError) {
-	props, err := m.GetLparProperties(lparURI)
+func (m *LparManager) ListNics(lparURI string) ([]string, int, *HmcError) {
+	props, status, err := m.GetLparProperties(lparURI)
 	if err != nil {
-		return nil, err
+		return nil, status, err
 	}
 
-	return props.NicUris, nil
+	return props.NicUris, status, nil
 }
 
 // AttachStorageGroupToPartition
@@ -263,20 +263,20 @@ func (m *LparManager) ListNics(lparURI string) ([]string, *HmcError) {
 * Return: 200
 *     or: 400, 404, 409
  */
-func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
+func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/attach-storage-group")
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
 
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		return nil
+		return status, nil
 	}
 
-	return GenerateErrorFromResponse(responseBody)
+	return status, GenerateErrorFromResponse(responseBody)
 }
 
 // DetachStorageGroupToPartition
@@ -285,19 +285,19 @@ func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *Sto
 * Return: 200
 *     or: 400, 404, 409
  */
-func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) *HmcError {
+func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/detach-storage-group")
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
 
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		return nil
+		return status, nil
 	}
 
-	return GenerateErrorFromResponse(responseBody)
+	return status, GenerateErrorFromResponse(responseBody)
 }

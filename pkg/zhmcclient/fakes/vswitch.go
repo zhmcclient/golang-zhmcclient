@@ -8,20 +8,22 @@ import (
 )
 
 type VirtualSwitchAPI struct {
-	GetVirtualSwitchPropertiesStub        func(string) (*zhmcclient.VirtualSwitchProperties, *zhmcclient.HmcError)
+	GetVirtualSwitchPropertiesStub        func(string) (*zhmcclient.VirtualSwitchProperties, int, *zhmcclient.HmcError)
 	getVirtualSwitchPropertiesMutex       sync.RWMutex
 	getVirtualSwitchPropertiesArgsForCall []struct {
 		arg1 string
 	}
 	getVirtualSwitchPropertiesReturns struct {
 		result1 *zhmcclient.VirtualSwitchProperties
-		result2 *zhmcclient.HmcError
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	getVirtualSwitchPropertiesReturnsOnCall map[int]struct {
 		result1 *zhmcclient.VirtualSwitchProperties
-		result2 *zhmcclient.HmcError
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
-	ListVirtualSwitchesStub        func(string, map[string]string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError)
+	ListVirtualSwitchesStub        func(string, map[string]string) ([]zhmcclient.VirtualSwitch, int, *zhmcclient.HmcError)
 	listVirtualSwitchesMutex       sync.RWMutex
 	listVirtualSwitchesArgsForCall []struct {
 		arg1 string
@@ -29,17 +31,19 @@ type VirtualSwitchAPI struct {
 	}
 	listVirtualSwitchesReturns struct {
 		result1 []zhmcclient.VirtualSwitch
-		result2 *zhmcclient.HmcError
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	listVirtualSwitchesReturnsOnCall map[int]struct {
 		result1 []zhmcclient.VirtualSwitch
-		result2 *zhmcclient.HmcError
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *VirtualSwitchAPI) GetVirtualSwitchProperties(arg1 string) (*zhmcclient.VirtualSwitchProperties, *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) GetVirtualSwitchProperties(arg1 string) (*zhmcclient.VirtualSwitchProperties, int, *zhmcclient.HmcError) {
 	fake.getVirtualSwitchPropertiesMutex.Lock()
 	ret, specificReturn := fake.getVirtualSwitchPropertiesReturnsOnCall[len(fake.getVirtualSwitchPropertiesArgsForCall)]
 	fake.getVirtualSwitchPropertiesArgsForCall = append(fake.getVirtualSwitchPropertiesArgsForCall, struct {
@@ -53,9 +57,9 @@ func (fake *VirtualSwitchAPI) GetVirtualSwitchProperties(arg1 string) (*zhmcclie
 		return stub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesCallCount() int {
@@ -64,7 +68,7 @@ func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesCallCount() int {
 	return len(fake.getVirtualSwitchPropertiesArgsForCall)
 }
 
-func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesCalls(stub func(string) (*zhmcclient.VirtualSwitchProperties, *zhmcclient.HmcError)) {
+func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesCalls(stub func(string) (*zhmcclient.VirtualSwitchProperties, int, *zhmcclient.HmcError)) {
 	fake.getVirtualSwitchPropertiesMutex.Lock()
 	defer fake.getVirtualSwitchPropertiesMutex.Unlock()
 	fake.GetVirtualSwitchPropertiesStub = stub
@@ -77,33 +81,36 @@ func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesArgsForCall(i int) strin
 	return argsForCall.arg1
 }
 
-func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesReturns(result1 *zhmcclient.VirtualSwitchProperties, result2 *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesReturns(result1 *zhmcclient.VirtualSwitchProperties, result2 int, result3 *zhmcclient.HmcError) {
 	fake.getVirtualSwitchPropertiesMutex.Lock()
 	defer fake.getVirtualSwitchPropertiesMutex.Unlock()
 	fake.GetVirtualSwitchPropertiesStub = nil
 	fake.getVirtualSwitchPropertiesReturns = struct {
 		result1 *zhmcclient.VirtualSwitchProperties
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
-func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesReturnsOnCall(i int, result1 *zhmcclient.VirtualSwitchProperties, result2 *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) GetVirtualSwitchPropertiesReturnsOnCall(i int, result1 *zhmcclient.VirtualSwitchProperties, result2 int, result3 *zhmcclient.HmcError) {
 	fake.getVirtualSwitchPropertiesMutex.Lock()
 	defer fake.getVirtualSwitchPropertiesMutex.Unlock()
 	fake.GetVirtualSwitchPropertiesStub = nil
 	if fake.getVirtualSwitchPropertiesReturnsOnCall == nil {
 		fake.getVirtualSwitchPropertiesReturnsOnCall = make(map[int]struct {
 			result1 *zhmcclient.VirtualSwitchProperties
-			result2 *zhmcclient.HmcError
+			result2 int
+			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.getVirtualSwitchPropertiesReturnsOnCall[i] = struct {
 		result1 *zhmcclient.VirtualSwitchProperties
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitches(arg1 string, arg2 map[string]string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) ListVirtualSwitches(arg1 string, arg2 map[string]string) ([]zhmcclient.VirtualSwitch, int, *zhmcclient.HmcError) {
 	fake.listVirtualSwitchesMutex.Lock()
 	ret, specificReturn := fake.listVirtualSwitchesReturnsOnCall[len(fake.listVirtualSwitchesArgsForCall)]
 	fake.listVirtualSwitchesArgsForCall = append(fake.listVirtualSwitchesArgsForCall, struct {
@@ -118,9 +125,9 @@ func (fake *VirtualSwitchAPI) ListVirtualSwitches(arg1 string, arg2 map[string]s
 		return stub(arg1, arg2)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *VirtualSwitchAPI) ListVirtualSwitchesCallCount() int {
@@ -129,7 +136,7 @@ func (fake *VirtualSwitchAPI) ListVirtualSwitchesCallCount() int {
 	return len(fake.listVirtualSwitchesArgsForCall)
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitchesCalls(stub func(string, map[string]string) ([]zhmcclient.VirtualSwitch, *zhmcclient.HmcError)) {
+func (fake *VirtualSwitchAPI) ListVirtualSwitchesCalls(stub func(string, map[string]string) ([]zhmcclient.VirtualSwitch, int, *zhmcclient.HmcError)) {
 	fake.listVirtualSwitchesMutex.Lock()
 	defer fake.listVirtualSwitchesMutex.Unlock()
 	fake.ListVirtualSwitchesStub = stub
@@ -142,30 +149,33 @@ func (fake *VirtualSwitchAPI) ListVirtualSwitchesArgsForCall(i int) (string, map
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitchesReturns(result1 []zhmcclient.VirtualSwitch, result2 *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) ListVirtualSwitchesReturns(result1 []zhmcclient.VirtualSwitch, result2 int, result3 *zhmcclient.HmcError) {
 	fake.listVirtualSwitchesMutex.Lock()
 	defer fake.listVirtualSwitchesMutex.Unlock()
 	fake.ListVirtualSwitchesStub = nil
 	fake.listVirtualSwitchesReturns = struct {
 		result1 []zhmcclient.VirtualSwitch
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
-func (fake *VirtualSwitchAPI) ListVirtualSwitchesReturnsOnCall(i int, result1 []zhmcclient.VirtualSwitch, result2 *zhmcclient.HmcError) {
+func (fake *VirtualSwitchAPI) ListVirtualSwitchesReturnsOnCall(i int, result1 []zhmcclient.VirtualSwitch, result2 int, result3 *zhmcclient.HmcError) {
 	fake.listVirtualSwitchesMutex.Lock()
 	defer fake.listVirtualSwitchesMutex.Unlock()
 	fake.ListVirtualSwitchesStub = nil
 	if fake.listVirtualSwitchesReturnsOnCall == nil {
 		fake.listVirtualSwitchesReturnsOnCall = make(map[int]struct {
 			result1 []zhmcclient.VirtualSwitch
-			result2 *zhmcclient.HmcError
+			result2 int
+			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.listVirtualSwitchesReturnsOnCall[i] = struct {
 		result1 []zhmcclient.VirtualSwitch
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
 func (fake *VirtualSwitchAPI) Invocations() map[string][][]interface{} {

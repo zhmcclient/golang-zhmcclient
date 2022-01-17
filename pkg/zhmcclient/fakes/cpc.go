@@ -8,24 +8,26 @@ import (
 )
 
 type CpcAPI struct {
-	ListCPCsStub        func(map[string]string) ([]zhmcclient.CPC, *zhmcclient.HmcError)
+	ListCPCsStub        func(map[string]string) ([]zhmcclient.CPC, int, *zhmcclient.HmcError)
 	listCPCsMutex       sync.RWMutex
 	listCPCsArgsForCall []struct {
 		arg1 map[string]string
 	}
 	listCPCsReturns struct {
 		result1 []zhmcclient.CPC
-		result2 *zhmcclient.HmcError
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	listCPCsReturnsOnCall map[int]struct {
 		result1 []zhmcclient.CPC
-		result2 *zhmcclient.HmcError
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *CpcAPI) ListCPCs(arg1 map[string]string) ([]zhmcclient.CPC, *zhmcclient.HmcError) {
+func (fake *CpcAPI) ListCPCs(arg1 map[string]string) ([]zhmcclient.CPC, int, *zhmcclient.HmcError) {
 	fake.listCPCsMutex.Lock()
 	ret, specificReturn := fake.listCPCsReturnsOnCall[len(fake.listCPCsArgsForCall)]
 	fake.listCPCsArgsForCall = append(fake.listCPCsArgsForCall, struct {
@@ -39,9 +41,9 @@ func (fake *CpcAPI) ListCPCs(arg1 map[string]string) ([]zhmcclient.CPC, *zhmccli
 		return stub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *CpcAPI) ListCPCsCallCount() int {
@@ -50,7 +52,7 @@ func (fake *CpcAPI) ListCPCsCallCount() int {
 	return len(fake.listCPCsArgsForCall)
 }
 
-func (fake *CpcAPI) ListCPCsCalls(stub func(map[string]string) ([]zhmcclient.CPC, *zhmcclient.HmcError)) {
+func (fake *CpcAPI) ListCPCsCalls(stub func(map[string]string) ([]zhmcclient.CPC, int, *zhmcclient.HmcError)) {
 	fake.listCPCsMutex.Lock()
 	defer fake.listCPCsMutex.Unlock()
 	fake.ListCPCsStub = stub
@@ -63,30 +65,33 @@ func (fake *CpcAPI) ListCPCsArgsForCall(i int) map[string]string {
 	return argsForCall.arg1
 }
 
-func (fake *CpcAPI) ListCPCsReturns(result1 []zhmcclient.CPC, result2 *zhmcclient.HmcError) {
+func (fake *CpcAPI) ListCPCsReturns(result1 []zhmcclient.CPC, result2 int, result3 *zhmcclient.HmcError) {
 	fake.listCPCsMutex.Lock()
 	defer fake.listCPCsMutex.Unlock()
 	fake.ListCPCsStub = nil
 	fake.listCPCsReturns = struct {
 		result1 []zhmcclient.CPC
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
-func (fake *CpcAPI) ListCPCsReturnsOnCall(i int, result1 []zhmcclient.CPC, result2 *zhmcclient.HmcError) {
+func (fake *CpcAPI) ListCPCsReturnsOnCall(i int, result1 []zhmcclient.CPC, result2 int, result3 *zhmcclient.HmcError) {
 	fake.listCPCsMutex.Lock()
 	defer fake.listCPCsMutex.Unlock()
 	fake.ListCPCsStub = nil
 	if fake.listCPCsReturnsOnCall == nil {
 		fake.listCPCsReturnsOnCall = make(map[int]struct {
 			result1 []zhmcclient.CPC
-			result2 *zhmcclient.HmcError
+			result2 int
+			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.listCPCsReturnsOnCall[i] = struct {
 		result1 []zhmcclient.CPC
-		result2 *zhmcclient.HmcError
-	}{result1, result2}
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
 func (fake *CpcAPI) Invocations() map[string][][]interface{} {
