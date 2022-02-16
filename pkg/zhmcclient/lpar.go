@@ -200,7 +200,7 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	pureInsName := path.Base(insFile)
 	query := map[string]string{
 		"image-name":    pureIsoName,
-		"ins-file-name": "/boot/" + pureInsName,
+		"ins-file-name": "/" + pureInsName,
 	}
 	imageData, byteErr := RetrieveBytes(isoFile)
 	if byteErr != nil {
