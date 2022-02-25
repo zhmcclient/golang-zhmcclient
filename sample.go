@@ -55,7 +55,7 @@ func main() {
 				"ListStorageGroupsforCPC":
 					- List the storage groups of a given CPC for the selected HMC	
 
-			       "ListStorageVolumesforCPC":
+			    "ListStorageVolumesforCPC":
 				 	- Get storage volumes of a given storage group for the selected HMC
 				
 				"AttachStorageGroupToPartitionofCPC":
@@ -69,6 +69,9 @@ func main() {
 
 				"ListAdaptersofCPC"
 					- List Adpaters for given CPC
+				
+				"FetchASCIIConsoleURI"
+				    - Get the URI to launch the Ascii Web Console
 
 		}`)
 		os.Exit(1)
@@ -167,6 +170,8 @@ func main() {
 					GetAdapterPropsforCPC(hmcManager)
 				case "ListAdaptersofCPC":
 					ListAdaptersofCPC(hmcManager)
+				case "FetchASCIIConsoleURI":
+					FetchASCIIConsoleURI(hmcManager)
 				}
 
 			}
@@ -299,6 +304,19 @@ func StartPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 		os.Exit(1)
 	}
 	fmt.Println("Start partition successfull")
+}
+
+func FetchASCIIConsoleURI(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	props := &zhmcclient.AsciiConsoleURIPayload{}
+
+	response, _, err := hmcManager.FetchAsciiConsoleURI(lparURI, props)
+
+	if err != nil {
+		fmt.Println("Fetch Ascii Console URI Error : ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("The URI to accesss the ASCII Console is :", response.URI)
 }
 
 /*

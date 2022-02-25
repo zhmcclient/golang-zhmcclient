@@ -632,3 +632,12 @@ type VolumePath struct {
 	TargetWWPN        string `json:"target-world-wide-port-name,omitempty"`
 	LogicalUnitNumber string `json:"logical-unit-number,omitempty"`
 }
+
+//ASCIIConsolePayload
+type AsciiConsoleURIPayload struct {
+	ForceTakeover bool `json:"force-takeover",omitempty`
+}
+
+type AsciiConsoleURIResponse struct {
+	URI string `json:"websocket-uri"`
+}

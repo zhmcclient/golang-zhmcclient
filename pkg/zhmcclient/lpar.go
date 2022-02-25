@@ -32,6 +32,7 @@ type LparAPI interface {
 	UnmountIsoImage(lparURI string) (int, *HmcError)
 
 	ListNics(lparURI string) ([]string, int, *HmcError)
+	FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError)
 }
 
 type LparManager struct {
@@ -300,4 +301,36 @@ func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 	}
 
 	return status, GenerateErrorFromResponse(responseBody)
+}
+
+// FetchAsciiConsoleURI
+/**
+* POST /api/partitions/{partition-id}/operations/get-ascii-console-websocket-uri
+* Return: 200
+*     or: 400, 404, 409
+ */
+func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/get-ascii-console-websocket-uri")
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+
+	if err != nil {
+		return nil, status, err
+	}
+
+	if status == http.StatusOK {
+		responseObj := &AsciiConsoleURIResponse{}
+
+		err := json.Unmarshal(responseBody, &responseObj)
+		if err != nil {
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		if responseObj.URI != "" {
+			return responseObj, status, nil
+		}
+		return responseObj, status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
+	}
+
+	return nil, status, GenerateErrorFromResponse(responseBody)
 }

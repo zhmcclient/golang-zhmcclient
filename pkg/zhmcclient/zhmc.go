@@ -94,6 +94,10 @@ func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 	return m.lparManager.DetachStorageGroupToPartition(lparURI, request)
 }
 
+func (m *ZhmcManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError) {
+	return m.lparManager.FetchAsciiConsoleURI(lparURI, request)
+}
+
 // Adapter
 func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Adapter, int, *HmcError) {
 	return m.adapterManager.ListAdapters(cpcURI, query)
