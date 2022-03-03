@@ -633,9 +633,9 @@ type VolumePath struct {
 	LogicalUnitNumber string `json:"logical-unit-number,omitempty"`
 }
 
-//ASCIIConsolePayload
+// ASCIIConsolePayload
 type AsciiConsoleURIPayload struct {
-	ForceTakeover bool `json:"force-takeover",omitempty`
+	ForceTakeover bool `json:"force-takeover,omitempty"`
 }
 
 type AsciiConsoleURIResponse struct {
