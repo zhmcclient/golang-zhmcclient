@@ -36,8 +36,10 @@ type ClientAPI interface {
 	TraceOn(outputStream io.Writer)
 	TraceOff()
 	SetSkipCertVerify(isSkipCert bool)
-	Logon(consoleSession bool) (string, int, *HmcError)
-	Logoff(sessionID string) *HmcError
+	Logon() *HmcError
+	Logoff() *HmcError
+	LogonConsole() (string, int, *HmcError)
+	LogoffConsole(sessionID string) *HmcError
 	IsLogon(verify bool) bool
 	ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionID string) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
 	UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
@@ -116,7 +118,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 		},
 	}
 
-	_, _, err = client.Logon(false)
+	err = client.Logon()
 	if err != nil {
 		return nil, err
 	}
@@ -197,10 +199,27 @@ func (c *Client) clearSession() {
 	c.session = nil
 }
 
-func (c *Client) Logon(consoleSession bool) (sessionID string, status int, err *HmcError) {
-	if !consoleSession {
-		c.clearSession()
+func (c *Client) Logon() *HmcError {
+	c.clearSession()
+	url := c.CloneEndpointURL()
+	url.Path = path.Join(url.Path, "/api/sessions")
+
+	status, responseBody, _ := c.executeMethod(http.MethodPost, url.String(), c.logondata, "")
+
+	if status == http.StatusOK || status == http.StatusCreated {
+		session := &Session{}
+		err := json.Unmarshal(responseBody, session)
+		if err != nil {
+			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		c.session = session
+		return nil
 	}
+
+	return GenerateErrorFromResponse(responseBody)
+}
+
+func (c *Client) LogonConsole() (sessionID string, status int, err *HmcError) {
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions")
 
@@ -214,22 +233,32 @@ func (c *Client) Logon(consoleSession bool) (sessionID string, status int, err *
 		if err != nil {
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		if !consoleSession {
-			c.session = session
-		} else {
-			return session.SessionID, status, nil
-		}
-		return "", status, nil
+		return session.SessionID, status, nil
 	}
 
 	return "", status, GenerateErrorFromResponse(responseBody)
 }
 
-func (c *Client) Logoff(sessionID string) *HmcError {
+func (c *Client) LogoffConsole(sessionID string) *HmcError {
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions/this-session")
 
 	status, responseBody, err := c.executeMethod(http.MethodDelete, url.String(), nil, sessionID)
+	if err != nil {
+		return err
+	}
+	if status == http.StatusNoContent {
+		c.clearSession()
+		return nil
+	}
+	return GenerateErrorFromResponse(responseBody)
+}
+
+func (c *Client) Logoff() *HmcError {
+	url := c.CloneEndpointURL()
+	url.Path = path.Join(url.Path, "/api/sessions/this-session")
+
+	status, responseBody, err := c.executeMethod(http.MethodDelete, url.String(), nil, "")
 	if err != nil {
 		return err
 	}
@@ -279,7 +308,7 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	retries := DEFAULT_CONNECT_RETRIES
 	responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-		c.Logon(false)
+		c.Logon()
 		c.executeUpload(requestType, url.String(), requestData)
 	}
 	if IsExpectedHttpStatus(responseStatusCode) {
@@ -312,7 +341,7 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 
 	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-		c.Logon(false)
+		c.Logon()
 		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 	}
 	if IsExpectedHttpStatus(responseStatusCode) { // Known error, don't retry

@@ -311,7 +311,7 @@ func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *Sto
  */
 func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError) {
 	// User a new session for each ascii console URI
-	consoleSessionID, status, err := m.client.Logon(true)
+	consoleSessionID, status, err := m.client.LogonConsole()
 	if err != nil {
 		return nil, status, err
 	}

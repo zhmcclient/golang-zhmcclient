@@ -49,10 +49,9 @@ type ClientAPI struct {
 	isLogonReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	LogoffStub        func(string) *zhmcclient.HmcError
+	LogoffStub        func() *zhmcclient.HmcError
 	logoffMutex       sync.RWMutex
 	logoffArgsForCall []struct {
-		arg1 string
 	}
 	logoffReturns struct {
 		result1 *zhmcclient.HmcError
@@ -60,17 +59,37 @@ type ClientAPI struct {
 	logoffReturnsOnCall map[int]struct {
 		result1 *zhmcclient.HmcError
 	}
-	LogonStub        func(bool) (string, int, *zhmcclient.HmcError)
+	LogoffConsoleStub        func(string) *zhmcclient.HmcError
+	logoffConsoleMutex       sync.RWMutex
+	logoffConsoleArgsForCall []struct {
+		arg1 string
+	}
+	logoffConsoleReturns struct {
+		result1 *zhmcclient.HmcError
+	}
+	logoffConsoleReturnsOnCall map[int]struct {
+		result1 *zhmcclient.HmcError
+	}
+	LogonStub        func() *zhmcclient.HmcError
 	logonMutex       sync.RWMutex
 	logonArgsForCall []struct {
-		arg1 bool
 	}
 	logonReturns struct {
+		result1 *zhmcclient.HmcError
+	}
+	logonReturnsOnCall map[int]struct {
+		result1 *zhmcclient.HmcError
+	}
+	LogonConsoleStub        func() (string, int, *zhmcclient.HmcError)
+	logonConsoleMutex       sync.RWMutex
+	logonConsoleArgsForCall []struct {
+	}
+	logonConsoleReturns struct {
 		result1 string
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
-	logonReturnsOnCall map[int]struct {
+	logonConsoleReturnsOnCall map[int]struct {
 		result1 string
 		result2 int
 		result3 *zhmcclient.HmcError
@@ -294,18 +313,17 @@ func (fake *ClientAPI) IsLogonReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *ClientAPI) Logoff(arg1 string) *zhmcclient.HmcError {
+func (fake *ClientAPI) Logoff() *zhmcclient.HmcError {
 	fake.logoffMutex.Lock()
 	ret, specificReturn := fake.logoffReturnsOnCall[len(fake.logoffArgsForCall)]
 	fake.logoffArgsForCall = append(fake.logoffArgsForCall, struct {
-		arg1 string
-	}{arg1})
+	}{})
 	stub := fake.LogoffStub
 	fakeReturns := fake.logoffReturns
-	fake.recordInvocation("Logoff", []interface{}{arg1})
+	fake.recordInvocation("Logoff", []interface{}{})
 	fake.logoffMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
@@ -319,17 +337,10 @@ func (fake *ClientAPI) LogoffCallCount() int {
 	return len(fake.logoffArgsForCall)
 }
 
-func (fake *ClientAPI) LogoffCalls(stub func(string) *zhmcclient.HmcError) {
+func (fake *ClientAPI) LogoffCalls(stub func() *zhmcclient.HmcError) {
 	fake.logoffMutex.Lock()
 	defer fake.logoffMutex.Unlock()
 	fake.LogoffStub = stub
-}
-
-func (fake *ClientAPI) LogoffArgsForCall(i int) string {
-	fake.logoffMutex.RLock()
-	defer fake.logoffMutex.RUnlock()
-	argsForCall := fake.logoffArgsForCall[i]
-	return argsForCall.arg1
 }
 
 func (fake *ClientAPI) LogoffReturns(result1 *zhmcclient.HmcError) {
@@ -355,23 +366,83 @@ func (fake *ClientAPI) LogoffReturnsOnCall(i int, result1 *zhmcclient.HmcError) 
 	}{result1}
 }
 
-func (fake *ClientAPI) Logon(arg1 bool) (string, int, *zhmcclient.HmcError) {
-	fake.logonMutex.Lock()
-	ret, specificReturn := fake.logonReturnsOnCall[len(fake.logonArgsForCall)]
-	fake.logonArgsForCall = append(fake.logonArgsForCall, struct {
-		arg1 bool
+func (fake *ClientAPI) LogoffConsole(arg1 string) *zhmcclient.HmcError {
+	fake.logoffConsoleMutex.Lock()
+	ret, specificReturn := fake.logoffConsoleReturnsOnCall[len(fake.logoffConsoleArgsForCall)]
+	fake.logoffConsoleArgsForCall = append(fake.logoffConsoleArgsForCall, struct {
+		arg1 string
 	}{arg1})
-	stub := fake.LogonStub
-	fakeReturns := fake.logonReturns
-	fake.recordInvocation("Logon", []interface{}{arg1})
-	fake.logonMutex.Unlock()
+	stub := fake.LogoffConsoleStub
+	fakeReturns := fake.logoffConsoleReturns
+	fake.recordInvocation("LogoffConsole", []interface{}{arg1})
+	fake.logoffConsoleMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1
 	}
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fakeReturns.result1
+}
+
+func (fake *ClientAPI) LogoffConsoleCallCount() int {
+	fake.logoffConsoleMutex.RLock()
+	defer fake.logoffConsoleMutex.RUnlock()
+	return len(fake.logoffConsoleArgsForCall)
+}
+
+func (fake *ClientAPI) LogoffConsoleCalls(stub func(string) *zhmcclient.HmcError) {
+	fake.logoffConsoleMutex.Lock()
+	defer fake.logoffConsoleMutex.Unlock()
+	fake.LogoffConsoleStub = stub
+}
+
+func (fake *ClientAPI) LogoffConsoleArgsForCall(i int) string {
+	fake.logoffConsoleMutex.RLock()
+	defer fake.logoffConsoleMutex.RUnlock()
+	argsForCall := fake.logoffConsoleArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ClientAPI) LogoffConsoleReturns(result1 *zhmcclient.HmcError) {
+	fake.logoffConsoleMutex.Lock()
+	defer fake.logoffConsoleMutex.Unlock()
+	fake.LogoffConsoleStub = nil
+	fake.logoffConsoleReturns = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *ClientAPI) LogoffConsoleReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+	fake.logoffConsoleMutex.Lock()
+	defer fake.logoffConsoleMutex.Unlock()
+	fake.LogoffConsoleStub = nil
+	if fake.logoffConsoleReturnsOnCall == nil {
+		fake.logoffConsoleReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.HmcError
+		})
+	}
+	fake.logoffConsoleReturnsOnCall[i] = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *ClientAPI) Logon() *zhmcclient.HmcError {
+	fake.logonMutex.Lock()
+	ret, specificReturn := fake.logonReturnsOnCall[len(fake.logonArgsForCall)]
+	fake.logonArgsForCall = append(fake.logonArgsForCall, struct {
+	}{})
+	stub := fake.LogonStub
+	fakeReturns := fake.logonReturns
+	fake.recordInvocation("Logon", []interface{}{})
+	fake.logonMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
 }
 
 func (fake *ClientAPI) LogonCallCount() int {
@@ -380,42 +451,88 @@ func (fake *ClientAPI) LogonCallCount() int {
 	return len(fake.logonArgsForCall)
 }
 
-func (fake *ClientAPI) LogonCalls(stub func(bool) (string, int, *zhmcclient.HmcError)) {
+func (fake *ClientAPI) LogonCalls(stub func() *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = stub
 }
 
-func (fake *ClientAPI) LogonArgsForCall(i int) bool {
-	fake.logonMutex.RLock()
-	defer fake.logonMutex.RUnlock()
-	argsForCall := fake.logonArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *ClientAPI) LogonReturns(result1 string, result2 int, result3 *zhmcclient.HmcError) {
+func (fake *ClientAPI) LogonReturns(result1 *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = nil
 	fake.logonReturns = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+	fake.logonMutex.Lock()
+	defer fake.logonMutex.Unlock()
+	fake.LogonStub = nil
+	if fake.logonReturnsOnCall == nil {
+		fake.logonReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.HmcError
+		})
+	}
+	fake.logonReturnsOnCall[i] = struct {
+		result1 *zhmcclient.HmcError
+	}{result1}
+}
+
+func (fake *ClientAPI) LogonConsole() (string, int, *zhmcclient.HmcError) {
+	fake.logonConsoleMutex.Lock()
+	ret, specificReturn := fake.logonConsoleReturnsOnCall[len(fake.logonConsoleArgsForCall)]
+	fake.logonConsoleArgsForCall = append(fake.logonConsoleArgsForCall, struct {
+	}{})
+	stub := fake.LogonConsoleStub
+	fakeReturns := fake.logonConsoleReturns
+	fake.recordInvocation("LogonConsole", []interface{}{})
+	fake.logonConsoleMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *ClientAPI) LogonConsoleCallCount() int {
+	fake.logonConsoleMutex.RLock()
+	defer fake.logonConsoleMutex.RUnlock()
+	return len(fake.logonConsoleArgsForCall)
+}
+
+func (fake *ClientAPI) LogonConsoleCalls(stub func() (string, int, *zhmcclient.HmcError)) {
+	fake.logonConsoleMutex.Lock()
+	defer fake.logonConsoleMutex.Unlock()
+	fake.LogonConsoleStub = stub
+}
+
+func (fake *ClientAPI) LogonConsoleReturns(result1 string, result2 int, result3 *zhmcclient.HmcError) {
+	fake.logonConsoleMutex.Lock()
+	defer fake.logonConsoleMutex.Unlock()
+	fake.LogonConsoleStub = nil
+	fake.logonConsoleReturns = struct {
 		result1 string
 		result2 int
 		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
 }
 
-func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 string, result2 int, result3 *zhmcclient.HmcError) {
-	fake.logonMutex.Lock()
-	defer fake.logonMutex.Unlock()
-	fake.LogonStub = nil
-	if fake.logonReturnsOnCall == nil {
-		fake.logonReturnsOnCall = make(map[int]struct {
+func (fake *ClientAPI) LogonConsoleReturnsOnCall(i int, result1 string, result2 int, result3 *zhmcclient.HmcError) {
+	fake.logonConsoleMutex.Lock()
+	defer fake.logonConsoleMutex.Unlock()
+	fake.LogonConsoleStub = nil
+	if fake.logonConsoleReturnsOnCall == nil {
+		fake.logonConsoleReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 int
 			result3 *zhmcclient.HmcError
 		})
 	}
-	fake.logonReturnsOnCall[i] = struct {
+	fake.logonConsoleReturnsOnCall[i] = struct {
 		result1 string
 		result2 int
 		result3 *zhmcclient.HmcError
@@ -595,8 +712,12 @@ func (fake *ClientAPI) Invocations() map[string][][]interface{} {
 	defer fake.isLogonMutex.RUnlock()
 	fake.logoffMutex.RLock()
 	defer fake.logoffMutex.RUnlock()
+	fake.logoffConsoleMutex.RLock()
+	defer fake.logoffConsoleMutex.RUnlock()
 	fake.logonMutex.RLock()
 	defer fake.logonMutex.RUnlock()
+	fake.logonConsoleMutex.RLock()
+	defer fake.logonConsoleMutex.RUnlock()
 	fake.setSkipCertVerifyMutex.RLock()
 	defer fake.setSkipCertVerifyMutex.RUnlock()
 	fake.traceOffMutex.RLock()
