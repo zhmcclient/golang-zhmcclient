@@ -39,7 +39,7 @@ type ClientAPI interface {
 	Logon(consoleSession bool) (string, int, *HmcError)
 	Logoff(sessionID string) *HmcError
 	IsLogon(verify bool) bool
-	ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionId string) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
+	ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionID string) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
 	UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
 }
 
@@ -197,7 +197,7 @@ func (c *Client) clearSession() {
 	c.session = nil
 }
 
-func (c *Client) Logon(consoleSession bool) (sessionId string, status int, err *HmcError) {
+func (c *Client) Logon(consoleSession bool) (sessionID string, status int, err *HmcError) {
 	if !consoleSession {
 		c.clearSession()
 	}
@@ -298,7 +298,7 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	return responseStatusCode, responseBodyStream, err
 }
 
-func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionId string) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
+func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionID string) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
 	var (
 		retries int
 	)
@@ -310,17 +310,17 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 		retries = DEFAULT_CONNECT_RETRIES
 	}
 
-	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionId)
+	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
 		c.Logon(false)
-		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionId)
+		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 	}
 	if IsExpectedHttpStatus(responseStatusCode) { // Known error, don't retry
 		return responseStatusCode, responseBodyStream, err
 	}
 
 	for retries > 0 {
-		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionId)
+		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 		if IsExpectedHttpStatus(responseStatusCode) || err == nil { // 2. Known error, don't retry
 			break
 		} else { // 3. Retry
@@ -330,7 +330,7 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 	return responseStatusCode, responseBodyStream, err
 }
 
-func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}, sessionId string) (responseStatusCode int, responseBodyStream []byte, hmcErr *HmcError) {
+func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}, sessionID string) (responseStatusCode int, responseBodyStream []byte, hmcErr *HmcError) {
 	var requestBody []byte
 	var err error
 
@@ -346,7 +346,7 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 	}
 
-	c.setRequestHeaders(request, APPLICATION_BODY_JSON, sessionId)
+	c.setRequestHeaders(request, APPLICATION_BODY_JSON, sessionID)
 
 	response, err := c.httpClient.Do(request)
 
