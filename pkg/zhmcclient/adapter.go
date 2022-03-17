@@ -18,7 +18,7 @@ import (
 )
 
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
+//go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
 	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, int, *HmcError)
 	GetAdapterProperties(adapterURI string) (*AdapterProperties, int, *HmcError)
@@ -54,7 +54,7 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -83,7 +83,7 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -111,7 +111,7 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor, "")
 	if err != nil {
 		return "", status, err
 	}
@@ -138,7 +138,7 @@ func (m *AdapterManager) DeleteHipersocket(adapterURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		return status, err
 	}

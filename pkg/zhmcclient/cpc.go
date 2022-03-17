@@ -18,7 +18,7 @@ import (
 )
 
 // CpcAPI defines an interface for issuing CPC requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
+//go:generate counterfeiter -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
 	ListCPCs(query map[string]string) ([]CPC, int, *HmcError)
 }
@@ -44,7 +44,7 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}

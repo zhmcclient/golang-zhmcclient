@@ -639,5 +639,6 @@ type AsciiConsoleURIPayload struct {
 }
 
 type AsciiConsoleURIResponse struct {
-	URI string `json:"websocket-uri"`
+	URI       string `json:"websocket-uri"`
+	SessionID string `json:"session-id"`
 }

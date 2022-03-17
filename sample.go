@@ -71,7 +71,7 @@ func main() {
 					- List Adpaters for given CPC
 				
 				"FetchASCIIConsoleURI"
-				    - Get the URI to launch the Ascii Web Console
+				  - Get the URI to launch the Ascii Web Console
 
 		}`)
 		os.Exit(1)
@@ -316,7 +316,8 @@ func FetchASCIIConsoleURI(hmcManager zhmcclient.ZhmcAPI) {
 		fmt.Println("Fetch Ascii Console URI Error : ", err.Message)
 		os.Exit(1)
 	}
-	fmt.Println("The URI to accesss the ASCII Console is :", response.URI)
+	fmt.Println("The URI to access the ASCII Console is :", response.URI)
+	fmt.Println("The sessionID for the ASCII Console is :", response.SessionID)
 }
 
 /*

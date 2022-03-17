@@ -19,7 +19,7 @@ import (
 )
 
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/lpar.go --fake-name LparAPI . LparAPI
+//go:generate counterfeiter -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
 	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError)
 	GetLparProperties(lparURI string) (*LparProperties, int, *HmcError)
@@ -61,7 +61,7 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/partitions")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -88,7 +88,7 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -116,7 +116,7 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 	if err != nil {
 		return status, err
 	}
@@ -139,7 +139,7 @@ func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/start")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		return "", status, err
 	}
@@ -170,7 +170,7 @@ func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/stop")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		return "", status, err
 	}
@@ -233,7 +233,7 @@ func (m *LparManager) UnmountIsoImage(lparURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/unmount-iso-image")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		return status, err
 	}
@@ -267,7 +267,7 @@ func (m *LparManager) ListNics(lparURI string) ([]string, int, *HmcError) {
 func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/attach-storage-group")
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
 
 	if err != nil {
 		return status, err
@@ -290,7 +290,7 @@ func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/detach-storage-group")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
 
 	if err != nil {
 		return status, err
@@ -306,14 +306,19 @@ func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 // FetchAsciiConsoleURI
 /**
 * POST /api/partitions/{partition-id}/operations/get-ascii-console-websocket-uri
-* Return: 200
+* Return: 200 and ascii-console-websocket-uri and sessionID for the given lpar
 *     or: 400, 404, 409
  */
 func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError) {
+	// User a new session for each ascii console URI
+	consoleSessionID, status, err := m.client.Logon(true)
+	if err != nil {
+		return nil, status, err
+	}
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/get-ascii-console-websocket-uri")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, consoleSessionID)
 
 	if err != nil {
 		return nil, status, err
@@ -327,7 +332,11 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
-			return responseObj, status, nil
+			newResponseObj := &AsciiConsoleURIResponse{
+				URI:       path.Join(requestUrl.Host, responseObj.URI),
+				SessionID: consoleSessionID,
+			}
+			return newResponseObj, status, nil
 		}
 		return responseObj, status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}

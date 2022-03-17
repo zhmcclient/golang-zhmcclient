@@ -18,7 +18,7 @@ import (
 )
 
 // StorageGroupAPI defines an interface for issuing NIC requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/sgroup.go --fake-name StorageGroupAPI . StorageGroupAPI
+//go:generate counterfeiter -o fakes/sgroup.go --fake-name StorageGroupAPI . StorageGroupAPI
 
 type StorageGroupAPI interface {
 	ListStorageGroups(storageGroupURI string, cpcUri string) ([]StorageGroup, int, *HmcError)
@@ -53,7 +53,7 @@ func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri s
 		"cpc-uri": cpcUri,
 	}
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -81,7 +81,7 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -108,7 +108,7 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
 func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]StorageVolume, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -135,7 +135,7 @@ func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageVolumeURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -161,7 +161,7 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, updateRequest)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, updateRequest, "")
 	if err != nil {
 		return status, err
 	}
@@ -188,7 +188,7 @@ func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, reques
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
 
 	if err != nil {
 		return status, err

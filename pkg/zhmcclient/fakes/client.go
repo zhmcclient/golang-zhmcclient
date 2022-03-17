@@ -20,12 +20,13 @@ type ClientAPI struct {
 	cloneEndpointURLReturnsOnCall map[int]struct {
 		result1 *url.URL
 	}
-	ExecuteRequestStub        func(string, *url.URL, interface{}) (int, []byte, *zhmcclient.HmcError)
+	ExecuteRequestStub        func(string, *url.URL, interface{}, string) (int, []byte, *zhmcclient.HmcError)
 	executeRequestMutex       sync.RWMutex
 	executeRequestArgsForCall []struct {
 		arg1 string
 		arg2 *url.URL
 		arg3 interface{}
+		arg4 string
 	}
 	executeRequestReturns struct {
 		result1 int
@@ -48,9 +49,10 @@ type ClientAPI struct {
 	isLogonReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	LogoffStub        func() *zhmcclient.HmcError
+	LogoffStub        func(string) *zhmcclient.HmcError
 	logoffMutex       sync.RWMutex
 	logoffArgsForCall []struct {
+		arg1 string
 	}
 	logoffReturns struct {
 		result1 *zhmcclient.HmcError
@@ -58,15 +60,20 @@ type ClientAPI struct {
 	logoffReturnsOnCall map[int]struct {
 		result1 *zhmcclient.HmcError
 	}
-	LogonStub        func() *zhmcclient.HmcError
+	LogonStub        func(bool) (string, int, *zhmcclient.HmcError)
 	logonMutex       sync.RWMutex
 	logonArgsForCall []struct {
+		arg1 bool
 	}
 	logonReturns struct {
-		result1 *zhmcclient.HmcError
+		result1 string
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	logonReturnsOnCall map[int]struct {
-		result1 *zhmcclient.HmcError
+		result1 string
+		result2 int
+		result3 *zhmcclient.HmcError
 	}
 	SetSkipCertVerifyStub        func(bool)
 	setSkipCertVerifyMutex       sync.RWMutex
@@ -156,20 +163,21 @@ func (fake *ClientAPI) CloneEndpointURLReturnsOnCall(i int, result1 *url.URL) {
 	}{result1}
 }
 
-func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 *url.URL, arg3 interface{}) (int, []byte, *zhmcclient.HmcError) {
+func (fake *ClientAPI) ExecuteRequest(arg1 string, arg2 *url.URL, arg3 interface{}, arg4 string) (int, []byte, *zhmcclient.HmcError) {
 	fake.executeRequestMutex.Lock()
 	ret, specificReturn := fake.executeRequestReturnsOnCall[len(fake.executeRequestArgsForCall)]
 	fake.executeRequestArgsForCall = append(fake.executeRequestArgsForCall, struct {
 		arg1 string
 		arg2 *url.URL
 		arg3 interface{}
-	}{arg1, arg2, arg3})
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
 	stub := fake.ExecuteRequestStub
 	fakeReturns := fake.executeRequestReturns
-	fake.recordInvocation("ExecuteRequest", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("ExecuteRequest", []interface{}{arg1, arg2, arg3, arg4})
 	fake.executeRequestMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -183,17 +191,17 @@ func (fake *ClientAPI) ExecuteRequestCallCount() int {
 	return len(fake.executeRequestArgsForCall)
 }
 
-func (fake *ClientAPI) ExecuteRequestCalls(stub func(string, *url.URL, interface{}) (int, []byte, *zhmcclient.HmcError)) {
+func (fake *ClientAPI) ExecuteRequestCalls(stub func(string, *url.URL, interface{}, string) (int, []byte, *zhmcclient.HmcError)) {
 	fake.executeRequestMutex.Lock()
 	defer fake.executeRequestMutex.Unlock()
 	fake.ExecuteRequestStub = stub
 }
 
-func (fake *ClientAPI) ExecuteRequestArgsForCall(i int) (string, *url.URL, interface{}) {
+func (fake *ClientAPI) ExecuteRequestArgsForCall(i int) (string, *url.URL, interface{}, string) {
 	fake.executeRequestMutex.RLock()
 	defer fake.executeRequestMutex.RUnlock()
 	argsForCall := fake.executeRequestArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *ClientAPI) ExecuteRequestReturns(result1 int, result2 []byte, result3 *zhmcclient.HmcError) {
@@ -286,17 +294,18 @@ func (fake *ClientAPI) IsLogonReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *ClientAPI) Logoff() *zhmcclient.HmcError {
+func (fake *ClientAPI) Logoff(arg1 string) *zhmcclient.HmcError {
 	fake.logoffMutex.Lock()
 	ret, specificReturn := fake.logoffReturnsOnCall[len(fake.logoffArgsForCall)]
 	fake.logoffArgsForCall = append(fake.logoffArgsForCall, struct {
-	}{})
+		arg1 string
+	}{arg1})
 	stub := fake.LogoffStub
 	fakeReturns := fake.logoffReturns
-	fake.recordInvocation("Logoff", []interface{}{})
+	fake.recordInvocation("Logoff", []interface{}{arg1})
 	fake.logoffMutex.Unlock()
 	if stub != nil {
-		return stub()
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -310,10 +319,17 @@ func (fake *ClientAPI) LogoffCallCount() int {
 	return len(fake.logoffArgsForCall)
 }
 
-func (fake *ClientAPI) LogoffCalls(stub func() *zhmcclient.HmcError) {
+func (fake *ClientAPI) LogoffCalls(stub func(string) *zhmcclient.HmcError) {
 	fake.logoffMutex.Lock()
 	defer fake.logoffMutex.Unlock()
 	fake.LogoffStub = stub
+}
+
+func (fake *ClientAPI) LogoffArgsForCall(i int) string {
+	fake.logoffMutex.RLock()
+	defer fake.logoffMutex.RUnlock()
+	argsForCall := fake.logoffArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *ClientAPI) LogoffReturns(result1 *zhmcclient.HmcError) {
@@ -339,22 +355,23 @@ func (fake *ClientAPI) LogoffReturnsOnCall(i int, result1 *zhmcclient.HmcError) 
 	}{result1}
 }
 
-func (fake *ClientAPI) Logon() *zhmcclient.HmcError {
+func (fake *ClientAPI) Logon(arg1 bool) (string, int, *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	ret, specificReturn := fake.logonReturnsOnCall[len(fake.logonArgsForCall)]
 	fake.logonArgsForCall = append(fake.logonArgsForCall, struct {
-	}{})
+		arg1 bool
+	}{arg1})
 	stub := fake.LogonStub
 	fakeReturns := fake.logonReturns
-	fake.recordInvocation("Logon", []interface{}{})
+	fake.recordInvocation("Logon", []interface{}{arg1})
 	fake.logonMutex.Unlock()
 	if stub != nil {
-		return stub()
+		return stub(arg1)
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *ClientAPI) LogonCallCount() int {
@@ -363,33 +380,46 @@ func (fake *ClientAPI) LogonCallCount() int {
 	return len(fake.logonArgsForCall)
 }
 
-func (fake *ClientAPI) LogonCalls(stub func() *zhmcclient.HmcError) {
+func (fake *ClientAPI) LogonCalls(stub func(bool) (string, int, *zhmcclient.HmcError)) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = stub
 }
 
-func (fake *ClientAPI) LogonReturns(result1 *zhmcclient.HmcError) {
+func (fake *ClientAPI) LogonArgsForCall(i int) bool {
+	fake.logonMutex.RLock()
+	defer fake.logonMutex.RUnlock()
+	argsForCall := fake.logonArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ClientAPI) LogonReturns(result1 string, result2 int, result3 *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = nil
 	fake.logonReturns = struct {
-		result1 *zhmcclient.HmcError
-	}{result1}
+		result1 string
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
-func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 *zhmcclient.HmcError) {
+func (fake *ClientAPI) LogonReturnsOnCall(i int, result1 string, result2 int, result3 *zhmcclient.HmcError) {
 	fake.logonMutex.Lock()
 	defer fake.logonMutex.Unlock()
 	fake.LogonStub = nil
 	if fake.logonReturnsOnCall == nil {
 		fake.logonReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.HmcError
+			result1 string
+			result2 int
+			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.logonReturnsOnCall[i] = struct {
-		result1 *zhmcclient.HmcError
-	}{result1}
+		result1 string
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
 func (fake *ClientAPI) SetSkipCertVerify(arg1 bool) {

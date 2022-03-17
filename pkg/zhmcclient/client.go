@@ -30,16 +30,16 @@ import (
 )
 
 // ClientAPI defines an interface for issuing client requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/client.go --fake-name ClientAPI . ClientAPI
+//go:generate counterfeiter -o fakes/client.go --fake-name ClientAPI . ClientAPI
 type ClientAPI interface {
 	CloneEndpointURL() *url.URL
 	TraceOn(outputStream io.Writer)
 	TraceOff()
 	SetSkipCertVerify(isSkipCert bool)
-	Logon() *HmcError
-	Logoff() *HmcError
+	Logon(consoleSession bool) (string, int, *HmcError)
+	Logoff(sessionID string) *HmcError
 	IsLogon(verify bool) bool
-	ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
+	ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionId string) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
 	UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError)
 }
 
@@ -116,7 +116,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 		},
 	}
 
-	err = client.Logon()
+	_, _, err = client.Logon(false)
 	if err != nil {
 		return nil, err
 	}
@@ -197,34 +197,39 @@ func (c *Client) clearSession() {
 	c.session = nil
 }
 
-func (c *Client) Logon() *HmcError {
-	c.clearSession()
+func (c *Client) Logon(consoleSession bool) (sessionId string, status int, err *HmcError) {
+	if !consoleSession {
+		c.clearSession()
+	}
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions")
 
-	status, responseBody, err := c.executeMethod(http.MethodPost, url.String(), c.logondata)
+	status, responseBody, err := c.executeMethod(http.MethodPost, url.String(), c.logondata, "")
 	if err != nil {
-		return err
+		return "", status, err
 	}
-
 	if status == http.StatusOK || status == http.StatusCreated {
 		session := &Session{}
 		err := json.Unmarshal(responseBody, session)
 		if err != nil {
-			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		c.session = session
-		return nil
+		if !consoleSession {
+			c.session = session
+		} else {
+			return session.SessionID, status, nil
+		}
+		return "", status, nil
 	}
 
-	return GenerateErrorFromResponse(responseBody)
+	return "", status, GenerateErrorFromResponse(responseBody)
 }
 
-func (c *Client) Logoff() *HmcError {
+func (c *Client) Logoff(sessionID string) *HmcError {
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions/this-session")
 
-	status, responseBody, err := c.executeMethod(http.MethodDelete, url.String(), nil)
+	status, responseBody, err := c.executeMethod(http.MethodDelete, url.String(), nil, sessionID)
 	if err != nil {
 		return err
 	}
@@ -240,7 +245,7 @@ func (c *Client) IsLogon(verify bool) bool {
 		url := c.CloneEndpointURL()
 		url.Path = path.Join(url.Path, "/api/console")
 
-		status, _, err := c.executeMethod(http.MethodGet, url.String(), nil)
+		status, _, err := c.executeMethod(http.MethodGet, url.String(), nil, "")
 		if err != nil {
 			return false
 		} else if status == http.StatusOK || status == http.StatusBadRequest {
@@ -259,21 +264,22 @@ func (c *Client) setUserAgent(req *http.Request) {
 	req.Header.Set("User-Agent", libraryUserAgent)
 }
 
-func (c *Client) setRequestHeaders(req *http.Request, bodyType string) {
+func (c *Client) setRequestHeaders(req *http.Request, bodyType, sessionID string) {
 	c.setUserAgent(req)
 	req.Header.Add("Content-Type", bodyType)
 	req.Header.Add("Accept", "*/*")
-	if c.session != nil && c.session.SessionID != "" {
+	if sessionID != "" {
+		req.Header.Add(SESSION_HEADER_NAME, sessionID)
+	} else if c.session != nil && c.session.SessionID != "" {
 		req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
 	}
-
 }
 
 func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
 	retries := DEFAULT_CONNECT_RETRIES
 	responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-		c.Logon()
+		c.Logon(false)
 		c.executeUpload(requestType, url.String(), requestData)
 	}
 	if IsExpectedHttpStatus(responseStatusCode) {
@@ -292,7 +298,7 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	return responseStatusCode, responseBodyStream, err
 }
 
-func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
+func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData interface{}, sessionId string) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
 	var (
 		retries int
 	)
@@ -304,17 +310,17 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 		retries = DEFAULT_CONNECT_RETRIES
 	}
 
-	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
+	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionId)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-		c.Logon()
-		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
+		c.Logon(false)
+		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionId)
 	}
 	if IsExpectedHttpStatus(responseStatusCode) { // Known error, don't retry
 		return responseStatusCode, responseBodyStream, err
 	}
 
 	for retries > 0 {
-		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData)
+		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionId)
 		if IsExpectedHttpStatus(responseStatusCode) || err == nil { // 2. Known error, don't retry
 			break
 		} else { // 3. Retry
@@ -324,7 +330,7 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 	return responseStatusCode, responseBodyStream, err
 }
 
-func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}) (responseStatusCode int, responseBodyStream []byte, hmcErr *HmcError) {
+func (c *Client) executeMethod(requestType string, urlStr string, requestData interface{}, sessionId string) (responseStatusCode int, responseBodyStream []byte, hmcErr *HmcError) {
 	var requestBody []byte
 	var err error
 
@@ -340,7 +346,7 @@ func (c *Client) executeMethod(requestType string, urlStr string, requestData in
 		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 	}
 
-	c.setRequestHeaders(request, APPLICATION_BODY_JSON)
+	c.setRequestHeaders(request, APPLICATION_BODY_JSON, sessionId)
 
 	response, err := c.httpClient.Do(request)
 
@@ -375,7 +381,7 @@ func (c *Client) executeUpload(requestType string, urlStr string, requestBody []
 		return -1, nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 	}
 
-	c.setRequestHeaders(request, APPLICATION_BODY_OCTET_STREAM)
+	c.setRequestHeaders(request, APPLICATION_BODY_OCTET_STREAM, "")
 
 	response, err := c.httpClient.Do(request)
 

@@ -120,6 +120,22 @@ type ZhmcAPI struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}
+	FetchAsciiConsoleURIStub        func(string, *zhmcclient.AsciiConsoleURIPayload) (*zhmcclient.AsciiConsoleURIResponse, int, *zhmcclient.HmcError)
+	fetchAsciiConsoleURIMutex       sync.RWMutex
+	fetchAsciiConsoleURIArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.AsciiConsoleURIPayload
+	}
+	fetchAsciiConsoleURIReturns struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	fetchAsciiConsoleURIReturnsOnCall map[int]struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	FulfillStorageGroupStub        func(string, *zhmcclient.StorageGroupProperties) (int, *zhmcclient.HmcError)
 	fulfillStorageGroupMutex       sync.RWMutex
 	fulfillStorageGroupArgsForCall []struct {
@@ -958,6 +974,74 @@ func (fake *ZhmcAPI) DetachStorageGroupToPartitionReturnsOnCall(i int, result1 i
 		result1 int
 		result2 *zhmcclient.HmcError
 	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) FetchAsciiConsoleURI(arg1 string, arg2 *zhmcclient.AsciiConsoleURIPayload) (*zhmcclient.AsciiConsoleURIResponse, int, *zhmcclient.HmcError) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	ret, specificReturn := fake.fetchAsciiConsoleURIReturnsOnCall[len(fake.fetchAsciiConsoleURIArgsForCall)]
+	fake.fetchAsciiConsoleURIArgsForCall = append(fake.fetchAsciiConsoleURIArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.AsciiConsoleURIPayload
+	}{arg1, arg2})
+	stub := fake.FetchAsciiConsoleURIStub
+	fakeReturns := fake.fetchAsciiConsoleURIReturns
+	fake.recordInvocation("FetchAsciiConsoleURI", []interface{}{arg1, arg2})
+	fake.fetchAsciiConsoleURIMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *ZhmcAPI) FetchAsciiConsoleURICallCount() int {
+	fake.fetchAsciiConsoleURIMutex.RLock()
+	defer fake.fetchAsciiConsoleURIMutex.RUnlock()
+	return len(fake.fetchAsciiConsoleURIArgsForCall)
+}
+
+func (fake *ZhmcAPI) FetchAsciiConsoleURICalls(stub func(string, *zhmcclient.AsciiConsoleURIPayload) (*zhmcclient.AsciiConsoleURIResponse, int, *zhmcclient.HmcError)) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	defer fake.fetchAsciiConsoleURIMutex.Unlock()
+	fake.FetchAsciiConsoleURIStub = stub
+}
+
+func (fake *ZhmcAPI) FetchAsciiConsoleURIArgsForCall(i int) (string, *zhmcclient.AsciiConsoleURIPayload) {
+	fake.fetchAsciiConsoleURIMutex.RLock()
+	defer fake.fetchAsciiConsoleURIMutex.RUnlock()
+	argsForCall := fake.fetchAsciiConsoleURIArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *ZhmcAPI) FetchAsciiConsoleURIReturns(result1 *zhmcclient.AsciiConsoleURIResponse, result2 int, result3 *zhmcclient.HmcError) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	defer fake.fetchAsciiConsoleURIMutex.Unlock()
+	fake.FetchAsciiConsoleURIStub = nil
+	fake.fetchAsciiConsoleURIReturns = struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *ZhmcAPI) FetchAsciiConsoleURIReturnsOnCall(i int, result1 *zhmcclient.AsciiConsoleURIResponse, result2 int, result3 *zhmcclient.HmcError) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	defer fake.fetchAsciiConsoleURIMutex.Unlock()
+	fake.FetchAsciiConsoleURIStub = nil
+	if fake.fetchAsciiConsoleURIReturnsOnCall == nil {
+		fake.fetchAsciiConsoleURIReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.AsciiConsoleURIResponse
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.fetchAsciiConsoleURIReturnsOnCall[i] = struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
 func (fake *ZhmcAPI) FulfillStorageGroup(arg1 string, arg2 *zhmcclient.StorageGroupProperties) (int, *zhmcclient.HmcError) {
@@ -2380,6 +2464,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.deleteNicMutex.RUnlock()
 	fake.detachStorageGroupToPartitionMutex.RLock()
 	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
+	fake.fetchAsciiConsoleURIMutex.RLock()
+	defer fake.fetchAsciiConsoleURIMutex.RUnlock()
 	fake.fulfillStorageGroupMutex.RLock()
 	defer fake.fulfillStorageGroupMutex.RUnlock()
 	fake.getAdapterPropertiesMutex.RLock()
