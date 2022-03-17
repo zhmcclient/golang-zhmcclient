@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * IBM Confidential
- * © Copyright IBM Corp. 2020, 2021
+ * © Copyright IBM Corp. 2020, 2022
  *
  * The source code for this program is not published or otherwise divested of
  * its trade secrets, irrespective of what has been deposited with the
@@ -32,8 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 	if len(args) == 0 {
-		fmt.Println(`
-		    	Usage: sample <Command>
+		fmt.Println(`Usage: sample <Command>
 
 			Please enter one of the below Command:
 
@@ -50,13 +49,13 @@ func main() {
 					- Mounts the iso image on the partition for the selected HMC
 				
 				"UnmountIsoImageToPartition":
-					- Unmounts the iso image on the partition for the selected HMC					
+					- Unmounts the iso image on the partition for the selected HMC
 				
 				"ListStorageGroupsforCPC":
-					- List the storage groups of a given CPC for the selected HMC	
+					- List the storage groups of a given CPC for the selected HMC
 
-			       "ListStorageVolumesforCPC":
-				 	- Get storage volumes of a given storage group for the selected HMC
+				"ListStorageVolumesforCPC":
+					- Get storage volumes of a given storage group for the selected HMC
 				
 				"AttachStorageGroupToPartitionofCPC":
 					- Attach storage group to selected partition
@@ -69,6 +68,9 @@ func main() {
 
 				"ListAdaptersofCPC"
 					- List Adpaters for given CPC
+				
+				"FetchASCIIConsoleURI"
+					- Get the URI to launch the Ascii Web Console
 
 		}`)
 		os.Exit(1)
@@ -167,6 +169,8 @@ func main() {
 					GetAdapterPropsforCPC(hmcManager)
 				case "ListAdaptersofCPC":
 					ListAdaptersofCPC(hmcManager)
+				case "FetchASCIIConsoleURI":
+					FetchASCIIConsoleURI(hmcManager)
 				}
 
 			}
@@ -299,6 +303,20 @@ func StartPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 		os.Exit(1)
 	}
 	fmt.Println("Start partition successfull")
+}
+
+func FetchASCIIConsoleURI(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	props := &zhmcclient.AsciiConsoleURIPayload{}
+
+	response, _, err := hmcManager.FetchAsciiConsoleURI(lparURI, props)
+
+	if err != nil {
+		fmt.Println("Fetch Ascii Console URI Error : ", err.Message)
+		os.Exit(1)
+	}
+	fmt.Println("The URI to access the ASCII Console is :", response.URI)
+	fmt.Println("The sessionID for the ASCII Console is :", response.SessionID)
 }
 
 /*

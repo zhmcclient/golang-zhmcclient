@@ -18,7 +18,7 @@ import (
 )
 
 // JobAPI defines an interface for issuing Job requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/job.go --fake-name JobAPI . JobAPI
+//go:generate counterfeiter -o fakes/job.go --fake-name JobAPI . JobAPI
 type JobAPI interface {
 	QueryJob(jobURI string) (*Job, int, *HmcError)
 	DeleteJob(jobURI string) (int, *HmcError)
@@ -44,7 +44,7 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -70,7 +70,7 @@ func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		return status, err
 	}
@@ -91,7 +91,7 @@ func (m *JobManager) CancelJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI, "operations/cancel")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		return status, err
 	}

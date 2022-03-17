@@ -18,7 +18,7 @@ import (
 )
 
 // NicAPI defines an interface for issuing NIC requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/nic.go --fake-name NicAPI . NicAPI
+//go:generate counterfeiter -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
 	CreateNic(lparURI string, nic *NIC) (string, int, *HmcError)
 	DeleteNic(nicURI string) (int, *HmcError)
@@ -45,7 +45,7 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "nics")
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic, "")
 	if err != nil {
 		return "", status, err
 	}
@@ -71,7 +71,7 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		return status, err
 	}
@@ -92,7 +92,7 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}

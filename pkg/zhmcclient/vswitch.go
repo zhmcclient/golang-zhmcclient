@@ -18,7 +18,7 @@ import (
 )
 
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
+//go:generate counterfeiter -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
 type VirtualSwitchAPI interface {
 	ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, int, *HmcError)
 	GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, int, *HmcError)
@@ -46,7 +46,7 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "virtual-switches")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}
@@ -74,7 +74,7 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, vSwitchURI)
 
-	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil)
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		return nil, status, err
 	}

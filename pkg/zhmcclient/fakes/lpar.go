@@ -36,6 +36,22 @@ type LparAPI struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}
+	FetchAsciiConsoleURIStub        func(string, *zhmcclient.AsciiConsoleURIPayload) (*zhmcclient.AsciiConsoleURIResponse, int, *zhmcclient.HmcError)
+	fetchAsciiConsoleURIMutex       sync.RWMutex
+	fetchAsciiConsoleURIArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.AsciiConsoleURIPayload
+	}
+	fetchAsciiConsoleURIReturns struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	fetchAsciiConsoleURIReturnsOnCall map[int]struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	GetLparPropertiesStub        func(string) (*zhmcclient.LparProperties, int, *zhmcclient.HmcError)
 	getLparPropertiesMutex       sync.RWMutex
 	getLparPropertiesArgsForCall []struct {
@@ -286,6 +302,74 @@ func (fake *LparAPI) DetachStorageGroupToPartitionReturnsOnCall(i int, result1 i
 		result1 int
 		result2 *zhmcclient.HmcError
 	}{result1, result2}
+}
+
+func (fake *LparAPI) FetchAsciiConsoleURI(arg1 string, arg2 *zhmcclient.AsciiConsoleURIPayload) (*zhmcclient.AsciiConsoleURIResponse, int, *zhmcclient.HmcError) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	ret, specificReturn := fake.fetchAsciiConsoleURIReturnsOnCall[len(fake.fetchAsciiConsoleURIArgsForCall)]
+	fake.fetchAsciiConsoleURIArgsForCall = append(fake.fetchAsciiConsoleURIArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.AsciiConsoleURIPayload
+	}{arg1, arg2})
+	stub := fake.FetchAsciiConsoleURIStub
+	fakeReturns := fake.fetchAsciiConsoleURIReturns
+	fake.recordInvocation("FetchAsciiConsoleURI", []interface{}{arg1, arg2})
+	fake.fetchAsciiConsoleURIMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *LparAPI) FetchAsciiConsoleURICallCount() int {
+	fake.fetchAsciiConsoleURIMutex.RLock()
+	defer fake.fetchAsciiConsoleURIMutex.RUnlock()
+	return len(fake.fetchAsciiConsoleURIArgsForCall)
+}
+
+func (fake *LparAPI) FetchAsciiConsoleURICalls(stub func(string, *zhmcclient.AsciiConsoleURIPayload) (*zhmcclient.AsciiConsoleURIResponse, int, *zhmcclient.HmcError)) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	defer fake.fetchAsciiConsoleURIMutex.Unlock()
+	fake.FetchAsciiConsoleURIStub = stub
+}
+
+func (fake *LparAPI) FetchAsciiConsoleURIArgsForCall(i int) (string, *zhmcclient.AsciiConsoleURIPayload) {
+	fake.fetchAsciiConsoleURIMutex.RLock()
+	defer fake.fetchAsciiConsoleURIMutex.RUnlock()
+	argsForCall := fake.fetchAsciiConsoleURIArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *LparAPI) FetchAsciiConsoleURIReturns(result1 *zhmcclient.AsciiConsoleURIResponse, result2 int, result3 *zhmcclient.HmcError) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	defer fake.fetchAsciiConsoleURIMutex.Unlock()
+	fake.FetchAsciiConsoleURIStub = nil
+	fake.fetchAsciiConsoleURIReturns = struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *LparAPI) FetchAsciiConsoleURIReturnsOnCall(i int, result1 *zhmcclient.AsciiConsoleURIResponse, result2 int, result3 *zhmcclient.HmcError) {
+	fake.fetchAsciiConsoleURIMutex.Lock()
+	defer fake.fetchAsciiConsoleURIMutex.Unlock()
+	fake.FetchAsciiConsoleURIStub = nil
+	if fake.fetchAsciiConsoleURIReturnsOnCall == nil {
+		fake.fetchAsciiConsoleURIReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.AsciiConsoleURIResponse
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.fetchAsciiConsoleURIReturnsOnCall[i] = struct {
+		result1 *zhmcclient.AsciiConsoleURIResponse
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
 }
 
 func (fake *LparAPI) GetLparProperties(arg1 string) (*zhmcclient.LparProperties, int, *zhmcclient.HmcError) {
@@ -826,6 +910,8 @@ func (fake *LparAPI) Invocations() map[string][][]interface{} {
 	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
 	fake.detachStorageGroupToPartitionMutex.RLock()
 	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
+	fake.fetchAsciiConsoleURIMutex.RLock()
+	defer fake.fetchAsciiConsoleURIMutex.RUnlock()
 	fake.getLparPropertiesMutex.RLock()
 	defer fake.getLparPropertiesMutex.RUnlock()
 	fake.listLPARsMutex.RLock()

@@ -12,7 +12,7 @@
 package zhmcclient
 
 // ZhmcAPI defines an interface for issuing requests to ZHMC
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/zhmc.go --fake-name ZhmcAPI . ZhmcAPI
+//go:generate counterfeiter -o fakes/zhmc.go --fake-name ZhmcAPI . ZhmcAPI
 type ZhmcAPI interface {
 	CpcAPI
 	LparAPI
@@ -92,6 +92,10 @@ func (m *ZhmcManager) AttachStorageGroupToPartition(lparURI string, request *Sto
 
 func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	return m.lparManager.DetachStorageGroupToPartition(lparURI, request)
+}
+
+func (m *ZhmcManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError) {
+	return m.lparManager.FetchAsciiConsoleURI(lparURI, request)
 }
 
 // Adapter
