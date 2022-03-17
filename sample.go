@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * IBM Confidential
- * © Copyright IBM Corp. 2020, 2021
+ * © Copyright IBM Corp. 2020, 2022
  *
  * The source code for this program is not published or otherwise divested of
  * its trade secrets, irrespective of what has been deposited with the
@@ -32,8 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 	if len(args) == 0 {
-		fmt.Println(`
-		    	Usage: sample <Command>
+		fmt.Println(`Usage: sample <Command>
 
 			Please enter one of the below Command:
 
@@ -50,13 +49,13 @@ func main() {
 					- Mounts the iso image on the partition for the selected HMC
 				
 				"UnmountIsoImageToPartition":
-					- Unmounts the iso image on the partition for the selected HMC					
+					- Unmounts the iso image on the partition for the selected HMC
 				
 				"ListStorageGroupsforCPC":
-					- List the storage groups of a given CPC for the selected HMC	
+					- List the storage groups of a given CPC for the selected HMC
 
-			    "ListStorageVolumesforCPC":
-				 	- Get storage volumes of a given storage group for the selected HMC
+				"ListStorageVolumesforCPC":
+					- Get storage volumes of a given storage group for the selected HMC
 				
 				"AttachStorageGroupToPartitionofCPC":
 					- Attach storage group to selected partition
@@ -71,7 +70,7 @@ func main() {
 					- List Adpaters for given CPC
 				
 				"FetchASCIIConsoleURI"
-				  - Get the URI to launch the Ascii Web Console
+					- Get the URI to launch the Ascii Web Console
 
 		}`)
 		os.Exit(1)
