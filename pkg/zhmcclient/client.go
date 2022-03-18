@@ -248,7 +248,6 @@ func (c *Client) LogoffConsole(sessionID string) *HmcError {
 		return err
 	}
 	if status == http.StatusNoContent {
-		c.clearSession()
 		return nil
 	}
 	return GenerateErrorFromResponse(responseBody)
