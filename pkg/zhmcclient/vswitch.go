@@ -13,8 +13,12 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
@@ -45,9 +49,13 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "virtual-switches")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error listing virtual switches",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -57,10 +65,14 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Status: %v, Virtual switches: %v", status, virtualSwitches.VIRTUALSWITCHES))
 		return virtualSwitches.VIRTUALSWITCHES, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error on listing virtual switches",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -73,9 +85,13 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*VirtualSwitchProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, vSwitchURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error getting virtual switch properties",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -85,6 +101,7 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Status: %v, Virtual switch properties: %v", status, virtualSwitch))
 		return virtualSwitch, status, nil
 	}
 

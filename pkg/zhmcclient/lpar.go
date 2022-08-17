@@ -13,9 +13,12 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
@@ -60,9 +63,13 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/partitions")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on getting lpar's",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -72,10 +79,14 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Status: %v, LPARS: %v", status, lpars.LPARS))
 		return lpars.LPARS, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error listing LPAR's",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -87,9 +98,13 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on getting lpar properties",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -99,11 +114,14 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-
+		logger.Info(fmt.Sprintf("Status: %v, Lpar properties: %v", status, lparProps))
 		return &lparProps, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error getting lpar properties",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -115,17 +133,25 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 	if err != nil {
+		logger.Error("Error on getting lpar properties",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Update LPAR properties completed, Status: %v", status))
 		return status, nil
 	}
-
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error updating lpar properties",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }
 
 /**
@@ -138,9 +164,13 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/start")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on starting lpar",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return "", status, err
 	}
 
@@ -151,12 +181,20 @@ func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
+			logger.Info(fmt.Sprintf("Status: %v, LPAR URI: %v", status, responseObj.URI))
 			return responseObj.URI, status, nil
 		}
+		logger.Error("Error on starting lpar",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New("Empty job uri")))
 		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
-	return "", status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error starting lpar",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return "", status, errorResponseBody
 }
 
 /**
@@ -169,9 +207,13 @@ func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/stop")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on stopping lpar",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return "", status, err
 	}
 
@@ -182,12 +224,19 @@ func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
+			logger.Info(fmt.Sprintf("Status: %v, LPAR URI: %v", status, responseObj.URI))
 			return responseObj.URI, status, nil
 		}
+		logger.Error("Error on stopping lpar",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New("Empty job uri")))
 		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
-
-	return "", status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error stopping lpar",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return "", status, errorResponseBody
 }
 
 /**
@@ -205,22 +254,30 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	}
 	imageData, byteErr := RetrieveBytes(isoFile)
 	if byteErr != nil {
-		fmt.Println("Error: ", byteErr.Error())
+		logger.Error("Error on retrieving iso file", genlog.Error(byteErr))
 	}
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/mount-iso-image")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, imageData)
-
 	if err != nil {
+		logger.Error("Error mounting iso image",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Mounting iso image completed, Status: %v", status))
 		return status, nil
 	}
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error mounting iso image",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }
 
 /**
@@ -232,28 +289,41 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 func (m *LparManager) UnmountIsoImage(lparURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/unmount-iso-image")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error unmounting iso image",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Status: %v", status))
 		return status, nil
 	}
 
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error unmounting iso image",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }
 
 /**
 * get_property('nic-uris') from LPAR
  */
 func (m *LparManager) ListNics(lparURI string) ([]string, int, *HmcError) {
+	logger.Info(fmt.Sprintf("Request URL: %v", lparURI))
 	props, status, err := m.GetLparProperties(lparURI)
 	if err != nil {
+		logger.Error("Error listing nics",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
-
+	logger.Info(fmt.Sprintf("Status: %v, NicURI's:%v", status, props.NicUris))
 	return props.NicUris, status, nil
 }
 
@@ -267,17 +337,25 @@ func (m *LparManager) ListNics(lparURI string) ([]string, int, *HmcError) {
 func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/attach-storage-group")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
-
 	if err != nil {
+		logger.Error("Error on attach storage group to partition",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Attach storage group to partition successfull, Status: %v", status))
 		return status, nil
 	}
 
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error attaching storage group to partition",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }
 
 // DetachStorageGroupToPartition
@@ -289,18 +367,27 @@ func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *Sto
 func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/detach-storage-group")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
 
 	if err != nil {
+		logger.Error("Error on detach storage group to partition",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Detach storage group to partition successfull, Status: %v", status))
 		return status, nil
 	}
 
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error detaching storage group to partition",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }
 
 // FetchAsciiConsoleURI
@@ -317,10 +404,14 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 	}
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/get-ascii-console-websocket-uri")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, consoleSessionID)
 
 	if err != nil {
+		logger.Error("Error on fetch ascii console uri",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -336,10 +427,19 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 				URI:       path.Join(requestUrl.Host, responseObj.URI),
 				SessionID: consoleSessionID,
 			}
+
+			logger.Info(fmt.Sprintf("Status: %v, LPAR URI: %v", status, responseObj.URI))
 			return newResponseObj, status, nil
 		}
+		logger.Error("Error on fetch ascii console uri",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New("Empty job uri")))
 		return responseObj, status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error on fetch ascii console uri",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return nil, status, errorResponseBody
 }

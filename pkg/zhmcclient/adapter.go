@@ -13,8 +13,12 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
@@ -53,9 +57,13 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on listing adapters",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -65,10 +73,15 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Status: %v, Adapters: %v", status, adapters.ADAPTERS))
 		return adapters.ADAPTERS, status, nil
 	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error listing adapters",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
 
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -82,9 +95,13 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on getting adapter properties",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -94,10 +111,14 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Status: %v, Adapters: %v", status, adapterProps))
 		return adapterProps, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error getting adapter properties",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -110,9 +131,13 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/adapters")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor, "")
 	if err != nil {
+		logger.Error("Error creating hipercocket",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return "", status, err
 	}
 
@@ -122,10 +147,15 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 		if err != nil {
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("HiperSocket created, Status: %v, URI: %v", status, uriObj.URI))
 		return uriObj.URI, status, nil
 	}
 
-	return "", status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error creating hipercocket",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return "", status, errorResponseBody
 }
 
 /**
@@ -137,15 +167,23 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 func (m *AdapterManager) DeleteHipersocket(adapterURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error deleting hipercocket",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("HiperSocket deleted, Status: %v", status))
 		return status, nil
 	}
-
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error deleting hipercocket",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }

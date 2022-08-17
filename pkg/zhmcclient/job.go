@@ -13,8 +13,12 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // JobAPI defines an interface for issuing Job requests to ZHMC
@@ -43,9 +47,13 @@ func NewJobManager(client ClientAPI) *JobManager {
 func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on get on job uri",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return nil, status, err
 	}
 
@@ -55,10 +63,14 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Status: %v, Adapters: %v", status, &myjob))
 		return &myjob, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error on get on job uri",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -69,17 +81,25 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on delete job",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Job deleted, Status: %v", status))
 		return status, nil
 	}
-
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error on delete job",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }
 
 /**
@@ -90,15 +110,23 @@ func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 func (m *JobManager) CancelJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI, "operations/cancel")
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("Error on cancel job",
+			genlog.String("Status", fmt.Sprint(status)),
+			genlog.Error(errors.New(err.Message)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Job cancelled, Status: %v", status))
 		return status, nil
 	}
-
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("Error on cancel job",
+		genlog.String("Status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return status, errorResponseBody
 }

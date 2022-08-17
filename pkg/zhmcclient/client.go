@@ -135,6 +135,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 }
 
 func GetEndpointURLFromString(endpoint string) (*url.URL, *HmcError) {
+	logger.Info(fmt.Sprintf("Endpoint: %v", endpoint))
 
 	if !strings.HasPrefix(strings.ToLower(endpoint), "https") {
 		return nil, getHmcErrorFromMsg(ERR_CODE_HMC_INVALID_URL, ERR_MSG_INSECURE_URL)
@@ -318,7 +319,7 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 		if IsExpectedHttpStatus(responseStatusCode) {
 			break
 		} else {
-			fmt.Println("Retry upload...", retries)
+			logger.Info(fmt.Sprintf("Retry upload... %d", retries))
 			responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
 			retries -= 1
 		}
