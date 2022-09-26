@@ -47,13 +47,13 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
-	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
-		logger.Error("Error on listing CPC's",
-			genlog.String("Status", fmt.Sprint(status)),
-			genlog.Error(errors.New(err.Message)))
+		logger.Error("error on listing cpc's",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -63,12 +63,13 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Status: %v, Adapters: %v", status, cpcs.CPCS))
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, adapters: %v", requestUrl, status, cpcs.CPCS))
 		return cpcs.CPCS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
-	logger.Error("Error on listing CPC's",
-		genlog.String("Status: ", fmt.Sprint(status)),
+	logger.Error("error on listing cpc's",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(errors.New(errorResponseBody.Message)))
 
 	return nil, status, errorResponseBody

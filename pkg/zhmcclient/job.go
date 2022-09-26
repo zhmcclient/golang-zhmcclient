@@ -13,7 +13,6 @@ package zhmcclient
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -47,13 +46,13 @@ func NewJobManager(client ClientAPI) *JobManager {
 func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
-	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
-		logger.Error("Error on get on job uri",
-			genlog.String("Status", fmt.Sprint(status)),
-			genlog.Error(errors.New(err.Message)))
+		logger.Error("error on get on job uri",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -63,13 +62,14 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Status: %v, Adapters: %v", status, &myjob))
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, adapters: %v", requestUrl, status, &myjob))
 		return &myjob, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
-	logger.Error("Error on get on job uri",
-		genlog.String("Status: ", fmt.Sprint(status)),
-		genlog.Error(errors.New(errorResponseBody.Message)))
+	logger.Error("error on get on job uri",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -81,24 +81,25 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
-	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
-		logger.Error("Error on delete job",
-			genlog.String("Status", fmt.Sprint(status)),
-			genlog.Error(errors.New(err.Message)))
+		logger.Error("error on delete job",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("Job deleted, Status: %v", status))
+		logger.Info(fmt.Sprintf("job deleted, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
-	logger.Error("Error on delete job",
-		genlog.String("Status: ", fmt.Sprint(status)),
-		genlog.Error(errors.New(errorResponseBody.Message)))
+	logger.Error("error on delete job",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -110,23 +111,24 @@ func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 func (m *JobManager) CancelJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI, "operations/cancel")
-	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
-		logger.Error("Error on cancel job",
-			genlog.String("Status", fmt.Sprint(status)),
-			genlog.Error(errors.New(err.Message)))
+		logger.Error("error on cancel job",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("Job cancelled, Status: %v", status))
+		logger.Info(fmt.Sprintf("job cancelled, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
-	logger.Error("Error on cancel job",
-		genlog.String("Status: ", fmt.Sprint(status)),
-		genlog.Error(errors.New(errorResponseBody.Message)))
+	logger.Error("error on cancel job",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }

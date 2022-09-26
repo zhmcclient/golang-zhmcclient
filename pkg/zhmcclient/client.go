@@ -135,7 +135,7 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 }
 
 func GetEndpointURLFromString(endpoint string) (*url.URL, *HmcError) {
-	logger.Info(fmt.Sprintf("Endpoint: %v", endpoint))
+	logger.Info(fmt.Sprintf("endpoint: %v", endpoint))
 
 	if !strings.HasPrefix(strings.ToLower(endpoint), "https") {
 		return nil, getHmcErrorFromMsg(ERR_CODE_HMC_INVALID_URL, ERR_MSG_INSECURE_URL)
