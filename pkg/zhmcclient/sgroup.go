@@ -13,8 +13,11 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // StorageGroupAPI defines an interface for issuing NIC requests to ZHMC
@@ -53,8 +56,13 @@ func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri s
 		"cpc-uri": cpcUri,
 	}
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
+
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on list storage groups",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -64,10 +72,15 @@ func (m *StorageGroupManager) ListStorageGroups(storageGroupURI string, cpcUri s
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, storage groups: %v", requestUrl, status, storageGroups.STORAGEGROUPS))
 		return storageGroups.STORAGEGROUPS, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on list storage groups",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -83,6 +96,10 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on get storage group properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -92,10 +109,15 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, storage group properties: %v", requestUrl, status, storageGroup))
 		return storageGroup, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on get storage group properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -108,8 +130,13 @@ func (m *StorageGroupManager) GetStorageGroupProperties(storageGroupURI string) 
 func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]StorageVolume, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on list storage volumes",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -119,10 +146,15 @@ func (m *StorageGroupManager) ListStorageVolumes(storageGroupURI string) ([]Stor
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, storage volumes: %v", requestUrl, status, storageVolumes.STORAGEVOLUMES))
 		return storageVolumes.STORAGEVOLUMES, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on list storage volumes",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -137,6 +169,10 @@ func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on get storage volume properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -146,10 +182,15 @@ func (m *StorageGroupManager) GetStorageVolumeProperties(storageVolumeURI string
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, storage volume properties: %v", requestUrl, status, storageVolume))
 		return storageVolume, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on get storage volume properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return nil, status, errorResponseBody
 }
 
 /**
@@ -163,6 +204,10 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, updateRequest, "")
 	if err != nil {
+		logger.Error("error on update storage group properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -172,9 +217,12 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 		if err != nil {
 			return status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("update storage group properties completed, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
-
+	logger.Error("error on update storage group properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)))
 	return status, nil
 }
 
@@ -189,8 +237,11 @@ func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, reques
 	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
-
 	if err != nil {
+		logger.Error("error on fulfill storage group",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -200,8 +251,11 @@ func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, reques
 		if err != nil {
 			return status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("fulfill storage group completed, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
-
+	logger.Error("error on fulfill storage group",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)))
 	return status, nil
 }

@@ -12,11 +12,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	"github.ibm.com/genctl/shared-logger/genlog"
 	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
 )
+
+var logger = genlog.New()
 
 func main() {
 	endpoint := os.Getenv("HMC_ENDPOINT") // "https://9.114.87.7:6794/", "https://192.168.195.118:6794"
@@ -28,11 +32,11 @@ func main() {
 	// insfile := os.Getenv("INS_FILE")
 	creds := &zhmcclient.Options{Username: username, Password: password, SkipCert: true, Trace: false}
 	if endpoint == "" || username == "" || password == "" {
-		fmt.Println("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
-		os.Exit(1)
+		// The Fatal functions call os.Exit(1) after writing the log message
+		logger.Fatal("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
 	}
 	if len(args) == 0 {
-		fmt.Println(`Usage: sample <Command>
+		logger.Fatal(`Usage: sample <Command>
 
 			Please enter one of the below Command:
 
@@ -73,17 +77,16 @@ func main() {
 					- Get the URI to launch the Ascii Web Console
 
 		}`)
-		os.Exit(1)
 	} else {
-		fmt.Println("HMC_ENDPOINT: ", endpoint)
-		fmt.Println("HMC_USERNAME: ", username)
-		fmt.Println("HMC_PASSWORD: xxxxxx")
+		logger.Info("HMC_ENDPOINT: " + endpoint)
+		logger.Info("HMC_USERNAME: " + username)
+		logger.Info("HMC_PASSWORD: xxxxxx")
 		client, err := zhmcclient.NewClient(endpoint, creds)
 		if err != nil {
-			fmt.Println("Error: ", err.Message)
+			logger.Error("Error getting client connection", genlog.Error(errors.New(err.Message)))
 		}
 		if client != nil {
-			fmt.Println("client initialized.")
+			logger.Info("client initialized.")
 			hmcManager := zhmcclient.NewManagerFromClient(client)
 			/*
 			 Create LPAR Base URI
@@ -187,35 +190,32 @@ func GetLPARURI() (lparURI string) {
 func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	query := map[string]string{}
 	CPCURI := "api/cpcs/" + os.Getenv("CPC_ID")
-	adapters,
-		_, err := hmcManager.ListAdapters(CPCURI, query)
-
+	adapters, _, err := hmcManager.ListAdapters(CPCURI, query)
 	if err != nil {
-		fmt.Println("List Adapters error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("List Adapters error", err))
 	} else {
-		fmt.Println("-----------------------")
+		logger.Info("-----------------------")
 		for _, adapter := range adapters {
-			fmt.Println("++++++++++++++++++++++++")
-			fmt.Println("Adapter Name:", adapter.Name)
-			fmt.Println("Adapter Type:", adapter.Type)
-			fmt.Println("Adapter Family:", adapter.Family)
-			fmt.Println("Adapter Status:", adapter.Status)
-			fmt.Println("Adapter URI:", adapter.URI)
+			logger.Info("++++++++++++++++++++++++")
+			logger.Info("Adapter Name:" + adapter.Name)
+			logger.Info("Adapter Type:" + string(adapter.Type))
+			logger.Info("Adapter Family:" + string(adapter.Family))
+			logger.Info("Adapter Status:" + string(adapter.Status))
+			logger.Info("Adapter URI:" + string(adapter.URI))
 			adapter, _, _ := hmcManager.GetAdapterProperties(adapter.URI)
-			fmt.Println("********* Adapter properties **************")
-			fmt.Println("\n- NAME: " + adapter.Name)
-			fmt.Println("\n- Status: " + adapter.Status)
-			fmt.Println("\n- State: " + adapter.State)
-			fmt.Println("\n- Detected Card Type: " + adapter.DetectedCardType)
-			fmt.Println("\n- Port Count: ", adapter.PortCount)
-			fmt.Println("\n- Adapter Family: " + adapter.Family)
-			fmt.Println("\n- PHYSICAL CONNECTION STATUS: " + adapter.PHYSICALCHANNELSTATUS)
-			fmt.Println("\n- Network Port URIS: ", adapter.NetworkAdapterPortURIs)
-			fmt.Println("\n- Storage Port URIS: ", adapter.StoragePortURIs)
-			fmt.Println("*********************************************")
+			logger.Info("********* Adapter properties **************")
+			logger.Info("\n- NAME: " + adapter.Name)
+			logger.Info("\n- Status: " + string(adapter.Status))
+			logger.Info("\n- State: " + string(adapter.State))
+			logger.Info("\n- Detected Card Type: " + string(adapter.DetectedCardType))
+			logger.Info("\n- Port Count: " + fmt.Sprint(adapter.PortCount))
+			logger.Info("\n- Adapter Family: " + string(adapter.Family))
+			logger.Info("\n- PHYSICAL CONNECTION STATUS: " + string(adapter.PHYSICALCHANNELSTATUS))
+			logger.Info("", genlog.Strings("\n- Network port URIS", adapter.NetworkAdapterPortURIs))
+			logger.Info("", genlog.Strings("\n- Storage Port URIS", adapter.StoragePortURIs))
+			logger.Info("*********************************************")
 		}
-		fmt.Println("\n-----------------------")
+		logger.Info("\n-----------------------")
 	}
 }
 
@@ -224,30 +224,28 @@ func GetAdapterPropsforCPC(hmcManager zhmcclient.ZhmcAPI) {
 	adapterURI := "api/adapters/" + adapterID
 	adapter, _, err := hmcManager.GetAdapterProperties(adapterURI)
 	if err != nil {
-		fmt.Println("Get Adapter properties error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Get Adapter properties error", err))
 	}
-	fmt.Println("Get properties operation successfull")
-	fmt.Println("********* Adapter properties **************")
-	fmt.Println("\n- NAME: " + adapter.Name)
-	fmt.Println("\n- Status: " + adapter.Status)
-	fmt.Println("\n- State: " + adapter.State)
-	fmt.Println("\n- Detected Card Type: " + adapter.DetectedCardType)
-	fmt.Println("\n- Port Count: ", adapter.PortCount)
-	fmt.Println("\n- Adapter Family: " + adapter.Family)
-	fmt.Println("\n- PHYSICAL CONNECTION STATUS: " + adapter.PHYSICALCHANNELSTATUS)
+	logger.Info("Get properties operation successfull")
+	logger.Info("********* Adapter properties **************")
+	logger.Info("\n- NAME: " + adapter.Name)
+	logger.Info("\n- Status: " + string(adapter.Status))
+	logger.Info("\n- State: " + string(adapter.State))
+	logger.Info("\n- Detected Card Type: " + string(adapter.DetectedCardType))
+	logger.Info("\n- Port Count: " + fmt.Sprint(adapter.PortCount))
+	logger.Info("\n- Adapter Family: " + string(adapter.Family))
+	logger.Info("\n- PHYSICAL CONNECTION STATUS: " + string(adapter.PHYSICALCHANNELSTATUS))
 	for i, v := range adapter.NetworkAdapterPortURIs {
-		fmt.Println(i+1, " Network Port URI: ", v)
+		logger.Info(fmt.Sprint(i+1) + " Network Port URI: " + v)
 		networkProps, _, err := hmcManager.GetAdapterProperties(v)
 		if err != nil {
-			fmt.Println("Get Network Port properties error: ", err.Message)
-			os.Exit(1)
+			logger.Fatal("", genlog.Any("Get Network Port properties error", err))
 		}
-		fmt.Println("Network Port Name: ", networkProps.Name)
-		fmt.Println("Network Port Description: ", networkProps.Description)
+		logger.Info("Network Port Name: " + networkProps.Name)
+		logger.Info("Network Port Description: " + networkProps.Description)
 
 	}
-	fmt.Println("*********************************************")
+	logger.Info("*********************************************")
 
 }
 
@@ -255,10 +253,9 @@ func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 	lparURI := GetLPARURI()
 	_, _, err := hmcManager.StopLPAR(lparURI)
 	if err != nil {
-		fmt.Println("Stop Partition error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Stop Partition error", err))
 	}
-	fmt.Println("Stop partition successfull")
+	logger.Info("Stop partition successfull")
 }
 
 func MountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
@@ -267,20 +264,18 @@ func MountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
 	insfile := os.Getenv("INS_FILE")
 	_, err := hmcManager.MountIsoImage(lparURI, isofile, insfile)
 	if err != nil {
-		fmt.Println("Mount iso error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Mount iso error: ", err))
 	}
-	fmt.Println("Mount iso image successfull")
+	logger.Info("Mount iso image successfull")
 }
 
 func UnmountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
 	lparURI := GetLPARURI()
 	_, err := hmcManager.UnmountIsoImage(lparURI)
 	if err != nil {
-		fmt.Println("Unmount iso error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Unmount iso error", err))
 	}
-	fmt.Println("Unmount iso image successfull")
+	logger.Info("Unmount iso image successfull")
 }
 
 func UpdateBootDeviceProperty(hmcManager zhmcclient.ZhmcAPI) {
@@ -289,20 +284,18 @@ func UpdateBootDeviceProperty(hmcManager zhmcclient.ZhmcAPI) {
 	props := &zhmcclient.LparProperties{BootDevice: bootDevice}
 	_, err := hmcManager.UpdateLparProperties(lparURI, props)
 	if err != nil {
-		fmt.Println("Update boot device error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Update boot device error", err))
 	}
-	fmt.Println("Update boot device successfull")
+	logger.Info("Update boot device successfull")
 }
 
 func StartPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 	lparURI := GetLPARURI()
 	_, _, err := hmcManager.StartLPAR(lparURI)
 	if err != nil {
-		fmt.Println("Stop Partition error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Stop Partition error", err))
 	}
-	fmt.Println("Start partition successfull")
+	logger.Info("Start partition successfull")
 }
 
 func FetchASCIIConsoleURI(hmcManager zhmcclient.ZhmcAPI) {
@@ -310,13 +303,11 @@ func FetchASCIIConsoleURI(hmcManager zhmcclient.ZhmcAPI) {
 	props := &zhmcclient.AsciiConsoleURIPayload{}
 
 	response, _, err := hmcManager.FetchAsciiConsoleURI(lparURI, props)
-
 	if err != nil {
-		fmt.Println("Fetch Ascii Console URI Error : ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Fetch Ascii Console URI Error", err))
 	}
-	fmt.Println("The URI to access the ASCII Console is :", response.URI)
-	fmt.Println("The sessionID for the ASCII Console is :", response.SessionID)
+	logger.Info("The URI to access the ASCII Console is :" + response.URI)
+	logger.Info("The sessionID for the ASCII Console is :" + response.SessionID)
 }
 
 /*
@@ -327,21 +318,21 @@ func ListStorageGroupsforCPC(hmcManager zhmcclient.ZhmcAPI) {
 	storageGroupURI := "api/storage-groups/"
 	storageGroups, _, err := hmcManager.ListStorageGroups(storageGroupURI, "/api/cpcs/"+cpcID)
 	if err != nil {
-		fmt.Println("List Storage Group Error: ", err.Message)
+		logger.Error("", genlog.Any("List Storage Group Error", err))
 	}
 	for _, sg := range storageGroups {
-		fmt.Println("########################################")
-		fmt.Println("Storage group Name: ", sg.Name)
-		fmt.Println("Storage group URI: ", sg.ObjectURI)
-		fmt.Println("Storage group TYPE: ", sg.Type)
-		fmt.Println("Storage group Fullfillment state: ", sg.FulfillmentState)
+		logger.Info("########################################")
+		logger.Info("Storage group Name: " + sg.Name)
+		logger.Info("Storage group URI: " + sg.ObjectURI)
+		logger.Info("Storage group TYPE: " + sg.Type)
+		logger.Info("Storage group Fullfillment state: " + string(sg.FulfillmentState))
 		sgroup, _, _ := hmcManager.GetStorageGroupProperties(sg.ObjectURI)
-		fmt.Println("Storage Group Properties")
-		fmt.Println("Storage group unassigned wwpns: ", sgroup.UnAssignedWWPNs)
-		fmt.Println("  - Storage Group Volumes: ", sgroup.StorageVolumesURIs)
-		fmt.Println("  - Storage Group ObjectID: ", sgroup.ObjectID)
+		logger.Info("Storage Group Properties")
+		logger.Info("", genlog.Any("Storage group unassigned wwpns", sgroup.UnAssignedWWPNs))
+		logger.Info("", genlog.Any("  - Storage Group Volumes", sgroup.StorageVolumesURIs))
+		logger.Info("", genlog.Any("  - Storage Group ObjectID", sgroup.ObjectID))
 	}
-	fmt.Println("########################################")
+	logger.Info("########################################")
 }
 
 func ListStorageVolumesforCPC(hmcManager zhmcclient.ZhmcAPI) {
@@ -349,32 +340,31 @@ func ListStorageVolumesforCPC(hmcManager zhmcclient.ZhmcAPI) {
 	storageGroupURI := "/api/storage-groups/" + sgroupID + "/storage-volumes"
 	storageVolumes, _, err := hmcManager.ListStorageVolumes(storageGroupURI)
 	if err != nil {
-		fmt.Println("List Storage Group Error: ", err.Message)
+		logger.Error("", genlog.Any("List Storage Group Error: ", err))
 	}
 	for _, sv := range storageVolumes {
-		fmt.Println("########################################")
-		fmt.Println("Storage Volume Name: ", sv.Name)
-		fmt.Println("Storage Volume Fullfillment state: ", sv.FulfillmentState)
-		fmt.Println("Storage volume usage: ", sv.Usage)
+		logger.Info("########################################")
+		logger.Info("Storage Volume Name: " + sv.Name)
+		logger.Info("", genlog.Any("Storage Volume Fullfillment state", sv.FulfillmentState))
+		logger.Info("Storage volume usage: " + sv.Usage)
 		storageVolume, _, volErr := hmcManager.GetStorageVolumeProperties(sv.URI)
 		if volErr != nil {
-			fmt.Println(volErr.Message)
-			os.Exit(1)
+			logger.Fatal(volErr.Message)
 		}
-		fmt.Println("Storage Volume Properties")
-		fmt.Println("  - Storage Volume ECKD Type: ", storageVolume.EckdType)
-		fmt.Println("  - Storage Volume Active Size: ", storageVolume.ActiveSize)
-		fmt.Println("  - Storage Volume Device Number: ", storageVolume.DeviceNumber)
-		fmt.Println("  - Storage Volume Path Information: ")
+		logger.Info("Storage Volume Properties")
+		logger.Info("  - Storage Volume ECKD Type: " + storageVolume.EckdType)
+		logger.Info("  - Storage Volume Active Size: " + fmt.Sprint(storageVolume.ActiveSize))
+		logger.Info("  - Storage Volume Device Number: " + storageVolume.DeviceNumber)
+		logger.Info("  - Storage Volume Path Information: ")
 		for index, path := range storageVolume.Paths {
-			fmt.Println(" ", (index + 1), "*****************************************")
-			fmt.Println("\tPath Device Number: ", path.DeviceNumber)
-			fmt.Println("\n\tPath PartitionURI: ", path.PartitionURI)
-			fmt.Println("\n\tPath LUN: ", path.LogicalUnitNumber)
-			fmt.Println("\n\tPath Target WWPN: ", path.TargetWWPN)
+			logger.Info(" " + fmt.Sprint(index+1) + "*****************************************")
+			logger.Info("\tPath Device Number: " + path.DeviceNumber)
+			logger.Info("\n\tPath PartitionURI: " + path.PartitionURI)
+			logger.Info("\n\tPath LUN: " + path.LogicalUnitNumber)
+			logger.Info("\n\tPath Target WWPN: " + path.TargetWWPN)
 		}
 	}
-	fmt.Println("########################################")
+	logger.Info("########################################")
 }
 
 func AttachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
@@ -382,10 +372,9 @@ func AttachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	props := &zhmcclient.StorageGroupPayload{StorageGroupURI: "/api/storage-groups/" + sgroupID}
 	_, err := hmcManager.AttachStorageGroupToPartition(GetLPARURI(), props)
 	if err != nil {
-		fmt.Println("Attach storage group error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Attach storage group error", err))
 	}
-	fmt.Println("Attach storage group operation successfull")
+	logger.Info("Attach storage group operation successfull")
 }
 
 func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
@@ -393,10 +382,9 @@ func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	props := &zhmcclient.StorageGroupPayload{StorageGroupURI: "/api/storage-groups/" + sgroupID}
 	_, err := hmcManager.DetachStorageGroupToPartition(GetLPARURI(), props)
 	if err != nil {
-		fmt.Println("Detach storage group error: ", err.Message)
-		os.Exit(1)
+		logger.Fatal("", genlog.Any("Detach storage group error", err))
 	}
-	fmt.Println("Detach storage group operation successfull")
+	logger.Info("Detach storage group operation successfull")
 }
 
 /*
@@ -404,61 +392,55 @@ func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 */
 func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 	query := map[string]string{}
-	cpcs,
-		_, err := hmcManager.ListCPCs(query)
+	cpcs, _, err := hmcManager.ListCPCs(query)
 	if err != nil {
-		fmt.Println("Error: ", err.Message)
+		logger.Error("Error: " + err.Message)
 	} else {
 		for _, cpc := range cpcs {
-			fmt.Println("########################################")
-			fmt.Println("cpc name: ", cpc.Name)
-			fmt.Println("cpc uri: ", cpc.URI)
+			logger.Info("########################################")
+			logger.Info("cpc name: " + cpc.Name)
+			logger.Info("cpc uri: " + cpc.URI)
 
-			adapters,
-				_, err := hmcManager.ListAdapters(cpc.URI, query)
+			adapters, _, err := hmcManager.ListAdapters(cpc.URI, query)
 			if err != nil {
-				fmt.Println("Error: ", err.Message)
+				logger.Error("Error: " + err.Message)
 			} else {
-				fmt.Println("-----------------------")
+				logger.Info("-----------------------")
 				for _, adapter := range adapters {
-					fmt.Println("++++++++++++++++++++++++")
-					fmt.Println("adapter properties: ", adapter)
+					logger.Info("++++++++++++++++++++++++")
+					logger.Info("", genlog.Any("adapter properties", adapter))
 				}
 			}
 
-			lpars,
-				_, err := hmcManager.ListLPARs(cpc.URI, query)
+			lpars, _, err := hmcManager.ListLPARs(cpc.URI, query)
 			if err != nil {
-				fmt.Println("Error: ", err.Message)
+				logger.Error("Error: " + err.Message)
 			} else {
-				fmt.Println("-----------------------")
+				logger.Info("-----------------------")
 				for _, lpar := range lpars {
-					fmt.Println("++++++++++++++++++++++++")
-					fmt.Println("lpar name: ", lpar.Name)
-					fmt.Println("lpar uri: ", lpar.URI)
+					logger.Info("++++++++++++++++++++++++")
+					logger.Info("lpar name: " + lpar.Name)
+					logger.Info("lpar uri: " + lpar.URI)
 
-					props,
-						_, err := hmcManager.GetLparProperties(lpar.URI)
+					props, _, err := hmcManager.GetLparProperties(lpar.URI)
 					if err != nil {
-						fmt.Println("Error: ", err.Message)
+						logger.Error("Error getting lpart properties", genlog.Error(errors.New(err.Message)))
 					} else {
-						fmt.Println("lpar properties: ", props)
+						logger.Info("", genlog.Any("lpar properties", props))
 					}
 
-					fmt.Println("++++++++++++++++++++++++")
-					nics,
-						_, err := hmcManager.ListNics(lpar.URI)
+					logger.Info("++++++++++++++++++++++++")
+					nics, _, err := hmcManager.ListNics(lpar.URI)
 					if err != nil {
-						fmt.Println("Error: ", err.Message)
+						logger.Error("Error listing nics ", genlog.Error(errors.New(err.Message)))
 					} else {
-						fmt.Println("nics list: ", nics)
+						logger.Info("", genlog.Any("nics list", nics))
 						for _, nicURI := range nics {
-							nic,
-								_, err := hmcManager.GetNicProperties(nicURI)
+							nic, _, err := hmcManager.GetNicProperties(nicURI)
 							if err != nil {
-								fmt.Println("Error: ", err.Message)
+								logger.Error("Error getting nic properties", genlog.Error(errors.New(err.Message)))
 							} else {
-								fmt.Println("nic properties: ", nic)
+								logger.Info("", genlog.Any("nic properties", nic))
 							}
 						}
 					}

@@ -13,8 +13,12 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // CpcAPI defines an interface for issuing CPC requests to ZHMC
@@ -46,6 +50,10 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on listing cpc's",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -55,8 +63,14 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, adapters: %v", requestUrl, status, cpcs.CPCS))
 		return cpcs.CPCS, status, nil
 	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on listing cpc's",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
 
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	return nil, status, errorResponseBody
 }

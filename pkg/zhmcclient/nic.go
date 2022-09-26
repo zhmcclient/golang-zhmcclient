@@ -13,8 +13,12 @@ package zhmcclient
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"path"
+
+	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 // NicAPI defines an interface for issuing NIC requests to ZHMC
@@ -47,6 +51,10 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic, "")
 	if err != nil {
+		logger.Error("error on create nic",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return "", status, err
 	}
 
@@ -56,10 +64,16 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 		if err != nil {
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, nic uri: %v", requestUrl, status, uriObj.URI))
 		return uriObj.URI, status, nil
 	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on create nic",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(errors.New(errorResponseBody.Message)))
+	return "", status, errorResponseBody
 
-	return "", status, GenerateErrorFromResponse(responseBody)
 }
 
 /**
@@ -73,14 +87,24 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on delete nic",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("nic deleted, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
 
-	return status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on delete nic",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return status, errorResponseBody
 }
 
 /**
@@ -94,6 +118,10 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
+		logger.Error("error on get nic properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -103,9 +131,13 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-
+		logger.Info(fmt.Sprintf("request url: %v, status: %v, nic propeties: %v", requestUrl, status, &nic))
 		return &nic, status, nil
 	}
-
-	return nil, status, GenerateErrorFromResponse(responseBody)
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on get nic properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return nil, status, errorResponseBody
 }
