@@ -79,7 +79,7 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, lpars: %v", requestUrl, status, lpars.LPARS))
+		logger.Info(fmt.Sprintf("request url: %v, status: %v", requestUrl, status))
 		return lpars.LPARS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
