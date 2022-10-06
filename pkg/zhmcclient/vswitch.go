@@ -50,6 +50,8 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "virtual-switches")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
+	logger.Info(fmt.Sprintf("Request URL: %v", requestUrl))
+	logger.Info(fmt.Sprintf("Request Method: %v", http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error listing virtual switches",
@@ -65,7 +67,7 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, virtual switches: %v", requestUrl, status, virtualSwitches.VIRTUALSWITCHES))
+		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, virtual switches: %v", requestUrl, status, virtualSwitches.VIRTUALSWITCHES))
 		return virtualSwitches.VIRTUALSWITCHES, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
@@ -86,6 +88,7 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, vSwitchURI)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error getting virtual switch properties",
@@ -101,7 +104,7 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, virtual switch properties: %v", requestUrl, status, virtualSwitch))
+		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, virtual switch properties: %v", requestUrl, status, virtualSwitch))
 		return virtualSwitch, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)

@@ -48,6 +48,7 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on listing cpc's",
@@ -63,7 +64,7 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, adapters: %v", requestUrl, status, cpcs.CPCS))
+		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, cpc's: %v", requestUrl, status, cpcs.CPCS))
 		return cpcs.CPCS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)

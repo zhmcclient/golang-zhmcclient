@@ -47,6 +47,7 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on get on job uri",
@@ -62,7 +63,7 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, adapters: %v", requestUrl, status, &myjob))
+		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, job: %v", requestUrl, status, &myjob))
 		return &myjob, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
@@ -82,6 +83,7 @@ func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodDelete))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on delete job",
@@ -92,7 +94,7 @@ func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("job deleted, request url: %v, status: %v", requestUrl, status))
+		logger.Info(fmt.Sprintf("Response: job deleted, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
@@ -112,6 +114,7 @@ func (m *JobManager) CancelJob(jobURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, jobURI, "operations/cancel")
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on cancel job",
@@ -122,7 +125,7 @@ func (m *JobManager) CancelJob(jobURI string) (int, *HmcError) {
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("job cancelled, request url: %v, status: %v", requestUrl, status))
+		logger.Info(fmt.Sprintf("Response: job cancelled, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)

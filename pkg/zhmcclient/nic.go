@@ -49,6 +49,7 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "nics")
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic, "")
 	if err != nil {
 		logger.Error("error on create nic",
@@ -64,7 +65,7 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 		if err != nil {
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, nic uri: %v", requestUrl, status, uriObj.URI))
+		logger.Info(fmt.Sprintf("Response: nic created, request url: %v, status: %v, nic uri: %v", requestUrl, status, uriObj.URI))
 		return uriObj.URI, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
@@ -85,6 +86,7 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodDelete))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on delete nic",
@@ -95,7 +97,7 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("nic deleted, request url: %v, status: %v", requestUrl, status))
+		logger.Info(fmt.Sprintf("Response: nic deleted, request url: %v, status: %v", requestUrl, status))
 		return status, nil
 	}
 
@@ -116,6 +118,7 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on get nic properties",
@@ -131,7 +134,7 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, nic propeties: %v", requestUrl, status, &nic))
+		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, nic propeties: %v", requestUrl, status, &nic))
 		return &nic, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
