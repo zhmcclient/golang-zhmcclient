@@ -65,14 +65,13 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
-
+	logger.Info(fmt.Sprintf("Response: listing adapters, request url: %v, status: %v, adapters: %v", requestUrl, status, responseBody))
 	if status == http.StatusOK {
 		adapters := &AdaptersArray{}
 		err := json.Unmarshal(responseBody, adapters)
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: listing adapters, request url: %v, status: %v, adapters: %v", requestUrl, status, adapters.ADAPTERS))
 		return adapters.ADAPTERS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)

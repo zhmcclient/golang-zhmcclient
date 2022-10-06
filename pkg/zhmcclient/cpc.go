@@ -57,14 +57,13 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
-
+	logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, cpc's: %v", requestUrl, status, responseBody))
 	if status == http.StatusOK {
 		cpcs := &CpcsArray{}
 		err := json.Unmarshal(responseBody, &cpcs)
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, cpc's: %v", requestUrl, status, cpcs.CPCS))
 		return cpcs.CPCS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
