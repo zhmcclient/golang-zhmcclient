@@ -52,6 +52,7 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 	if err != nil {
 		logger.Error("error on get on job uri",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodGet),
 			genlog.String("status", fmt.Sprint(status)),
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
@@ -63,12 +64,13 @@ func (m *JobManager) QueryJob(jobURI string) (*Job, int, *HmcError) {
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, job: %v", requestUrl, status, &myjob))
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, job: %v", requestUrl, http.MethodGet, status, &myjob))
 		return &myjob, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on get on job uri",
 		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
@@ -88,18 +90,20 @@ func (m *JobManager) DeleteJob(jobURI string) (int, *HmcError) {
 	if err != nil {
 		logger.Error("error on delete job",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodDelete),
 			genlog.String("status", fmt.Sprint(status)),
 			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("Response: job deleted, request url: %v, status: %v", requestUrl, status))
+		logger.Info(fmt.Sprintf("Response: job deleted, request url: %v, method: %v, status: %v", requestUrl, http.MethodDelete, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on delete job",
 		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodDelete),
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
@@ -119,18 +123,20 @@ func (m *JobManager) CancelJob(jobURI string) (int, *HmcError) {
 	if err != nil {
 		logger.Error("error on cancel job",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodPost),
 			genlog.String("status", fmt.Sprint(status)),
 			genlog.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
 	if status == http.StatusNoContent {
-		logger.Info(fmt.Sprintf("Response: job cancelled, request url: %v, status: %v", requestUrl, status))
+		logger.Info(fmt.Sprintf("Response: job cancelled, request url: %v, method: %v, status: %v", requestUrl, http.MethodPost, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on cancel job",
 		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodPost),
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody

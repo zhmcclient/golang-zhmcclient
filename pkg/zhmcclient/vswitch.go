@@ -56,6 +56,7 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 	if err != nil {
 		logger.Error("error listing virtual switches",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodGet),
 			genlog.String("status", fmt.Sprint(status)),
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
@@ -65,13 +66,19 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 		virtualSwitches := &VirtualSwitchesArray{}
 		err := json.Unmarshal(responseBody, virtualSwitches)
 		if err != nil {
+			logger.Error("error on unmarshalling adapters",
+				genlog.String("request url", fmt.Sprint(requestUrl)),
+				genlog.String("method", http.MethodGet),
+				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, virtual switches: %v", requestUrl, status, virtualSwitches.VIRTUALSWITCHES))
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, virtual switches: %v", requestUrl, http.MethodGet, status, virtualSwitches.VIRTUALSWITCHES))
 		return virtualSwitches.VIRTUALSWITCHES, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on listing virtual switches",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(errors.New(errorResponseBody.Message)))
 	return nil, status, errorResponseBody
@@ -93,6 +100,7 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 	if err != nil {
 		logger.Error("error getting virtual switch properties",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodGet),
 			genlog.String("status", fmt.Sprint(status)),
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
@@ -102,13 +110,19 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 		virtualSwitch := &VirtualSwitchProperties{}
 		err := json.Unmarshal(responseBody, virtualSwitch)
 		if err != nil {
+			logger.Error("error on unmarshalling adapters",
+				genlog.String("request url", fmt.Sprint(requestUrl)),
+				genlog.String("method", http.MethodGet),
+				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: request url: %v, status: %v, virtual switch properties: %v", requestUrl, status, virtualSwitch))
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, virtual switch properties: %v", requestUrl, http.MethodGet, status, virtualSwitch))
 		return virtualSwitch, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on getting switch properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(errors.New(errorResponseBody.Message)))
 	return nil, status, errorResponseBody
