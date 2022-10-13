@@ -190,6 +190,7 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 func (m *AdapterManager) DeleteHipersocket(adapterURI string) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, adapterURI)
+
 	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodDelete))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
