@@ -85,6 +85,7 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
+		logger.Info(fmt.Sprintf("Response: get on lpars successfull, status: %v", status))
 		return lpars.LPARS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
@@ -123,7 +124,10 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, lpar properties: %v", requestUrl, http.MethodGet, status, lparProps))
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, property details, name: %v,description: %v"+
+			"uri: %v, partition status: %v, partition type: %v, id: %v, processor mode: %v, ifl processors: %v, memory: %v",
+			requestUrl, http.MethodGet, status, lparProps.Name, lparProps.Description, lparProps.URI, lparProps.Status, lparProps.Type,
+			lparProps.ID, lparProps.ProcessorMode, lparProps.IflProcessors, lparProps.MaximumMemory))
 		return &lparProps, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
