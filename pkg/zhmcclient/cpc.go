@@ -48,27 +48,33 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 	requestUrl.Path = path.Join(requestUrl.Path, "/api/cpcs")
 	requestUrl = BuildUrlFromQuery(requestUrl, query)
 
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on listing cpc's",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodGet),
 			genlog.String("status", fmt.Sprint(status)),
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
-
+	logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, cpc's: %v", requestUrl, http.MethodGet, status, responseBody))
 	if status == http.StatusOK {
 		cpcs := &CpcsArray{}
 		err := json.Unmarshal(responseBody, &cpcs)
 		if err != nil {
+			logger.Error("error on unmarshalling adapters",
+				genlog.String("request url", fmt.Sprint(requestUrl)),
+				genlog.String("method", http.MethodGet),
+				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("request url: %v, status: %v, adapters: %v", requestUrl, status, cpcs.CPCS))
 		return cpcs.CPCS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on listing cpc's",
 		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(errors.New(errorResponseBody.Message)))
 
