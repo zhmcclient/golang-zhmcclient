@@ -66,7 +66,7 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
-	logger.Info(fmt.Sprintf("Response: listing adapters, request url: %v, method: %v, status: %v, adapters: %v", requestUrl, http.MethodGet, status, responseBody))
+	logger.Info(fmt.Sprintf("Response: listing adapters, request url: %v, method: %v, status: %v, adapters: %v", requestUrl, http.MethodGet, status, string(responseBody)))
 
 	if status == http.StatusOK {
 		adapters := &AdaptersArray{}
