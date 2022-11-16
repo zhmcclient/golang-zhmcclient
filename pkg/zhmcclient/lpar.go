@@ -149,7 +149,7 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
-	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v, Parameters: %v", requestUrl, http.MethodPost, props))
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 	if err != nil {
 		logger.Error("error on getting lpar properties",

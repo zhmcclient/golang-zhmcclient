@@ -58,7 +58,7 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 			genlog.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
-	logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, cpc's: %v", requestUrl, http.MethodGet, status, responseBody))
+	logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v", requestUrl, http.MethodGet, status))
 	if status == http.StatusOK {
 		cpcs := &CpcsArray{}
 		err := json.Unmarshal(responseBody, &cpcs)
