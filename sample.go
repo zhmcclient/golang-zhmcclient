@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.ibm.com/genctl/shared-logger/genlog"
 	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
@@ -26,6 +27,7 @@ func main() {
 	endpoint := os.Getenv("HMC_ENDPOINT") // "https://9.114.87.7:6794/", "https://192.168.195.118:6794"
 	username := os.Getenv("HMC_USERNAME")
 	password := os.Getenv("HMC_PASSWORD")
+
 	args := os.Args[1:]
 	//partitionId := os.Getenv("PAR_ID")
 	// isofile := os.Getenv("ISO_FILE")
@@ -39,7 +41,10 @@ func main() {
 		logger.Fatal(`Usage: sample <Command>
 
 			Please enter one of the below Command:
-
+			
+				"CreatePartition":
+					- Starts the partition for the selected HMC
+				
 				"StartPartitionforHmc":
 					- Starts the partition for the selected HMC
 				
@@ -152,6 +157,8 @@ func main() {
 			//ListAll(hmcManager)
 			for _, arg := range args {
 				switch arg {
+				case "CreatePartition":
+					CreatePartition(hmcManager)
 				case "StartPartitionforHmc":
 					StartPartitionforHmc(hmcManager)
 				case "StopPartitionforHmc":
@@ -185,6 +192,34 @@ func GetLPARURI() (lparURI string) {
 	partitionId := os.Getenv("PAR_ID")
 	lparURI = "api/partitions/" + partitionId
 	return
+}
+func GetCpcURL(hmcManager zhmcclient.ZhmcAPI) (cpcuri string) {
+	cpcURI := GetCPCURI(hmcManager)
+	fmt.Println("CPCID: ********************", cpcURI)
+	return cpcURI
+}
+
+func GetCPCURI(hmcManager zhmcclient.ZhmcAPI) string {
+	query := map[string]string{}
+	cpcID := ""
+	cpcName := os.Getenv("CPC_NAME")
+	cpcs, _, err := hmcManager.ListCPCs(query)
+	if err != nil {
+		logger.Error("Error: " + err.Message)
+	} else {
+		for _, cpc := range cpcs {
+			logger.Info("########################################")
+			logger.Info("cpc ENV Name: " + cpcName)
+			logger.Info("cpc name: " + cpc.Name)
+			logger.Info("cpc uri: " + cpc.URI)
+			fmt.Println("################# CPCURI: ", cpc.URI)
+			fmt.Println("################# CPCURI END")
+			if cpc.Name == cpcName {
+				cpcID = cpc.URI
+			}
+		}
+	}
+	return cpcID
 }
 
 func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
@@ -247,6 +282,33 @@ func GetAdapterPropsforCPC(hmcManager zhmcclient.ZhmcAPI) {
 	}
 	logger.Info("*********************************************")
 
+}
+
+func CreatePartition(hmcManager zhmcclient.ZhmcAPI) {
+	cpcURI := GetCpcURL(hmcManager)
+	parName := os.Getenv("PAR_NAME")
+	iflProcessor, _ := strconv.Atoi(os.Getenv("IFLs"))
+	initialMemory, _ := strconv.Atoi(os.Getenv("INITIAL_MEMORY"))
+	maxMemory, _ := strconv.Atoi(os.Getenv("MAX_MEMORY"))
+	processorType := os.Getenv("PROCESSOR_TYPE")
+	var processorMode zhmcclient.PartitionProcessorMode = ""
+	if processorType == "shared" {
+		processorMode = zhmcclient.PROCESSOR_MODE_SHARED
+	} else {
+		processorMode = zhmcclient.PROCESSOR_MODE_DEDICATED
+	}
+	props := &zhmcclient.LparProperties{
+		Name:          parName,
+		IflProcessors: iflProcessor,
+		InitialMemory: initialMemory,
+		MaximumMemory: maxMemory,
+		ProcessorMode: processorMode,
+	}
+	_, _, err := hmcManager.CreateLPAR(cpcURI, props)
+	if err != nil {
+		logger.Fatal("", genlog.Any("Create Partition error", err))
+	}
+	logger.Info("Create partition successfull")
 }
 
 func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
