@@ -93,6 +93,19 @@ type ZhmcAPI struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}
+	DeleteLPARStub        func(string) (int, *zhmcclient.HmcError)
+	deleteLPARMutex       sync.RWMutex
+	deleteLPARArgsForCall []struct {
+		arg1 string
+	}
+	deleteLPARReturns struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
+	deleteLPARReturnsOnCall map[int]struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
 	DeleteNicStub        func(string) (int, *zhmcclient.HmcError)
 	deleteNicMutex       sync.RWMutex
 	deleteNicArgsForCall []struct {
@@ -842,6 +855,70 @@ func (fake *ZhmcAPI) DeleteJobReturnsOnCall(i int, result1 int, result2 *zhmccli
 		})
 	}
 	fake.deleteJobReturnsOnCall[i] = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) DeleteLPAR(arg1 string) (int, *zhmcclient.HmcError) {
+	fake.deleteLPARMutex.Lock()
+	ret, specificReturn := fake.deleteLPARReturnsOnCall[len(fake.deleteLPARArgsForCall)]
+	fake.deleteLPARArgsForCall = append(fake.deleteLPARArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.DeleteLPARStub
+	fakeReturns := fake.deleteLPARReturns
+	fake.recordInvocation("DeleteLPAR", []interface{}{arg1})
+	fake.deleteLPARMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ZhmcAPI) DeleteLPARCallCount() int {
+	fake.deleteLPARMutex.RLock()
+	defer fake.deleteLPARMutex.RUnlock()
+	return len(fake.deleteLPARArgsForCall)
+}
+
+func (fake *ZhmcAPI) DeleteLPARCalls(stub func(string) (int, *zhmcclient.HmcError)) {
+	fake.deleteLPARMutex.Lock()
+	defer fake.deleteLPARMutex.Unlock()
+	fake.DeleteLPARStub = stub
+}
+
+func (fake *ZhmcAPI) DeleteLPARArgsForCall(i int) string {
+	fake.deleteLPARMutex.RLock()
+	defer fake.deleteLPARMutex.RUnlock()
+	argsForCall := fake.deleteLPARArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) DeleteLPARReturns(result1 int, result2 *zhmcclient.HmcError) {
+	fake.deleteLPARMutex.Lock()
+	defer fake.deleteLPARMutex.Unlock()
+	fake.DeleteLPARStub = nil
+	fake.deleteLPARReturns = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) DeleteLPARReturnsOnCall(i int, result1 int, result2 *zhmcclient.HmcError) {
+	fake.deleteLPARMutex.Lock()
+	defer fake.deleteLPARMutex.Unlock()
+	fake.DeleteLPARStub = nil
+	if fake.deleteLPARReturnsOnCall == nil {
+		fake.deleteLPARReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.deleteLPARReturnsOnCall[i] = struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}{result1, result2}
@@ -2460,6 +2537,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.deleteHipersocketMutex.RUnlock()
 	fake.deleteJobMutex.RLock()
 	defer fake.deleteJobMutex.RUnlock()
+	fake.deleteLPARMutex.RLock()
+	defer fake.deleteLPARMutex.RUnlock()
 	fake.deleteNicMutex.RLock()
 	defer fake.deleteNicMutex.RUnlock()
 	fake.detachStorageGroupToPartitionMutex.RLock()

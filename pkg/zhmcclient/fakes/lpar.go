@@ -22,6 +22,19 @@ type LparAPI struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}
+	DeleteLPARStub        func(string) (int, *zhmcclient.HmcError)
+	deleteLPARMutex       sync.RWMutex
+	deleteLPARArgsForCall []struct {
+		arg1 string
+	}
+	deleteLPARReturns struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
+	deleteLPARReturnsOnCall map[int]struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
 	DetachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupPayload) (int, *zhmcclient.HmcError)
 	detachStorageGroupToPartitionMutex       sync.RWMutex
 	detachStorageGroupToPartitionArgsForCall []struct {
@@ -234,6 +247,70 @@ func (fake *LparAPI) AttachStorageGroupToPartitionReturnsOnCall(i int, result1 i
 		})
 	}
 	fake.attachStorageGroupToPartitionReturnsOnCall[i] = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *LparAPI) DeleteLPAR(arg1 string) (int, *zhmcclient.HmcError) {
+	fake.deleteLPARMutex.Lock()
+	ret, specificReturn := fake.deleteLPARReturnsOnCall[len(fake.deleteLPARArgsForCall)]
+	fake.deleteLPARArgsForCall = append(fake.deleteLPARArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.DeleteLPARStub
+	fakeReturns := fake.deleteLPARReturns
+	fake.recordInvocation("DeleteLPAR", []interface{}{arg1})
+	fake.deleteLPARMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *LparAPI) DeleteLPARCallCount() int {
+	fake.deleteLPARMutex.RLock()
+	defer fake.deleteLPARMutex.RUnlock()
+	return len(fake.deleteLPARArgsForCall)
+}
+
+func (fake *LparAPI) DeleteLPARCalls(stub func(string) (int, *zhmcclient.HmcError)) {
+	fake.deleteLPARMutex.Lock()
+	defer fake.deleteLPARMutex.Unlock()
+	fake.DeleteLPARStub = stub
+}
+
+func (fake *LparAPI) DeleteLPARArgsForCall(i int) string {
+	fake.deleteLPARMutex.RLock()
+	defer fake.deleteLPARMutex.RUnlock()
+	argsForCall := fake.deleteLPARArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *LparAPI) DeleteLPARReturns(result1 int, result2 *zhmcclient.HmcError) {
+	fake.deleteLPARMutex.Lock()
+	defer fake.deleteLPARMutex.Unlock()
+	fake.DeleteLPARStub = nil
+	fake.deleteLPARReturns = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *LparAPI) DeleteLPARReturnsOnCall(i int, result1 int, result2 *zhmcclient.HmcError) {
+	fake.deleteLPARMutex.Lock()
+	defer fake.deleteLPARMutex.Unlock()
+	fake.DeleteLPARStub = nil
+	if fake.deleteLPARReturnsOnCall == nil {
+		fake.deleteLPARReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.deleteLPARReturnsOnCall[i] = struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}{result1, result2}
@@ -908,6 +985,8 @@ func (fake *LparAPI) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.attachStorageGroupToPartitionMutex.RLock()
 	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
+	fake.deleteLPARMutex.RLock()
+	defer fake.deleteLPARMutex.RUnlock()
 	fake.detachStorageGroupToPartitionMutex.RLock()
 	defer fake.detachStorageGroupToPartitionMutex.RUnlock()
 	fake.fetchAsciiConsoleURIMutex.RLock()

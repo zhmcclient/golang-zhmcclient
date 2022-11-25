@@ -45,6 +45,9 @@ func main() {
 				
 				"StopPartitionforHmc":
 					- Stops the partition for the selected HMC
+
+				"DeletePartitionforHmc":
+					- Deletes the partition for the selected HMC
 				
 				"UpdateBootDeviceProperty":
 					- Updates the partition as boot device="iso" for the selected HMC
@@ -156,6 +159,8 @@ func main() {
 					StartPartitionforHmc(hmcManager)
 				case "StopPartitionforHmc":
 					StopPartitionforHmc(hmcManager)
+				case "DeletePartitionforHmc":
+					DeletePartitionforHmc(hmcManager)
 				case "UpdateBootDeviceProperty":
 					UpdateBootDeviceProperty(hmcManager)
 				case "MountIsoImageToPartition":
@@ -252,6 +257,15 @@ func GetAdapterPropsforCPC(hmcManager zhmcclient.ZhmcAPI) {
 func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 	lparURI := GetLPARURI()
 	_, _, err := hmcManager.StopLPAR(lparURI)
+	if err != nil {
+		logger.Fatal("", genlog.Any("Stop Partition error", err))
+	}
+	logger.Info("Stop partition successfull")
+}
+
+func DeletePartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
+	lparURI := GetLPARURI()
+	_, _, err := hmcManager.DeletePartitionforHmc(lparURI)
 	if err != nil {
 		logger.Fatal("", genlog.Any("Stop Partition error", err))
 	}
