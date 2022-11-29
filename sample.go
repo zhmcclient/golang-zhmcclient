@@ -195,7 +195,6 @@ func GetLPARURI() (lparURI string) {
 }
 func GetCpcURL(hmcManager zhmcclient.ZhmcAPI) (cpcuri string) {
 	cpcURI := GetCPCURI(hmcManager)
-	fmt.Println("CPCID: ********************", cpcURI)
 	return cpcURI
 }
 
@@ -212,8 +211,6 @@ func GetCPCURI(hmcManager zhmcclient.ZhmcAPI) string {
 			logger.Info("cpc ENV Name: " + cpcName)
 			logger.Info("cpc name: " + cpc.Name)
 			logger.Info("cpc uri: " + cpc.URI)
-			fmt.Println("################# CPCURI: ", cpc.URI)
-			fmt.Println("################# CPCURI END")
 			if cpc.Name == cpcName {
 				cpcID = cpc.URI
 			}

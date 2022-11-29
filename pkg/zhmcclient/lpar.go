@@ -143,7 +143,7 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 /**
 * POST /api/cpcs/{cpc-id}/partitions
 * @cpcURI is the cpc object-uri
-* @query are LPAR properties'
+* @props are LPAR properties'
 * @return object-uri string
 * Return: 200 and object-uri string
 *     or: 400, 404, 409
