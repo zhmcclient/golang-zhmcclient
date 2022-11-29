@@ -265,11 +265,11 @@ func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 
 func DeletePartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 	lparURI := GetLPARURI()
-	_, _, err := hmcManager.DeletePartitionforHmc(lparURI)
+	_, err := hmcManager.DeleteLPAR(lparURI)
 	if err != nil {
-		logger.Fatal("", genlog.Any("Stop Partition error", err))
+		logger.Fatal("", genlog.Any("Delete Partition error", err))
 	}
-	logger.Info("Stop partition successfull")
+	logger.Info("Delete partition successfull")
 }
 
 func MountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {

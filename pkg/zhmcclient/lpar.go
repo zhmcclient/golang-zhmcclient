@@ -288,7 +288,7 @@ func (m *LparManager) DeleteLPAR(lparURI string) (int, *HmcError) {
 	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodDelete))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
-		logger.Error("error deleting hipersocket",
+		logger.Error("error deleting partition",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
 			genlog.String("method", http.MethodDelete),
 			genlog.String("status", fmt.Sprint(status)),
