@@ -43,7 +43,7 @@ func main() {
 			Please enter one of the below Command:
 			
 				"CreatePartition":
-					- Creates the partition for the selected HMC
+					- Creates the partition on the selected HMC
 				
 				"StartPartitionforHmc":
 					- Starts the partition for the selected HMC
