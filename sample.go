@@ -43,7 +43,7 @@ func main() {
 			Please enter one of the below Command:
 			
 				"CreatePartition":
-					- Starts the partition for the selected HMC
+					- Creates the partition for the selected HMC
 				
 				"StartPartitionforHmc":
 					- Starts the partition for the selected HMC
@@ -305,7 +305,7 @@ func CreatePartition(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Create Partition error", err))
 	}
-	logger.Info("Create partition successfull")
+	logger.Info("Create partition successful")
 }
 
 func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
@@ -314,7 +314,7 @@ func StopPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Stop Partition error", err))
 	}
-	logger.Info("Stop partition successfull")
+	logger.Info("Stop partition successful")
 }
 
 func MountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
@@ -325,7 +325,7 @@ func MountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Mount iso error: ", err))
 	}
-	logger.Info("Mount iso image successfull")
+	logger.Info("Mount iso image successful")
 }
 
 func UnmountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
@@ -334,7 +334,7 @@ func UnmountIsoImageToPartition(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Unmount iso error", err))
 	}
-	logger.Info("Unmount iso image successfull")
+	logger.Info("Unmount iso image successful")
 }
 
 func UpdateBootDeviceProperty(hmcManager zhmcclient.ZhmcAPI) {
@@ -345,7 +345,7 @@ func UpdateBootDeviceProperty(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Update boot device error", err))
 	}
-	logger.Info("Update boot device successfull")
+	logger.Info("Update boot device successful")
 }
 
 func StartPartitionforHmc(hmcManager zhmcclient.ZhmcAPI) {
@@ -433,7 +433,7 @@ func AttachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Attach storage group error", err))
 	}
-	logger.Info("Attach storage group operation successfull")
+	logger.Info("Attach storage group operation successful")
 }
 
 func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
@@ -443,7 +443,7 @@ func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	if err != nil {
 		logger.Fatal("", genlog.Any("Detach storage group error", err))
 	}
-	logger.Info("Detach storage group operation successfull")
+	logger.Info("Detach storage group operation successful")
 }
 
 /*
