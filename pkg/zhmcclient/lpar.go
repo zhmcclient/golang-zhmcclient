@@ -30,6 +30,7 @@ type LparAPI interface {
 	UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError)
 	StartLPAR(lparURI string) (string, int, *HmcError)
 	StopLPAR(lparURI string) (string, int, *HmcError)
+	DeleteLPAR(lparURI string) (int, *HmcError)
 	AttachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) (int, *HmcError)
 	DetachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) (int, *HmcError)
 	MountIsoImage(lparURI string, isoFile string, insFile string) (int, *HmcError)
@@ -322,6 +323,40 @@ func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return "", status, errorResponseBody
+}
+
+/**
+* DELETE /api/partitions/{partition-id}
+* @lparURI the lpar ID to be deleted
+* Return: 204
+*     or: 400, 403, 404, 409, 503
+ */
+func (m *LparManager) DeleteLPAR(lparURI string) (int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodDelete))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
+	if err != nil {
+		logger.Error("error deleting partition",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodDelete),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
+		return status, err
+	}
+
+	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Response: partition deleted, request url: %v, method: %v, status: %v", requestUrl, http.MethodDelete, status))
+		return status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error deleting partition",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodDelete),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return status, errorResponseBody
 }
 
 /**

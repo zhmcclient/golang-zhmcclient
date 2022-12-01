@@ -409,6 +409,36 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
+	Describe("DeleteLPAR", func() {
+
+		BeforeEach(func() {
+			hmcErr = &HmcError{
+				Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+				Message: "error message",
+			}
+		})
+
+		Context("When delete lpar and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
+				status, err := manager.DeleteLPAR(lparid)
+				Expect(err).To(BeNil())
+				Expect(status).ToNot(BeNil())
+				Expect(status).To(Equal(204))
+			})
+		})
+
+		Context("When delete lpar and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
+				_, err := manager.DeleteLPAR(lparid)
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
+
 	Describe("MountIsoImage", func() {
 
 		var (
