@@ -184,6 +184,51 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
+	Describe("CreateLPAR", func() {
+		var (
+			payload       *LparProperties
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			payload = &LparProperties{
+				URI:                        "uri",
+				CpcURI:                     "cpcuri",
+				Class:                      "partition",
+				Name:                       "lpar",
+				Description:                "description",
+				InitialIflProcessingWeight: 4096,
+				MaximumMemory:              1024,
+				ProcessorMode:              "shared",
+				Type:                       PARTITION_TYPE_LINUX,
+				AutoGenerateID:             true,
+			}
+
+			bytesResponse, _ = json.Marshal(payload)
+		})
+
+		Context("When CreateLPAR and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusCreated, bytesResponse, nil)
+				uri, status, err := manager.CreateLPAR(lparid, payload)
+				Expect(uri).ToNot(BeNil())
+				Expect(status).To(Equal(201))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When CreateLPAR and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				_, _, err := manager.CreateLPAR(lparid, payload)
+
+				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+	})
+
 	Describe("UpdateLparProperties", func() {
 		var (
 			payload       *LparProperties
