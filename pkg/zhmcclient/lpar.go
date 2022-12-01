@@ -24,6 +24,7 @@ import (
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
 //go:generate counterfeiter -o fakes/lpar.go --fake-name LparAPI . LparAPI
 type LparAPI interface {
+	CreateLPAR(cpcURI string, props *LparProperties) (string, int, *HmcError)
 	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError)
 	GetLparProperties(lparURI string) (*LparProperties, int, *HmcError)
 	UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError)
@@ -137,6 +138,55 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
+}
+
+/**
+* POST /api/cpcs/{cpc-id}/partitions
+* @cpcURI is the cpc object-uri
+* @props are LPAR properties'
+* @return object-uri string
+* Return: 200 and object-uri string
+*     or: 400, 404, 409
+ */
+func (m *LparManager) CreateLPAR(cpcURI string, props *LparProperties) (string, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, cpcURI, "/partitions")
+
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
+	if err != nil {
+		logger.Error("error on getting lpar's",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodPost),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
+		return "", status, err
+	}
+
+	if status == http.StatusCreated {
+		responseObj := LparProperties{}
+		err := json.Unmarshal(responseBody, &responseObj)
+		if err != nil {
+			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		if responseObj.URI != "" {
+			logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, lpar uri: %v", requestUrl, http.MethodPost, status, responseObj.URI))
+			return responseObj.URI, status, nil
+		}
+		logger.Error("error on starting lpar",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodPost),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(errors.New("empty job uri")))
+		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error listing lpar's",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodPost),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return "", status, errorResponseBody
 }
 
 /**

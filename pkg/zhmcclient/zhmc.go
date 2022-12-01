@@ -70,6 +70,9 @@ func (m *ZhmcManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 func (m *ZhmcManager) UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError) {
 	return m.lparManager.UpdateLparProperties(lparURI, props)
 }
+func (m *ZhmcManager) CreateLPAR(cpcURI string, props *LparProperties) (string, int, *HmcError) {
+	return m.lparManager.CreateLPAR(cpcURI, props)
+}
 func (m *ZhmcManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 	return m.lparManager.StartLPAR(lparURI)
 }
