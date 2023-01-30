@@ -14,6 +14,7 @@ package zhmcclient
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -30,6 +31,7 @@ import (
 )
 
 // ClientAPI defines an interface for issuing client requests to ZHMC
+//
 //go:generate counterfeiter -o fakes/client.go --fake-name ClientAPI . ClientAPI
 type ClientAPI interface {
 	CloneEndpointURL() *url.URL
@@ -58,6 +60,9 @@ type Options struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 	Trace    bool   `json:"trace,omitempty"`
+	CaCert   string `json:"ca-cert,omitempty"`
+	Pem      string `json:"pem,omitempty"`
+	Key      string `json:"key,omitempty"`
 	SkipCert bool   `json:"skip-cert,omitempty"`
 }
 
@@ -89,13 +94,34 @@ type Client struct {
 }
 
 func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
+	tlsConfig := &tls.Config{}
+	if !opts.SkipCert {
+		cert, certerr := tls.LoadX509KeyPair(opts.Pem, opts.Key)
+		// TODO: Add Error messages
+		if certerr != nil {
+			//return nil, fmt.Errorf("could not locate %s %s or %s certificates", pem, key, opts.CaCert)
+			return nil, &HmcError{}
+		}
+		dataBytes, err := ioutil.ReadFile(opts.CaCert)
+		// TODO: Add Error messages
+		if err != nil {
+			//return nil, fmt.Errorf("could not locate %s %s or %s certificates", pem, key, opts.CaCert)
+			return nil, &HmcError{}
+		}
+		roots := x509.NewCertPool()
+		ok := roots.AppendCertsFromPEM(dataBytes)
+		if !ok {
+			return nil, &HmcError{}
+		}
+		tlsConfig.RootCAs = roots
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+	tlsConfig.InsecureSkipVerify = opts.SkipCert
 	transport := &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: DEFAULT_DIAL_TIMEOUT,
 		}).Dial,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: opts.SkipCert,
-		},
+		TLSClientConfig:     tlsConfig,
 		TLSHandshakeTimeout: DEFAULT_HANDSHAKE_TIMEOUT,
 	}
 
