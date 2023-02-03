@@ -96,12 +96,12 @@ type Client struct {
 func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 	tlsConfig := &tls.Config{}
 	if !opts.SkipCert {
-		cert, certerr := tls.LoadX509KeyPair(opts.Pem, opts.Key)
+		//cert, certerr := tls.LoadX509KeyPair(opts.Pem, opts.Key)
 		// TODO: Add Error messages
-		if certerr != nil {
-			//return nil, fmt.Errorf("could not locate %s %s or %s certificates", pem, key, opts.CaCert)
-			return nil, &HmcError{}
-		}
+		// if certerr != nil {
+		// 	//return nil, fmt.Errorf("could not locate %s %s or %s certificates", pem, key, opts.CaCert)
+		// 	return nil, &HmcError{}
+		// }
 		dataBytes, err := ioutil.ReadFile(opts.CaCert)
 		// TODO: Add Error messages
 		if err != nil {
@@ -114,7 +114,6 @@ func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 			return nil, &HmcError{}
 		}
 		tlsConfig.RootCAs = roots
-		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
 	tlsConfig.InsecureSkipVerify = opts.SkipCert
 	transport := &http.Transport{
