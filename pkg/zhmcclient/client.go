@@ -61,8 +61,6 @@ type Options struct {
 	Password string `json:"password,omitempty"`
 	Trace    bool   `json:"trace,omitempty"`
 	CaCert   string `json:"ca-cert,omitempty"`
-	Pem      string `json:"pem,omitempty"`
-	Key      string `json:"key,omitempty"`
 	SkipCert bool   `json:"skip-cert,omitempty"`
 }
 
@@ -96,24 +94,16 @@ type Client struct {
 func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
 	tlsConfig := &tls.Config{}
 	if !opts.SkipCert {
-		//cert, certerr := tls.LoadX509KeyPair(opts.Pem, opts.Key)
-		// TODO: Add Error messages
-		// if certerr != nil {
-		// 	//return nil, fmt.Errorf("could not locate %s %s or %s certificates", pem, key, opts.CaCert)
-		// 	return nil, &HmcError{}
-		// }
 		dataBytes, err := ioutil.ReadFile(opts.CaCert)
-		// TODO: Add Error messages
 		if err != nil {
-			//return nil, fmt.Errorf("could not locate %s %s or %s certificates", pem, key, opts.CaCert)
-			return nil, &HmcError{}
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_READ_RESPONSE_FAIL, err)
 		}
-		roots := x509.NewCertPool()
-		ok := roots.AppendCertsFromPEM(dataBytes)
-		if !ok {
-			return nil, &HmcError{}
+
+		cert, err := x509.ParseCertificate(dataBytes)
+		if err != nil {
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 		}
-		tlsConfig.RootCAs = roots
+		tlsConfig.RootCAs.AddCert(cert)
 	}
 	tlsConfig.InsecureSkipVerify = opts.SkipCert
 	transport := &http.Transport{
