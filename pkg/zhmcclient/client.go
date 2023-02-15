@@ -31,7 +31,6 @@ import (
 )
 
 // ClientAPI defines an interface for issuing client requests to ZHMC
-//
 //go:generate counterfeiter -o fakes/client.go --fake-name ClientAPI . ClientAPI
 type ClientAPI interface {
 	CloneEndpointURL() *url.URL
