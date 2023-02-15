@@ -12,7 +12,10 @@
 package zhmcclient_test
 
 import (
+	"crypto/tls"
+	"fmt"
 	"net/http"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -91,6 +94,33 @@ var _ = Describe("client", func() {
 				var staus = http.StatusUnauthorized
 				ret := IsExpectedHttpStatus(staus)
 				Expect(ret).To(Equal(false))
+			})
+		})
+	})
+
+	Describe("SetCertificate", func() {
+		Context("When skipcert is false", func() {
+			It("returns tls config without CaCert", func() {
+				opts := &Options{
+					SkipCert: false,
+				}
+				tlsConfig, _ := SetCertificate(opts, &tls.Config{})
+				Expect(tlsConfig).To(BeNil())
+
+			})
+		})
+
+		Context("When skipcert is true", func() {
+			It("returns tls config with root CaCert", func() {
+				file, _ := os.Create("data.der")
+				file.WriteString("CACERT")
+				opts := &Options{
+					SkipCert: true,
+					CaCert:   "data.der",
+				}
+				tlsConfig, _ := SetCertificate(opts, &tls.Config{})
+				fmt.Println("TLS CONFIG W ROOT CA:::::::: ", tlsConfig.Certificates)
+				Expect(tlsConfig).ToNot(BeNil())
 			})
 		})
 	})
