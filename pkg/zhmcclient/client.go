@@ -14,6 +14,7 @@ package zhmcclient
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -29,7 +30,10 @@ import (
 	"net/url"
 )
 
-// ClientAPI defines an interface for issuing client requests to ZHMC
+/*
+	ClientAPI defines an interface for issuing client requests to ZHMC
+*/
+
 //go:generate counterfeiter -o fakes/client.go --fake-name ClientAPI . ClientAPI
 type ClientAPI interface {
 	CloneEndpointURL() *url.URL
@@ -58,6 +62,7 @@ type Options struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 	Trace    bool   `json:"trace,omitempty"`
+	CaCert   string `json:"ca-cert,omitempty"`
 	SkipCert bool   `json:"skip-cert,omitempty"`
 }
 
@@ -78,24 +83,27 @@ type Session struct {
 }
 
 type Client struct {
-	endpointURL *url.URL
-	httpClient  *http.Client
-	logondata   *LogonData
-	session     *Session
-
+	endpointURL    *url.URL
+	httpClient     *http.Client
+	logondata      *LogonData
+	session        *Session
 	isSkipCert     bool
 	isTraceEnabled bool
 	traceOutput    io.Writer
 }
 
 func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
+
+	tslConfig, err := SetCertificate(opts, &tls.Config{})
+	if err != nil {
+		return nil, err
+	}
+	tslConfig.InsecureSkipVerify = opts.SkipCert
 	transport := &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: DEFAULT_DIAL_TIMEOUT,
 		}).Dial,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: opts.SkipCert,
-		},
+		TLSClientConfig:     tslConfig,
 		TLSHandshakeTimeout: DEFAULT_HANDSHAKE_TIMEOUT,
 	}
 
@@ -302,6 +310,22 @@ func (c *Client) setRequestHeaders(req *http.Request, bodyType, sessionID string
 	} else if c.session != nil && c.session.SessionID != "" {
 		req.Header.Add(SESSION_HEADER_NAME, c.session.SessionID)
 	}
+}
+
+func SetCertificate(opts *Options, tlsConfig *tls.Config) (*tls.Config, *HmcError) {
+	if !opts.SkipCert {
+		dataBytes, err := ioutil.ReadFile(opts.CaCert)
+		if err != nil {
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_READ_RESPONSE_FAIL, err)
+		}
+
+		cert, err := x509.ParseCertificate(dataBytes)
+		if err != nil {
+			return nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
+		}
+		tlsConfig.RootCAs.AddCert(cert)
+	}
+	return tlsConfig, nil
 }
 
 func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []byte) (responseStatusCode int, responseBodyStream []byte, err *HmcError) {
