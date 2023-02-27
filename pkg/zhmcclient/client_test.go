@@ -111,7 +111,7 @@ var _ = Describe("client", func() {
 			It("returns tls config with root CaCert", func() {
 				opts := &Options{
 					SkipCert: true,
-					CaCert:   "data.der",
+					CaCert:   "data.pem",
 				}
 				tlsConfig, err := SetCertificate(opts, &tls.Config{})
 				Expect(tlsConfig).ToNot(BeNil())
