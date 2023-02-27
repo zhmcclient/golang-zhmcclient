@@ -314,16 +314,20 @@ func (c *Client) setRequestHeaders(req *http.Request, bodyType, sessionID string
 
 func SetCertificate(opts *Options, tlsConfig *tls.Config) (*tls.Config, *HmcError) {
 	if !opts.SkipCert {
-		dataBytes, err := ioutil.ReadFile(opts.CaCert)
+		//Read root CA bundle in PEM format
+		cert, err := ioutil.ReadFile(opts.CaCert)
 		if err != nil {
 			return nil, getHmcErrorFromErr(ERR_CODE_HMC_READ_RESPONSE_FAIL, err)
 		}
-
-		cert, err := x509.ParseCertificate(dataBytes)
 		if err != nil {
 			return nil, getHmcErrorFromErr(ERR_CODE_HMC_BAD_REQUEST, err)
 		}
-		tlsConfig.RootCAs.AddCert(cert)
+		/*
+			Read certs for PEM CA bundle and append rootCA cert pool of the TLS config for validation
+		*/
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(cert)
+		tlsConfig.RootCAs = certPool
 	}
 	return tlsConfig, nil
 }
