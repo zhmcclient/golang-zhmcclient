@@ -27,12 +27,15 @@ func main() {
 	endpoint := os.Getenv("HMC_ENDPOINT") // "https://9.114.87.7:6794/", "https://192.168.195.118:6794"
 	username := os.Getenv("HMC_USERNAME")
 	password := os.Getenv("HMC_PASSWORD")
+	cacert := os.Getenv("CA_CERT")
+	skipCert := os.Getenv("SKIP_CERT")
+	isSkipCert, _ := strconv.ParseBool(skipCert)
 
 	args := os.Args[1:]
 	//partitionId := os.Getenv("PAR_ID")
 	// isofile := os.Getenv("ISO_FILE")
 	// insfile := os.Getenv("INS_FILE")
-	creds := &zhmcclient.Options{Username: username, Password: password, SkipCert: true, Trace: false}
+	creds := &zhmcclient.Options{Username: username, Password: password, CaCert: cacert, SkipCert: isSkipCert, Trace: false}
 	if endpoint == "" || username == "" || password == "" {
 		// The Fatal functions call os.Exit(1) after writing the log message
 		logger.Fatal("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
@@ -384,7 +387,7 @@ func FetchASCIIConsoleURI(hmcManager zhmcclient.ZhmcAPI) {
 }
 
 /*
-	List all function
+List all function
 */
 func ListStorageGroupsforCPC(hmcManager zhmcclient.ZhmcAPI) {
 	cpcID := os.Getenv("CPC_ID")
@@ -461,7 +464,7 @@ func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 }
 
 /*
-	List all function
+List all function
 */
 func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 	query := map[string]string{}
