@@ -1,0 +1,21 @@
+dist: focal
+
+language: minimal
+
+git:
+  submodules: false
+
+notifications:
+  email: false
+
+jobs:
+  include:
+    - stage: unit_tests
+      os: linux
+      language: go
+      go:
+        - 1.18.x
+      script: bash go-test.sh pkg/zhmcclient
+
+stages:
+- unit_tests
