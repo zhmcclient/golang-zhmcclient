@@ -14,6 +14,7 @@ package zhmcclient
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"os"
 
@@ -45,6 +46,10 @@ const (
 type HmcError struct {
 	Reason  int    `json:"reason"`
 	Message string `json:"message"`
+}
+
+func (e HmcError) Error() string {
+	return fmt.Sprintf("HmcError - Reason: %d, %s", e.Reason, e.Message)
 }
 
 func getHmcErrorFromErr(reason HmcErrorCode, err error) *HmcError {

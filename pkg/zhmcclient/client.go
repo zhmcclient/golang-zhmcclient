@@ -213,7 +213,11 @@ func (c *Client) Logon() *HmcError {
 	url := c.CloneEndpointURL()
 	url.Path = path.Join(url.Path, "/api/sessions")
 
-	status, responseBody, _ := c.executeMethod(http.MethodPost, url.String(), c.logondata, "")
+	status, responseBody, hmcErr := c.executeMethod(http.MethodPost, url.String(), c.logondata, "")
+
+	if hmcErr != nil {
+		return hmcErr
+	}
 
 	if status == http.StatusOK || status == http.StatusCreated {
 		session := &Session{}
