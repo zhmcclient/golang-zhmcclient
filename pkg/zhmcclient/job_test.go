@@ -68,7 +68,7 @@ var _ = Describe("JOB", func() {
 
 	Describe("QueryJob", func() {
 
-		Context("When query job and returns correctly", func() {
+		Context("When QueryJob returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -81,7 +81,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When query job  and returns error", func() {
+		Context("When QueryJob returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, hmcErr)
@@ -92,7 +92,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When query job and unmarshal error", func() {
+		Context("When QueryJob returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
@@ -103,7 +103,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When query job and returns incorrect status", func() {
+		Context("When QueryJob returns incorrect status", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, bytes, nil)
@@ -117,7 +117,7 @@ var _ = Describe("JOB", func() {
 
 	Describe("DeleteJob", func() {
 
-		Context("When delete job and returns correctly", func() {
+		Context("When DeleteJob returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
@@ -127,7 +127,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When delete job  and returns error", func() {
+		Context("When DeleteJob returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, hmcErr)
@@ -137,7 +137,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When delete job  and returns incorrect status", func() {
+		Context("When DeleteJob returns incorrect status", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)
@@ -150,7 +150,7 @@ var _ = Describe("JOB", func() {
 
 	Describe("CancelJob", func() {
 
-		Context("When cancel job and returns correctly", func() {
+		Context("When CancelJob returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
@@ -160,7 +160,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When cancel job  and returns error", func() {
+		Context("When CancelJob returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, hmcErr)
@@ -170,7 +170,7 @@ var _ = Describe("JOB", func() {
 			})
 		})
 
-		Context("When cancel job  and returns incorrect status", func() {
+		Context("When CancelJob returns incorrect status", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)

@@ -80,7 +80,7 @@ var _ = Describe("LPAR", func() {
 			bytes, _ = json.Marshal(lparsArray)
 		})
 
-		Context("When list lpars and returns correctly", func() {
+		Context("When ListLPARs returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -92,7 +92,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When list lpars and returns error", func() {
+		Context("When ListLPARs returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
@@ -103,7 +103,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When list lpars and unmarshal error", func() {
+		Context("When ListLPARs returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
@@ -114,7 +114,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When list lpars and returns incorrect status", func() {
+		Context("When ListLPARs returns incorrect status", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
@@ -161,7 +161,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When GetLparProperties and ExecuteRequest error", func() {
+		Context("When GetLparProperties returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -172,13 +172,24 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When GetLparProperties and unmarshal error", func() {
+		Context("When GetLparProperties returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
 				rets, _, err := manager.GetLparProperties(lparid)
 
 				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When GetLparProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.GetLparProperties(lparid)
+
+				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -218,7 +229,17 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When CreateLPAR and ExecuteRequest error", func() {
+		Context("When CreateLPAR returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
+				_, _, err := manager.CreateLPAR(lparid, payload)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+			})
+		})
+
+		Context("When CreateLPAR and returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -262,7 +283,17 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When UpdateLparProperties and ExecuteRequest error", func() {
+		Context("When UpdateLparProperties returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				_, err := manager.UpdateLparProperties(lparid, payload)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+			})
+		})
+
+		Context("When UpdateLparProperties returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -295,7 +326,7 @@ var _ = Describe("LPAR", func() {
 			bytesResponseWithoutURI, _ = json.Marshal(responseWithoutURI)
 		})
 
-		Context("When start lpar and returns correctly", func() {
+		Context("When StartLPAR returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponse, nil)
@@ -307,7 +338,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When start lpar and ExecuteRequest error", func() {
+		Context("When StartLPAR returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -318,7 +349,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When start lpar and unmarshal error", func() {
+		Context("When StartLPAR returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, []byte("incorrect json bytes"), nil)
@@ -329,7 +360,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When start lpar and no URI responded", func() {
+		Context("When StartLPAR returns hmcErr for WithoutURI", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, hmcErr)
@@ -363,7 +394,7 @@ var _ = Describe("LPAR", func() {
 			bytesResponseWithoutURI, _ = json.Marshal(responseWithoutURI)
 		})
 
-		Context("When stop lpar and returns correctly", func() {
+		Context("When StopLPAR returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponse, nil)
@@ -375,7 +406,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When stop lpar and ExecuteRequest error", func() {
+		Context("When StopLPAR returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -386,7 +417,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When stop lpar and unmarshal error", func() {
+		Context("When StopLPAR returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, []byte("incorrect json bytes"), nil)
@@ -397,7 +428,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When stop lpar and no URI responded", func() {
+		Context("When StopLPAR returns error due to WithoutURI", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, nil)
@@ -418,7 +449,7 @@ var _ = Describe("LPAR", func() {
 			}
 		})
 
-		Context("When delete lpar and returns correctly", func() {
+		Context("When DeleteLPAR returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
@@ -429,7 +460,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When delete lpar and ExecuteRequest error", func() {
+		Context("When DeleteLPAR returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
@@ -453,7 +484,7 @@ var _ = Describe("LPAR", func() {
 			insFile = "insFileName"
 		})
 
-		Context("When mount iso image and returns correctly", func() {
+		Context("When MountIsoImage returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.UploadRequestReturns(http.StatusNoContent, nil, nil)
@@ -462,7 +493,7 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When mount iso image and ExecuteRequest error", func() {
+		Context("When MountIsoImage returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.UploadRequestReturns(http.StatusBadRequest, nil, hmcErr)
@@ -475,7 +506,7 @@ var _ = Describe("LPAR", func() {
 
 	Describe("UnmountIsoImage", func() {
 
-		Context("When unmount iso image and returns correctly", func() {
+		Context("When UnmountIsoImage returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
@@ -485,13 +516,122 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 
-		Context("When unmount iso image and ExecuteRequest error", func() {
+		Context("When UnmountIsoImage returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
 				_, err := manager.UnmountIsoImage(lparid)
 
 				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+	})
+
+	Describe("ListNics", func() {
+		var (
+			nicresponse      []string
+			nicbytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			nicresponse = []string{
+				"uri1", "uri2"}
+
+			nicbytesResponse, _ = json.Marshal(nicresponse)
+		})
+
+		Context("When ListNics returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nicbytesResponse, nil)
+				rets, _, err := manager.ListNics(lparid)
+
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(BeNil())
+			})
+		})
+		Context("When ListNics returns error due to unmarshalErr", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.ListNics(lparid)
+				Expect(err).ToNot(BeNil())
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+	})
+
+	Describe("AttachStorageGroupToPartition", func() {
+		var storage *StorageGroupPayload
+		BeforeEach(func() {
+			storage = &StorageGroupPayload{
+				StorageGroupURI: "uri",
+			}
+		})
+		Context("When AttachStorageGroupToPartition returns correctly", func() {
+			It("Check the results Succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, nil)
+				rets, err := manager.AttachStorageGroupToPartition(lparid, storage)
+				Expect(rets).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+
+		})
+		Context("When AttachStorageGroupToPartition returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, hmcErr)
+				rets, err := manager.AttachStorageGroupToPartition(lparid, storage)
+				Expect(rets).To(BeNil())
+				Expect(err).To(Equal(*hmcErr))
+			})
+		})
+		Context("When AttachStorageGroupToPartition returns correctly with status 204", func() {
+			It("check the response has no content", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
+				rets, err := manager.AttachStorageGroupToPartition(lparid, storage)
+				Expect(err).To(BeNil())
+				Expect(rets).To(Equal(204))
+			})
+		})
+	})
+	Describe("DetachStorageGroupToPartition", func() {
+		var storage *StorageGroupPayload
+		BeforeEach(func() {
+			storage = &StorageGroupPayload{
+				StorageGroupURI: "uri",
+			}
+		})
+		Context("When DetachStorageGroupToPartition returns correctly", func() {
+			It("Check the results Succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, nil)
+				rets, err := manager.DetachStorageGroupToPartition(lparid, storage)
+				Expect(rets).ToNot(BeNil())
+				Expect(err).To(BeNil())
+			})
+
+		})
+		Context("When DetachStorageGroupToPartition returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, hmcErr)
+				rets, err := manager.DetachStorageGroupToPartition(lparid, storage)
+				Expect(rets).To(BeNil())
+				Expect(err).To(Equal(*hmcErr))
+			})
+		})
+		Context("When DetachStorageGroupToPartition returns correctly with status 204", func() {
+			It("check the response has no content", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
+				rets, err := manager.DetachStorageGroupToPartition(lparid, storage)
+				Expect(err).To(BeNil())
+				Expect(rets).To(Equal(204))
 			})
 		})
 	})

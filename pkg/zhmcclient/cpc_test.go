@@ -77,7 +77,7 @@ var _ = Describe("CPC", func() {
 			}
 		})
 
-		Context("When list cpcs and returns correctly", func() {
+		Context("When ListCPCs returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -89,7 +89,7 @@ var _ = Describe("CPC", func() {
 			})
 		})
 
-		Context("When list cpcs and returns error", func() {
+		Context("When ListCPCs returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
@@ -100,7 +100,7 @@ var _ = Describe("CPC", func() {
 			})
 		})
 
-		Context("When list cpcs and unmarshal error", func() {
+		Context("When ListCPCs returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
@@ -111,7 +111,7 @@ var _ = Describe("CPC", func() {
 			})
 		})
 
-		Context("When list cpcs and returns incorrect status", func() {
+		Context("When ListCPCs returns incorrect status", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)

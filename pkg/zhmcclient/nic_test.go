@@ -92,7 +92,7 @@ var _ = Describe("Nic", func() {
 			bytesResponseWithoutURI, _ = json.Marshal(responseWithoutURI)
 		})
 
-		Context("When CreateNic and returns correctly", func() {
+		Context("When CreateNic returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, bytesResponse, nil)
@@ -104,7 +104,7 @@ var _ = Describe("Nic", func() {
 			})
 		})
 
-		Context("When CreateNic and ExecuteRequest error", func() {
+		Context("When CreateNic returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -115,7 +115,7 @@ var _ = Describe("Nic", func() {
 			})
 		})
 
-		Context("When CreateNic and unmarshal error", func() {
+		Context("When CreateNic returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
@@ -126,7 +126,7 @@ var _ = Describe("Nic", func() {
 			})
 		})
 
-		Context("When CreateNic and no URI responded", func() {
+		Context("When CreateNic returns hmcErr for WithoutURI", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, hmcErr)
@@ -140,7 +140,7 @@ var _ = Describe("Nic", func() {
 
 	Describe("DeleteNic", func() {
 
-		Context("When DeleteNic and returns correctly", func() {
+		Context("When DeleteNic returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
@@ -150,7 +150,7 @@ var _ = Describe("Nic", func() {
 			})
 		})
 
-		Context("When DeleteNic and ExecuteRequest error", func() {
+		Context("When DeleteNic returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
@@ -159,5 +159,78 @@ var _ = Describe("Nic", func() {
 				Expect(*err).To(Equal(*hmcErr))
 			})
 		})
+	})
+
+	Describe("GetNicProperties", func() {
+		var (
+			response      *NIC
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			response = &NIC{
+				ID:                    "id",
+				URI:                   "uri",
+				Parent:                "parent_uri",
+				Class:                 "nic",
+				Name:                  "name",
+				Description:           "description",
+				DeviceNumber:          "device_number",
+				NetworkAdapterPortURI: "adapter_uri",
+				VirtualSwitchUriType:  "",
+				VirtualSwitchURI:      "",
+				Type:                  NIC_TYPE_ROCE,
+				SscManagmentNIC:       false,
+				SscIpAddressType:      SSC_IP_TYPE_IPV4,
+				SscIpAddress:          "",
+				VlanID:                1024,
+				MacAddress:            "",
+				SscMaskPrefix:         "",
+				VlanType:              VLAN_TYPE_ENFORCED,
+			}
+			bytesResponse, _ = json.Marshal(response)
+		})
+		Context("When GetNicProperties returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
+				rets, _, err := manager.GetNicProperties(nicid)
+
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(BeNil())
+				Expect(rets.URI).To(Equal(response.URI))
+			})
+		})
+		Context("When GetNicProperties returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				rets, _, err := manager.GetNicProperties(nicid)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When GetNicProperties returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.GetNicProperties(nicid)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When GetNicProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.GetNicProperties(nicid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
 	})
 })

@@ -79,7 +79,7 @@ var _ = Describe("Storage Group", func() {
 			bytes, _ = json.Marshal(storageGroupsArray)
 		})
 
-		Context("When list storage groups request and returns correctly", func() {
+		Context("When ListStorageGroups returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -91,7 +91,7 @@ var _ = Describe("Storage Group", func() {
 			})
 		})
 
-		Context("When list storage groups request and returns error", func() {
+		Context("When ListStorageGroups returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
@@ -99,6 +99,149 @@ var _ = Describe("Storage Group", func() {
 
 				Expect(*err).To(Equal(*hmcErr))
 				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When ListStorageGroups returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.ListStorageGroups(sgroupid, cpcid)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When ListStorageGroups returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
+				rets, _, err := manager.ListStorageGroups(sgroupid, cpcid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+	})
+
+	Describe("UpdateStorageGroupProperties", func() {
+		var (
+			response           *StorageGroupProperties
+			storageVolumeURIs  []string
+			virtualStorageURIs []string
+			bytesResponse      []byte
+		)
+
+		BeforeEach(func() {
+			response = &StorageGroupProperties{
+				Class:                      "class",
+				CpcURI:                     "cpcuri",
+				Connectivity:               4,
+				Name:                       "lpar",
+				Description:                "description",
+				FulfillmentState:           PARTITION_STATUS_STARTING,
+				Type:                       PARTITION_TYPE_LINUX,
+				StorageVolumesURIs:         storageVolumeURIs,
+				ActiveMaxPartitions:        1,
+				MaxPartitions:              2,
+				VirtualStorageResourceURIs: virtualStorageURIs,
+			}
+			bytesResponse, _ = json.Marshal(response)
+		})
+
+		Context("When UpdateStorageGroupProperties returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
+				_, err := manager.UpdateStorageGroupProperties(sgroupid, response)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When UpdateStorageGroupProperties returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				_, err := manager.UpdateStorageGroupProperties(sgroupid, response)
+
+				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+
+		Context("When UpdateStorageGroupProperties returns error due to unmarshalerr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				_, err := manager.UpdateStorageGroupProperties(sgroupid, response)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+			})
+		})
+	})
+
+	Describe("FulfillStorageGroup", func() {
+		var (
+			response           *StorageGroupProperties
+			storageVolumeURIs  []string
+			virtualStorageURIs []string
+			bytesResponse      []byte
+		)
+
+		BeforeEach(func() {
+			response = &StorageGroupProperties{
+				Class:                      "class",
+				CpcURI:                     "cpcuri",
+				Connectivity:               4,
+				Name:                       "lpar",
+				Description:                "description",
+				FulfillmentState:           PARTITION_STATUS_STARTING,
+				Type:                       PARTITION_TYPE_LINUX,
+				StorageVolumesURIs:         storageVolumeURIs,
+				ActiveMaxPartitions:        1,
+				MaxPartitions:              2,
+				VirtualStorageResourceURIs: virtualStorageURIs,
+			}
+			bytesResponse, _ = json.Marshal(response)
+		})
+
+		Context("When FulfillStorageGroup returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
+				_, err := manager.FulfillStorageGroup(sgroupid, response)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When FulfillStorageGroup returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				_, err := manager.FulfillStorageGroup(sgroupid, response)
+
+				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+
+		Context("When FulfillStorageGroup returns error due to unmarshalerr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				_, err := manager.FulfillStorageGroup(sgroupid, response)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+			})
+		})
+
+		Context("When FulfillStorageGroup returns incorrect status", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				_, err := manager.FulfillStorageGroup(sgroupid, response)
+
+				Expect(*err).ToNot(BeNil())
 			})
 		})
 	})
@@ -133,7 +276,7 @@ var _ = Describe("Storage Group", func() {
 			bytesResponse, _ = json.Marshal(response)
 		})
 
-		Context("When GetLparProperties and returns correctly", func() {
+		Context("When GetStorageGroupProperties and returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
@@ -147,7 +290,7 @@ var _ = Describe("Storage Group", func() {
 			})
 		})
 
-		Context("When get stoarge properties and ExecuteRequest error", func() {
+		Context("When GetStorageGroupproperties returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -157,7 +300,7 @@ var _ = Describe("Storage Group", func() {
 			})
 		})
 
-		Context("When GetLparProperties and unmarshal error", func() {
+		Context("When GetStorageGroupProperties returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
@@ -165,6 +308,17 @@ var _ = Describe("Storage Group", func() {
 
 				Expect(err).ToNot(BeNil())
 				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When GetStorageGroupProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.GetStorageGroupProperties(sgroupid)
+
+				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -201,7 +355,7 @@ var _ = Describe("Storage Group", func() {
 			bytesResponse, _ = json.Marshal(response)
 		})
 
-		Context("When GetLparProperties and returns correctly", func() {
+		Context("When GetStorageVolumeProperties returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
@@ -214,23 +368,34 @@ var _ = Describe("Storage Group", func() {
 			})
 		})
 
-		Context("When get stoarge properties and ExecuteRequest error", func() {
+		Context("When GetStorageVolumeProperties returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
-				_, _, err := manager.GetStorageGroupProperties(sgroupid)
+				_, _, err := manager.GetStorageVolumeProperties(sgroupid)
 
 				Expect(*err).To(Equal(*hmcErr))
 			})
 		})
 
-		Context("When GetLparProperties and unmarshal error", func() {
+		Context("When GetStorageVolumeProperties returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, _, err := manager.GetStorageGroupProperties(sgroupid)
+				rets, _, err := manager.GetStorageVolumeProperties(sgroupid)
 
 				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When GetStorageVolumeProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.GetStorageVolumeProperties(sgroupid)
+
+				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())
 			})
 		})
@@ -260,7 +425,7 @@ var _ = Describe("Storage Group", func() {
 			bytesResponse, _ = json.Marshal(storagevolumearray)
 		})
 
-		Context("When list stoarge volumes request and returns correctly", func() {
+		Context("When ListStorageVolumes returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
@@ -270,13 +435,35 @@ var _ = Describe("Storage Group", func() {
 			})
 		})
 
-		Context("When list stoarge volumes and ExecuteRequest error", func() {
+		Context("When ListStorageVolumes returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
 				_, _, err := manager.ListStorageVolumes(sgroupid)
 
 				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+
+		Context("When ListStorageVolumes returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.ListStorageVolumes(sgroupid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When ListStorageVolumes returns error due to unmarshalerr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.ListStorageVolumes(sgroupid)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
 			})
 		})
 	})

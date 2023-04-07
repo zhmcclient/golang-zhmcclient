@@ -78,7 +78,7 @@ var _ = Describe("Virtual Switch", func() {
 			bytes, _ = json.Marshal(virtualSwitchesArray)
 		})
 
-		Context("When list virtual switches and returns correctly", func() {
+		Context("When ListVirtualSwitches returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -90,7 +90,7 @@ var _ = Describe("Virtual Switch", func() {
 			})
 		})
 
-		Context("When list virtual switches and returns error", func() {
+		Context("When ListVirtualSwitches returns error due hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
@@ -101,7 +101,7 @@ var _ = Describe("Virtual Switch", func() {
 			})
 		})
 
-		Context("When list virtual switches and unmarshal error", func() {
+		Context("When ListVirtualSwitches returns error due to unmarshalerr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
@@ -112,7 +112,7 @@ var _ = Describe("Virtual Switch", func() {
 			})
 		})
 
-		Context("When list virtual switches and returns incorrect status", func() {
+		Context("When ListVirtualSwitches returns incorrect status", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
@@ -146,7 +146,7 @@ var _ = Describe("Virtual Switch", func() {
 			bytes, _ = json.Marshal(virtualSwitch)
 		})
 
-		Context("When get virtual switch properties return correctly", func() {
+		Context("When GetVirtualSwitchProperties return correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -158,7 +158,7 @@ var _ = Describe("Virtual Switch", func() {
 			})
 		})
 
-		Context("When get virtual switches and returns error", func() {
+		Context("When GetVirtualSwitchProperties returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
@@ -169,23 +169,22 @@ var _ = Describe("Virtual Switch", func() {
 			})
 		})
 
-		Context("When get virtual switches and unmarshal error", func() {
+		Context("When GetVirtualSwitchProperties returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
-				rets, _, err := manager.ListVirtualSwitches(vswitchId, nil)
+				rets, _, err := manager.GetVirtualSwitchProperties(vswitchId)
 
 				Expect(*err).To(Equal(*unmarshalErr))
 				Expect(rets).To(BeNil())
 			})
 		})
 
-		Context("When get virtual switches and returns incorrect status", func() {
+		Context("When GetVirtualSwitchProperties returns incorrect status", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
-				rets, _, err := manager.ListVirtualSwitches(vswitchId, nil)
-
+				rets, _, err := manager.GetVirtualSwitchProperties(vswitchId)
 				Expect(err).ToNot(BeNil())
 				Expect(rets).To(BeNil())
 			})

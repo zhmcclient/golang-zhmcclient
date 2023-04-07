@@ -84,7 +84,7 @@ var _ = Describe("Adapter", func() {
 			bytes, _ = json.Marshal(adaptersArray)
 		})
 
-		Context("When list adapters and returns correctly", func() {
+		Context("When ListAdapters returns correctly", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
@@ -96,7 +96,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When list adapters and returns error", func() {
+		Context("When ListAdapters returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
@@ -107,7 +107,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When list adapters and unmarshal error", func() {
+		Context("When ListAdapters returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
@@ -118,7 +118,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When list adapters and returns incorrect status", func() {
+		Context("When ListAdapters returns incorrect status", func() {
 			It("check the results is empty", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytes, nil)
@@ -128,6 +128,69 @@ var _ = Describe("Adapter", func() {
 				Expect(rets).To(BeNil())
 			})
 		})
+	})
+
+	Describe("GetAdapterProperties", func() {
+		var (
+			response      *AdapterProperties
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			response = &AdapterProperties{
+				URI:              "uri",
+				Name:             "adapter",
+				ID:               "id",
+				ObjectID:         "object-id",
+				Description:      "description",
+				Family:           ADAPTER_FAMILY_HIPERSOCKET,
+				Type:             ADAPTER_TYPE_HIPERSOCKET,
+				Status:           ADAPTER_STATUS_ACTIVE,
+				DetectedCardType: ADPATER_CARD_HIPERSOCKETS,
+			}
+			bytesResponse, _ = json.Marshal(response)
+		})
+		Context("When GetAdapterProperties returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
+				rets, _, err := manager.GetAdapterProperties(adapterid)
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(BeNil())
+				Expect(rets.URI).To(Equal(response.URI))
+			})
+		})
+		Context("When GetAdapterProperties returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				rets, _, err := manager.GetAdapterProperties(adapterid)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When GetAdapterProperties returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.GetAdapterProperties(adapterid)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When GetAdapaterProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.GetAdapterProperties(adapterid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
 	})
 
 	Describe("CreateHipersocket", func() {
@@ -169,7 +232,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When CreateHipersocket and ExecuteRequest error", func() {
+		Context("When CreateHipersocket returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
@@ -180,7 +243,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When CreateHipersocket and unmarshal error", func() {
+		Context("When CreateHipersocket returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
@@ -191,7 +254,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When CreateHipersocket and no URI responded", func() {
+		Context("When CreateHipersocket returns hmcErr for WithoutURI", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusCreated, bytesResponseWithoutURI, nil)
@@ -205,7 +268,7 @@ var _ = Describe("Adapter", func() {
 
 	Describe("DeleteHipersocket", func() {
 
-		Context("When DeleteHipersocket and returns correctly", func() {
+		Context("When DeleteHipersocket returns correctly with status 204", func() {
 			It("check the results succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
@@ -215,7 +278,7 @@ var _ = Describe("Adapter", func() {
 			})
 		})
 
-		Context("When DeleteHipersocket and ExecuteRequest error", func() {
+		Context("When DeleteHipersocket returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
