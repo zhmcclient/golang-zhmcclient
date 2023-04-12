@@ -182,7 +182,11 @@ func NeedLogon(status, reason int) bool {
 * make a copy of the URL as it may be changed.
  */
 func (c *Client) CloneEndpointURL() *url.URL {
-	url, _ := url.Parse(c.endpointURL.String())
+	var url *url.URL
+	if c.endpointURL == nil {
+		return url
+	}
+	url, _ = url.Parse(c.endpointURL.String())
 	return url
 }
 
@@ -211,6 +215,9 @@ func (c *Client) clearSession() {
 func (c *Client) Logon() *HmcError {
 	c.clearSession()
 	url := c.CloneEndpointURL()
+	if url == nil {
+		return &HmcError{Reason: int(ERR_CODE_HMC_INVALID_URL), Message: ERR_MSG_EMPTY_JOB_URI}
+	}
 	url.Path = path.Join(url.Path, "/api/sessions")
 
 	status, responseBody, hmcErr := c.executeMethod(http.MethodPost, url.String(), c.logondata, "")
@@ -284,6 +291,9 @@ func (c *Client) Logoff() *HmcError {
 func (c *Client) IsLogon(verify bool) bool {
 	if verify {
 		url := c.CloneEndpointURL()
+		if url == nil {
+			return false
+		}
 		url.Path = path.Join(url.Path, "/api/console")
 
 		status, _, err := c.executeMethod(http.MethodGet, url.String(), nil, "")

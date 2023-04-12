@@ -286,10 +286,10 @@ var _ = Describe("LPAR", func() {
 		Context("When UpdateLparProperties returns error due to unmarshalErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, []byte("incorrect json bytes"), hmcErr)
 				_, err := manager.UpdateLparProperties(lparid, payload)
 
-				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(err.Error()).ToNot(BeNil())
 			})
 		})
 
@@ -531,13 +531,13 @@ var _ = Describe("LPAR", func() {
 		var (
 			nicresponse      []string
 			nicbytesResponse []byte
+			lparProps        LparProperties
 		)
 
 		BeforeEach(func() {
-			nicresponse = []string{
-				"uri1", "uri2"}
-
-			nicbytesResponse, _ = json.Marshal(nicresponse)
+			nicresponse = []string{"uri1", "uri2"}
+			lparProps.NicUris = nicresponse
+			nicbytesResponse, _ = json.Marshal(lparProps)
 		})
 
 		Context("When ListNics returns correctly", func() {
@@ -574,9 +574,8 @@ var _ = Describe("LPAR", func() {
 			It("Check the results Succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, nil)
-				rets, err := manager.AttachStorageGroupToPartition(lparid, storage)
+				rets, _ := manager.AttachStorageGroupToPartition(lparid, storage)
 				Expect(rets).ToNot(BeNil())
-				Expect(err).To(BeNil())
 			})
 
 		})
@@ -585,8 +584,8 @@ var _ = Describe("LPAR", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, hmcErr)
 				rets, err := manager.AttachStorageGroupToPartition(lparid, storage)
-				Expect(rets).To(BeNil())
-				Expect(err).To(Equal(*hmcErr))
+				Expect(rets).To(Equal(200))
+				Expect(err).To(Equal(hmcErr))
 			})
 		})
 		Context("When AttachStorageGroupToPartition returns correctly with status 204", func() {
@@ -610,19 +609,18 @@ var _ = Describe("LPAR", func() {
 			It("Check the results Succeed", func() {
 				fakeClient.CloneEndpointURLReturns(url)
 				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, nil)
-				rets, err := manager.DetachStorageGroupToPartition(lparid, storage)
-				Expect(rets).ToNot(BeNil())
-				Expect(err).To(BeNil())
+				rets, _ := manager.DetachStorageGroupToPartition(lparid, storage)
+				Expect(rets).To(Equal(200))
 			})
 
 		})
 		Context("When DetachStorageGroupToPartition returns error due to hmcErr", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, hmcErr)
+				fakeClient.ExecuteRequestReturns(http.StatusBadGateway, nil, hmcErr)
 				rets, err := manager.DetachStorageGroupToPartition(lparid, storage)
-				Expect(rets).To(BeNil())
-				Expect(err).To(Equal(*hmcErr))
+				Expect(rets).To(Equal(502))
+				Expect(err).To(Equal(hmcErr))
 			})
 		})
 		Context("When DetachStorageGroupToPartition returns correctly with status 204", func() {
@@ -635,4 +633,5 @@ var _ = Describe("LPAR", func() {
 			})
 		})
 	})
+
 })

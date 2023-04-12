@@ -9,7 +9,7 @@ tmpfile="tmp.out"
 
 function check_env() {
 
-  if $TRAVIS ; then
+  if [ "$TRAVIS" = true ]; then
    if [ -z "$GH_USERNAME" ]; then
          echo "github.ibm.com username missing, cannot pull private dependencies. Exiting ..."
          exit 1
@@ -38,6 +38,15 @@ if [[ $package =~ ^[a-z]{0,2}$ ]];
     echo "Invalid package name, please enter valid package and retry command"
     exit 1
 fi
+
+test_coversummary=`go test -v -cover ./... | grep  -E -A15 --text "(^\-\-\-\-|Fail|Pass).*"`
+test_cover_result=`echo "$test_coversummary" | grep --text "^--- "| cut -d " " -f2| sed "s/://g"`
+
+#check if the test cases are passing before getting the coverage
+if [[ $test_cover_result == "FAIL" ]];then
+  echo -e "$test_coversummary"
+  exit 1
+fi
 go_test_coverout=`go test ./$package -coverprofile=$coveroutput`
 go tool cover -func=$coveroutput > $tmpfile
 unlink $coveroutput
@@ -64,4 +73,10 @@ else
   go_test_coverout=`go test ./$package -coverprofile=$coveroutput`
   go tool cover -func=$coveroutput
   unlink $coveroutput
+fi
+
+test_result=`echo $go_test_coverout | cut -d ":" -f2 | cut -d " " -f2 | awk '{printf("%d\n",$0+=$0<0?0:0.9)}'`
+# If coverage is below 65 then fail the build
+if [[ $test_result -lt 65 ]]; then
+  exit 1
 fi

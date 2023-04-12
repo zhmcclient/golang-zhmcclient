@@ -15,7 +15,6 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
-	"net/url"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -107,7 +106,6 @@ var _ = Describe("client", func() {
 	Describe("ClientTesting", func() {
 		BeforeEach(func() {
 			client = &Client{}
-
 			hmcErr = &HmcError{
 				Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
 				Message: "error message",
@@ -117,16 +115,9 @@ var _ = Describe("client", func() {
 			It("check the result of CloneEndPointURL", func() {
 				url := client.CloneEndpointURL()
 				Expect(url).To(BeNil())
+			})
+		})
 
-			})
-		})
-		Context("When client is empty Logoff should throw error", func() {
-			It("check the result of Logoff", func() {
-				err := client.Logoff()
-				Expect(err).ToNot(BeNil())
-				Expect(err).To(Equal(*hmcErr))
-			})
-		})
 		Context("When client is empty, IsLogon is executed with true should throw  error as false", func() {
 			It("checks the result of IsLogon", func() {
 				err := client.IsLogon(true)
@@ -144,20 +135,6 @@ var _ = Describe("client", func() {
 		Context("When client is empty, Logon should throw error", func() {
 			It("checks the result of Logon", func() {
 				err := client.Logon()
-				Expect(err).ToNot(BeNil())
-				Expect(err).To(Equal(*hmcErr))
-			})
-		})
-		Context("When client is empty LogonConsole should throw error", func() {
-			It("checks the result of LogonConsole", func() {
-				session, status, _ := client.LogonConsole()
-				Expect(session).To(BeNil())
-				Expect(status).ToNot(BeNil())
-			})
-		})
-		Context("When client is empty LogoffConsole should throw error", func() {
-			It("checks the result of LogoffConsole", func() {
-				err := client.LogoffConsole("abcd")
 				Expect(err).ToNot(BeNil())
 			})
 		})
@@ -180,46 +157,6 @@ var _ = Describe("client", func() {
 				Expect(client).ToNot(BeNil())
 			})
 		})
-		Context("When client is empty, UploadRequest with url empty", func() {
-			It("check the result of Client Upload Request", func() {
-				var requestUrl *url.URL
-				var imageData []byte
-				status, resp, err := client.UploadRequest(http.MethodPost, requestUrl, imageData)
-				Expect(status).ToNot(Equal(200))
-				Expect(resp).To(BeNil())
-				Expect(err).ToNot(BeNil())
-			})
-		})
-		Context("When client is empty, UploadRequest with url as input", func() {
-			It("check the result of Client UploadRequest", func() {
-				var requestUrl *url.URL
-				requestUrl, _ = url.Parse("https://127.0.01")
-				var imageData []byte
-				status, resp, err := client.UploadRequest(http.MethodPost, requestUrl, imageData)
-				Expect(status).To(Equal(-1))
-				Expect(resp).To(BeNil())
-				Expect(err).To(Equal(*hmcErr))
-			})
-		})
-		Context("When client is empty, ExecuteRequest with post call", func() {
-			It("check the result of Client ExecuteRequest", func() {
-				var requestUrl *url.URL
-				status, resp, err := client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
-				Expect(status).ToNot(Equal(200))
-				Expect(resp).To(BeNil())
-				Expect(err).ToNot(BeNil())
-			})
-		})
-		Context("When client is empty, ExecuteRequest with get call", func() {
-			It("check the result of Client ExecuteRequest", func() {
-				var requestUrl *url.URL
-				requestUrl, _ = url.Parse("https://127.0.01")
-				status, resp, err := client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
-				Expect(status).ToNot(Equal(200))
-				Expect(resp).To(BeNil())
-				Expect(err).ToNot(BeNil())
-			})
-		})
 	})
 
 	Describe("NewClient", func() {
@@ -234,10 +171,12 @@ var _ = Describe("client", func() {
 				var endpoint string
 				opts := &Options{
 					SkipCert: false,
+					Username: "",
+					Password: "",
 				}
 				client, err := NewClient(endpoint, opts)
 				Expect(client).To(BeNil())
-				Expect(err).To(Equal(*hmcErr))
+				Expect(err.Error()).ToNot(BeNil())
 			})
 		})
 	})

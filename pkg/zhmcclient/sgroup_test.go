@@ -238,10 +238,9 @@ var _ = Describe("Storage Group", func() {
 		Context("When FulfillStorageGroup returns incorrect status", func() {
 			It("check the error happened", func() {
 				fakeClient.CloneEndpointURLReturns(url)
-				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, hmcErr)
 				_, err := manager.FulfillStorageGroup(sgroupid, response)
-
-				Expect(*err).ToNot(BeNil())
+				Expect(err).ToNot(BeNil())
 			})
 		})
 	})
