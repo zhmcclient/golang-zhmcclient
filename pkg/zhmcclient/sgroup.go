@@ -30,6 +30,9 @@ type StorageGroupAPI interface {
 	GetStorageVolumeProperties(storageVolumeURI string) (*StorageVolume, int, *HmcError)
 	UpdateStorageGroupProperties(storageGroupURI string, updateRequest *StorageGroupProperties) (int, *HmcError)
 	FulfillStorageGroup(storageGroupURI string, updateRequest *StorageGroupProperties) (int, *HmcError)
+	CreateStorageGroups(storageGroupURI string, storageGroup *CreateStorageGroupProperties) (*StorageGroupCreateResponse, int, *HmcError)
+	GetStorageGroupPartitions(storageGroupURI string, query map[string]string) (*StorageGroupPartitions, int, *HmcError)
+	DeleteStorageGroup(storageGroupURI string) (int, *HmcError)
 }
 
 type StorageGroupManager struct {
@@ -299,4 +302,100 @@ func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, reques
 		genlog.String("method", http.MethodPost),
 		genlog.String("status: ", fmt.Sprint(status)))
 	return status, nil
+}
+
+// CreateStorageGroup
+
+/**
+ * POST/api/storage-groups
+ * @returns object-uri and the element-uri of each storage volume that was created in the response body
+ * Return: 201
+ *     or: 400, 404, 409
+ */
+func (m *StorageGroupManager) CreateStorageGroups(storageGroupURI string, storageGroup *CreateStorageGroupProperties) (*StorageGroupCreateResponse, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, storageGroup, "")
+	if err != nil {
+		return nil, status, err
+	}
+
+	if status == http.StatusCreated {
+		sgURI := StorageGroupCreateResponse{}
+		err := json.Unmarshal(responseBody, &sgURI)
+		if err != nil {
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		var svPaths []StorageGroupVolumePath
+		for _, i := range sgURI.URI {
+			sv, statuscode, err := m.GetStorageVolumeProperties(i)
+			if err != nil {
+				return nil, statuscode, err
+			}
+			svpath := StorageGroupVolumePath{
+				URI:   sv.URI,
+				Paths: sv.Paths,
+			}
+			svPaths = append(svPaths, svpath)
+		}
+		sgURI.SvPaths = svPaths
+		return &sgURI, status, nil
+	}
+
+	return nil, status, GenerateErrorFromResponse(responseBody)
+}
+
+/**
+ * GET /api/storage-groups/{storage-group-id}/operations/get-partitions
+ * @cpcURI the ID of the virtual switch
+ * @return adapter array
+ * Return: 200 and Storage Group object
+ *     or: 400, 404, 409
+ */
+func (m *StorageGroupManager) GetStorageGroupPartitions(storageGroupURI string, query map[string]string) (*StorageGroupPartitions, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI, "/operations/get-partitions")
+
+	requestUrl = BuildUrlFromQuery(requestUrl, query)
+
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
+
+	if err != nil {
+		return nil, status, err
+	}
+
+	if status == http.StatusOK {
+		storageGroup := StorageGroupPartitions{}
+
+		err := json.Unmarshal(responseBody, &storageGroup)
+
+		if err != nil {
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		return &storageGroup, status, nil
+	}
+
+	return nil, status, GenerateErrorFromResponse(responseBody)
+}
+
+func (m *StorageGroupManager) DeleteStorageGroup(storageGroupURI string) (int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageGroupURI, "/operations/delete")
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
+	if err != nil {
+		return status, err
+	}
+	if status == http.StatusNoContent {
+		return status, nil
+	}
+
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error deleting storage group ",
+		genlog.String("request url", fmt.Sprint(storageGroupURI)),
+		genlog.String("method", http.MethodPost),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return status, errorResponseBody
+
 }

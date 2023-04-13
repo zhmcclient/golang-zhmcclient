@@ -469,7 +469,9 @@ func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *Sto
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/attach-storage-group")
 
 	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
+	logger.Info(fmt.Sprintf("request: %v", request))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
+
 	if err != nil {
 		logger.Error("error on attach storage group to partition",
 			genlog.String("request url", fmt.Sprint(lparURI)),

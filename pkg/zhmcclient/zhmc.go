@@ -144,6 +144,18 @@ func (m *ZhmcManager) FulfillStorageGroup(storageGroupURI string, updateRequest 
 	return m.storageGroupManager.FulfillStorageGroup(storageGroupURI, updateRequest)
 }
 
+func (m *ZhmcManager) CreateStorageGroups(storageGroupURI string, storageGroup *CreateStorageGroupProperties) (*StorageGroupCreateResponse, int, *HmcError) {
+	return m.storageGroupManager.CreateStorageGroups(storageGroupURI, storageGroup)
+}
+
+func (m *ZhmcManager) GetStorageGroupPartitions(storageGroupURI string, query map[string]string) (*StorageGroupPartitions, int, *HmcError) {
+	return m.storageGroupManager.GetStorageGroupPartitions(storageGroupURI, query)
+}
+
+func (m *ZhmcManager) DeleteStorageGroup(storageGroupURI string) (int, *HmcError) {
+	return m.storageGroupManager.DeleteStorageGroup(storageGroupURI)
+}
+
 // Virtual Switches
 
 func (m *ZhmcManager) ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, int, *HmcError) {

@@ -13,6 +13,7 @@ package zhmcclient_test
 
 import (
 	"encoding/json"
+
 	"net/http"
 	"net/url"
 
@@ -343,7 +344,7 @@ var _ = Describe("Storage Group", func() {
 
 			response = &StorageVolume{
 				Class:            "class",
-				URI:              "URI",
+				URI:              "StorageVolume",
 				Usage:            "usage",
 				Name:             "lpar",
 				Description:      "description",
@@ -466,4 +467,248 @@ var _ = Describe("Storage Group", func() {
 			})
 		})
 	})
+
+	// New Entries
+
+	Describe("CreateStorageGroups", func() {
+		var (
+			response                *StorageGroupCreateResponse
+			responseWithoutURI      *StorageGroupCreateResponse
+			payload                 *CreateStorageGroupProperties
+			response1, response2    *StorageVolume
+			volumePaths             []VolumePath
+			bytesResponse           []byte
+			bytesResponse1          []byte
+			bytesResponse2          []byte
+			bytesResponseWithoutURI []byte
+		)
+
+		BeforeEach(func() {
+
+			volumePaths = []VolumePath{
+				{
+					PartitionURI:      "partition-uri",
+					DeviceNumber:      "09",
+					TargetWWPN:        "target-wwpn",
+					LogicalUnitNumber: "logicalunit-number",
+				},
+			}
+			response = &StorageGroupCreateResponse{
+				URI:       []string{"Storagevolume1"},
+				ObjectURI: "object_uri",
+				SvPaths: []StorageGroupVolumePath{
+					{
+
+						URI:   "Storagevolume1",
+						Paths: volumePaths,
+					},
+				},
+			}
+
+			response1 = &StorageVolume{
+
+				URI:   "Storagevolume1",
+				Paths: volumePaths,
+			}
+			response2 = &StorageVolume{
+
+				URI:   "Storagevolume2",
+				Paths: volumePaths,
+			}
+			responseWithoutURI = &StorageGroupCreateResponse{
+				ObjectURI: "",
+				URI:       nil,
+				SvPaths:   nil,
+			}
+			payload = &CreateStorageGroupProperties{
+				CpcURI: "cpc_uri",
+				Name:   "name",
+				Type:   "type",
+			}
+
+			bytesResponse, _ = json.Marshal(response)
+			bytesResponse1, _ = json.Marshal(response1)
+			bytesResponse2, _ = json.Marshal(response2)
+			bytesResponseWithoutURI, _ = json.Marshal(responseWithoutURI)
+		})
+
+		Context("When CreateStorageGroup and returns correctly", func() {
+			It("check the results succeed", func() {
+
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturnsOnCall(0, http.StatusCreated, bytesResponse, nil)
+				fakeClient.ExecuteRequestReturnsOnCall(1, http.StatusOK, bytesResponse1, nil)
+
+				rets, status, err := manager.CreateStorageGroups(sgroupid, payload)
+
+				Expect(status).To(Equal(201))
+
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(Equal(""))
+				Expect(rets.URI).To(Equal(response.URI))
+				Expect(rets.ObjectURI).To(Equal(response.ObjectURI))
+				Expect(rets.SvPaths).To(Equal(response.SvPaths))
+
+			})
+		})
+
+		Context("When CreateStorageGroup and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				rets, _, err := manager.CreateStorageGroups(sgroupid, payload)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When CreateStorageGroup and unmarshal error", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusCreated, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.CreateStorageGroups(sgroupid, payload)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When CreateStorageGroup and no URI responded", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusAccepted, bytesResponseWithoutURI, hmcErr)
+				rets, _, err := manager.CreateStorageGroups(sgroupid, payload)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+
+		Context("When CreateStorageGroup creates Multiple StorageVolumes", func() {
+			BeforeEach(func() {
+				response.URI = []string{"storageVolume1", "storageVolume2"}
+				response.SvPaths = []StorageGroupVolumePath{
+					{
+
+						URI:   "Storagevolume1",
+						Paths: volumePaths,
+					},
+					{
+
+						URI:   "Storagevolume2",
+						Paths: volumePaths,
+					},
+				}
+				bytesResponse, _ = json.Marshal(response)
+
+			})
+			It("check the result success", func() {
+
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturnsOnCall(0, http.StatusCreated, bytesResponse, nil)
+				fakeClient.ExecuteRequestReturnsOnCall(1, http.StatusOK, bytesResponse1, nil)
+				fakeClient.ExecuteRequestReturnsOnCall(2, http.StatusOK, bytesResponse2, nil)
+				rets, status, err := manager.CreateStorageGroups(sgroupid, payload)
+				Expect(status).To(Equal(201))
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(Equal(""))
+				Expect(len(rets.SvPaths)).To(Equal(2))
+				Expect(rets.URI).To(Equal(response.URI))
+				Expect(rets.SvPaths).To(Equal(response.SvPaths))
+			})
+		})
+
+	})
+
+	Describe("GetStorageGroupPartitionss", func() {
+		var (
+			storageGroups      []LparProperties
+			storageGroupsArray *StorageGroupPartitions
+			bytes              []byte
+		)
+
+		BeforeEach(func() {
+			storageGroups = []LparProperties{
+				{
+					URI:    "object-uri",
+					Name:   "name1",
+					Status: "status",
+				},
+				{
+					URI:    "object-uri",
+					Name:   "name2",
+					Status: "status",
+				},
+			}
+			storageGroupsArray = &StorageGroupPartitions{
+				storageGroups,
+			}
+			bytes, _ = json.Marshal(storageGroupsArray)
+		})
+
+		Context("When get storage groups partitions request and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
+				rets, _, err := manager.GetStorageGroupPartitions(sgroupid, nil)
+
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(BeNil())
+				Expect(rets).To(Equal(storageGroupsArray))
+			})
+		})
+
+		Context("When get storage groups partitions request and returns error", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
+				rets, _, err := manager.GetStorageGroupPartitions(sgroupid, nil)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+	})
+
+	Describe("DeleteStorageGroup", func() {
+
+		BeforeEach(func() {
+			hmcErr = &HmcError{
+				Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+				Message: "error message",
+			}
+		})
+
+		Context("When delete lpar and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
+				status, err := manager.DeleteStorageGroup(sgroupid)
+				Expect(err).To(BeNil())
+				Expect(status).ToNot(BeNil())
+				Expect(status).To(Equal(204))
+			})
+		})
+
+		Context("When delete lpar and ExecuteRequest error", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, nil, hmcErr)
+				_, err := manager.DeleteStorageGroup(sgroupid)
+				Expect(err).ToNot(BeNil())
+			})
+		})
+
+		Context("When delete lpar and returns incorrect status", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusInternalServerError, nil, nil)
+				_, err := manager.DeleteStorageGroup(sgroupid)
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
+
 })

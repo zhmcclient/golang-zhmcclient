@@ -514,7 +514,8 @@ type NicCreateResponse struct {
 type StorageGroupOperation string
 
 const (
-	STORAGE_GROUP_MODIFY = "modify"
+	STORAGE_GROUP_MODIFY  StorageGroupOperation = "modify"
+	STORAGE_VOLUME_CREATE StorageGroupOperation = "create"
 )
 
 type StorageGroupState string
@@ -538,6 +539,11 @@ type StorageVolumeArray struct {
 }
 
 type StorageGroupPayload struct {
+	StorageGroupURI  string `json:"storage-group-uri"`
+	StorageGroupName string `json:"storage-group-name,omitempty"`
+	PartitionName    string `json:"partition-name,omitempty"`
+}
+type AttachStorageGroupPayload struct {
 	StorageGroupURI string `json:"storage-group-uri"`
 }
 
@@ -549,10 +555,10 @@ type StorageGroupProperties struct {
 	CpcURI                     string            `json:"cpc-uri,omitempty"`
 	CandidatePortURIs          []string          `json:"candidate-port-uris,omitempty"`
 	Description                string            `json:"description,omitempty"`
-	DirectConnectionCount      string            `json:direct-connection-count,omitempty`
+	DirectConnectionCount      int               `json:"direct-connection-count,omitempty"`
 	FulfillmentState           StorageGroupState `json:"fulfillment-state,omitempty"`
-	MaxPartitions              int               `json:max-partitions,omitempty`
-	ActiveMaxPartitions        int               `json:active-max-partitions,omitempty`
+	MaxPartitions              int               `json:"max-partitions,omitempty"`
+	ActiveMaxPartitions        int               `json:"active-max-partitions,omitempty"`
 	Name                       string            `json:"name,omitempty"`
 	ObjectID                   string            `json:"object-id,omitempty"`
 	ObjectURI                  string            `json:"object-uri,omitempty"`
@@ -563,6 +569,22 @@ type StorageGroupProperties struct {
 	UnAssignedWWPNs            []WWPN            `json:"unassigned-world- wide-port-names,omitempty"`
 	VirtualStorageResourceURIs []string          `json:"virtual-storage-resource-uris,omitempty"`
 	Type                       string            `json:"type,omitempty"`
+}
+
+type CreateStorageGroupProperties struct {
+	CpcURI                string          `json:"cpc-uri,omitempty"`
+	TemplateURI           string          `json:"template-uri,omitempty"`
+	Name                  string          `json:"name,omitempty"`
+	Description           string          `json:"description,omitempty"`
+	Type                  string          `json:"type,omitempty"`
+	Shared                bool            `json:"shared,omitempty"`
+	Connectivity          int             `json:"connectivity,omitempty"`
+	MaxPartitions         int             `json:"max-partitions,omitempty"`
+	DirectConnectionCount int             `json:"direct-connection-count,omitempty"`
+	StorageVolumes        []StorageVolume `json:"storage-volumes,omitempty"`
+	EmailToAddress        []string        `json:"email-to-address,omitempty"`
+	EmailCcAddress        []string        `json:"email-cc-address,omitempty"`
+	EmailInsert           string          `json:"email-insert,omitempty"`
 }
 
 type WWPN struct {
@@ -580,6 +602,11 @@ type StorageGroup struct {
 	Name             string            `json:"name,omitempty"`
 	ObjectURI        string            `json:"object-uri,omitempty"`
 	Type             string            `json:"type,omitempty"`
+	StorageVolumes   []StorageVolume   `json:"storage-volumes,omitempty"`
+}
+
+type StorageGroupPartitions struct {
+	GetStorageGroups []LparProperties `json:"partitions,omitempty"`
 }
 
 type StorageGroupModel string
@@ -613,7 +640,7 @@ type StorageVolume struct {
 	UUID             string                `json:"uuid,omitempty"`
 	Model            string                `json:"model,omitempty"`
 	ActiveModel      string                `json:"acitve-model,omitempty"`
-	Usage            string                `json:"usage,omitempty"`
+	Usage            StorageVolumeUsage    `json:"usage,omitempty"`
 	FulfillmentState StorageGroupState     `json:"fulfillment-state,omitempty"`
 	Cylinders        int                   `json:"cylinders,omitempty"`
 	DeviceNumber     string                `json:"device-number,omitempty"`
@@ -626,11 +653,27 @@ type StorageVolume struct {
 	FID              string                `json:"fid,omitempty"`
 }
 
+type StorageVolumeUsage string
+
+const (
+	BOOT_USAGE StorageVolumeUsage = "boot"
+	DATA_USAGE StorageVolumeUsage = "data"
+)
+
 type VolumePath struct {
 	PartitionURI      string `json:"partition-uri,omitempty"`
 	DeviceNumber      string `json:"device-number,omitempty"`
 	TargetWWPN        string `json:"target-world-wide-port-name,omitempty"`
 	LogicalUnitNumber string `json:"logical-unit-number,omitempty"`
+}
+type StorageGroupCreateResponse struct {
+	URI       []string                 `json:"element-uris,omitempty"`
+	ObjectURI string                   `json:"object-uri,omitempty"`
+	SvPaths   []StorageGroupVolumePath `json:"sv-paths,omitempty"`
+}
+type StorageGroupVolumePath struct {
+	URI   string       `json:"element-uris,omitempty"`
+	Paths []VolumePath `json:"paths,omitempty"`
 }
 
 // ASCIIConsolePayload

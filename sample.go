@@ -36,9 +36,9 @@ func main() {
 	// isofile := os.Getenv("ISO_FILE")
 	// insfile := os.Getenv("INS_FILE")
 	creds := &zhmcclient.Options{Username: username, Password: password, CaCert: cacert, SkipCert: isSkipCert, Trace: false}
-	if endpoint == "" || username == "" || password == "" {
+	if endpoint == "" || username == "" || password == "" || (cacert == "" && !isSkipCert) {
 		// The Fatal functions call os.Exit(1) after writing the log message
-		logger.Fatal("Please set HMC_ENDPOINT, HMC_USERNAME and HMC_PASSWORD")
+		logger.Fatal("Please set HMC_ENDPOINT, HMC_USERNAME, HMC_PASSWORD, CA_CERT")
 	}
 	if len(args) == 0 {
 		logger.Fatal(`Usage: sample <Command>
@@ -86,6 +86,21 @@ func main() {
 				
 				"FetchASCIIConsoleURI"
 					- Get the URI to launch the Ascii Web Console
+
+				"CreateStorageGroupsforCPC":
+					- Create storage groups operation creates a new storage group object
+					
+				"GetStorageGroupPartitionsforCPC":
+					- Get storage groups operation retrieves the properties of a single storage group object
+
+				"DeleteStorageGroupforCPC":	
+				    - Delete storage group operation deletes a storage group
+
+				"GetStorageGroupPropertiesforCPC":
+					- Get storage groups operation retrieves the properties of a single storage group object
+	
+					
+
 
 		}`)
 	} else {
@@ -189,6 +204,15 @@ func main() {
 					ListAdaptersofCPC(hmcManager)
 				case "FetchASCIIConsoleURI":
 					FetchASCIIConsoleURI(hmcManager)
+				case "CreateStorageGroupsforCPC":
+					CreateStorageGroupsforCPC(hmcManager)
+				case "GetStorageGroupPartitionsforCPC":
+					GetStorageGroupPartitionsforCPC(hmcManager)
+				case "DeleteStorageGroupforCPC":
+					DeleteStorageGroupforCPC(hmcManager)
+				case "GetStorageGroupPropertiesforCPC":
+					GetStorageGroupPropertiesforCPC(hmcManager)
+
 				}
 
 			}
@@ -199,6 +223,7 @@ func main() {
 func GetLPARURI() (lparURI string) {
 	partitionId := os.Getenv("PAR_ID")
 	lparURI = "api/partitions/" + partitionId
+
 	return
 }
 func GetCpcURL(hmcManager zhmcclient.ZhmcAPI) (cpcuri string) {
@@ -422,7 +447,6 @@ func ListStorageVolumesforCPC(hmcManager zhmcclient.ZhmcAPI) {
 		logger.Info("########################################")
 		logger.Info("Storage Volume Name: " + sv.Name)
 		logger.Info("", genlog.Any("Storage Volume Fullfillment state", sv.FulfillmentState))
-		logger.Info("Storage volume usage: " + sv.Usage)
 		storageVolume, _, volErr := hmcManager.GetStorageVolumeProperties(sv.URI)
 		if volErr != nil {
 			logger.Fatal(volErr.Message)
@@ -461,6 +485,109 @@ func DetachStorageGroupToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
 		logger.Fatal("", genlog.Any("Detach storage group error", err))
 	}
 	logger.Info("Detach storage group operation successful")
+}
+
+func CreateStorageGroupsforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	cpcURI := GetCpcURL(hmcManager)
+	uri := "/api/storage-groups/"
+	sgname := os.Getenv("SG_NAME")
+	sgtype := os.Getenv("SG_TYPE")
+	svusage := zhmcclient.BOOT_USAGE
+	svname := os.Getenv("SVOLUME_NAME")
+	svsize := os.Getenv("SVOLUME_SIZE")
+	volsize, _ := strconv.ParseFloat(svsize, 64)
+	svoperation := zhmcclient.STORAGE_VOLUME_CREATE
+	sv := zhmcclient.StorageVolume{
+		Operation: svoperation,
+		Usage:     svusage,
+		Size:      volsize,
+		Name:      svname,
+	}
+
+	props := &zhmcclient.CreateStorageGroupProperties{
+		CpcURI:         cpcURI,
+		Name:           sgname,
+		Type:           sgtype,
+		StorageVolumes: []zhmcclient.StorageVolume{sv},
+	}
+	storagegroup, _, err := hmcManager.CreateStorageGroups(uri, props)
+	if err != nil {
+		logger.Fatal("", genlog.Any("Create StorageGroup error", err))
+	}
+
+	logger.Info("Create StorageGroup successful")
+	logger.Info("storageGroup" + storagegroup.ObjectURI)
+
+	for _, v := range storagegroup.URI {
+		logger.Info("Storage Group URI:" + v)
+		logger.Info("storage Group ObjectURI" + storagegroup.ObjectURI)
+
+		storageVolume, _, volErr := hmcManager.GetStorageVolumeProperties(v)
+		if volErr != nil {
+			logger.Fatal(volErr.Message)
+		}
+		logger.Info("Storage Volume Properties")
+
+		logger.Info("  - Storage Volume Active Size: " + fmt.Sprint(storageVolume.ActiveSize))
+		logger.Info("  - Storage Volume Device Number: " + storageVolume.DeviceNumber)
+		logger.Info("  - Storage Volume Path Information: ")
+		for index, path := range storageVolume.Paths {
+			logger.Info(" " + fmt.Sprint(index+1) + "*****************************************")
+			logger.Info("\tPath Device Number: " + path.DeviceNumber)
+			logger.Info("\n\tPath PartitionURI: " + path.PartitionURI)
+			logger.Info("\n\tPath LUN: " + path.LogicalUnitNumber)
+			logger.Info("\n\tPath Target WWPN: " + path.TargetWWPN)
+		}
+	}
+	logger.Info("########################################")
+}
+
+func GetStorageGroupPropertiesforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	sgroupID := os.Getenv("SGROUP_ID")
+	storageGroupURI := "api/storage-groups/" + sgroupID
+	storagegroup, status, err := hmcManager.GetStorageGroupProperties(storageGroupURI)
+	logger.Error("error message",
+		genlog.String("status", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", err)))
+	if err != nil {
+		logger.Fatal("", genlog.Any("Get Storage Group Properties error", err))
+	}
+	logger.Info("Get Storage Group Properties successful")
+	logger.Info("storaage group object uri" + storagegroup.ObjectURI)
+	logger.Info("direct connect count" + fmt.Sprintln(storagegroup.DirectConnectionCount))
+	logger.Info("max-partitions" + fmt.Sprintln(storagegroup.MaxPartitions))
+	logger.Info("connectivity" + fmt.Sprintln(storagegroup.Connectivity))
+}
+func GetStorageGroupPartitionsforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	query := map[string]string{}
+	sgroupID := os.Getenv("SGROUP_ID")
+	storageGroupURI := "api/storage-groups/" + sgroupID
+
+	storageGroupPartitions, status, err := hmcManager.GetStorageGroupPartitions(storageGroupURI, query)
+	logger.Error("error message",
+		genlog.String("status", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", err)))
+	if err != nil {
+		logger.Fatal("", genlog.Any("Get Storage Group Partitions error", err))
+	}
+	logger.Info("Get Storage Group Partitions successful")
+
+	for _, v := range storageGroupPartitions.GetStorageGroups {
+		logger.Info("LPAR Name" + v.Name)
+		logger.Info("Storage Group ObjectURI" + v.URI)
+		logger.Info("Storage Group Status:  " + string(v.Status))
+
+	}
+}
+
+func DeleteStorageGroupforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	sgroupID := os.Getenv("SGROUP_ID")
+	storageGroupURI := "api/storage-groups/" + sgroupID
+	_, err := hmcManager.DeleteStorageGroup(storageGroupURI)
+	if err != nil {
+		logger.Fatal("", genlog.Any("Delete StorageGroup error", err))
+	}
+	logger.Info("Delete StorageGroup successfull")
 }
 
 /*
