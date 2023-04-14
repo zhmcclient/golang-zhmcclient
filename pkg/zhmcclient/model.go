@@ -577,7 +577,7 @@ type CreateStorageGroupProperties struct {
 	Name                  string          `json:"name,omitempty"`
 	Description           string          `json:"description,omitempty"`
 	Type                  string          `json:"type,omitempty"`
-	Shared                bool            `json:"shared,omitempty"`
+	Shared                bool            `json:"shared"`
 	Connectivity          int             `json:"connectivity,omitempty"`
 	MaxPartitions         int             `json:"max-partitions,omitempty"`
 	DirectConnectionCount int             `json:"direct-connection-count,omitempty"`
