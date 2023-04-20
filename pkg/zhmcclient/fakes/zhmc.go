@@ -510,6 +510,20 @@ type ZhmcAPI struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}
+	UpdateNicPropertiesStub        func(string, *zhmcclient.NIC) (int, *zhmcclient.HmcError)
+	updateNicPropertiesMutex       sync.RWMutex
+	updateNicPropertiesArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.NIC
+	}
+	updateNicPropertiesReturns struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
+	updateNicPropertiesReturnsOnCall map[int]struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
 	UpdateStorageGroupPropertiesStub        func(string, *zhmcclient.StorageGroupProperties) (int, *zhmcclient.HmcError)
 	updateStorageGroupPropertiesMutex       sync.RWMutex
 	updateStorageGroupPropertiesArgsForCall []struct {
@@ -2786,6 +2800,71 @@ func (fake *ZhmcAPI) UpdateLparPropertiesReturnsOnCall(i int, result1 int, resul
 	}{result1, result2}
 }
 
+func (fake *ZhmcAPI) UpdateNicProperties(arg1 string, arg2 *zhmcclient.NIC) (int, *zhmcclient.HmcError) {
+	fake.updateNicPropertiesMutex.Lock()
+	ret, specificReturn := fake.updateNicPropertiesReturnsOnCall[len(fake.updateNicPropertiesArgsForCall)]
+	fake.updateNicPropertiesArgsForCall = append(fake.updateNicPropertiesArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.NIC
+	}{arg1, arg2})
+	stub := fake.UpdateNicPropertiesStub
+	fakeReturns := fake.updateNicPropertiesReturns
+	fake.recordInvocation("UpdateNicProperties", []interface{}{arg1, arg2})
+	fake.updateNicPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ZhmcAPI) UpdateNicPropertiesCallCount() int {
+	fake.updateNicPropertiesMutex.RLock()
+	defer fake.updateNicPropertiesMutex.RUnlock()
+	return len(fake.updateNicPropertiesArgsForCall)
+}
+
+func (fake *ZhmcAPI) UpdateNicPropertiesCalls(stub func(string, *zhmcclient.NIC) (int, *zhmcclient.HmcError)) {
+	fake.updateNicPropertiesMutex.Lock()
+	defer fake.updateNicPropertiesMutex.Unlock()
+	fake.UpdateNicPropertiesStub = stub
+}
+
+func (fake *ZhmcAPI) UpdateNicPropertiesArgsForCall(i int) (string, *zhmcclient.NIC) {
+	fake.updateNicPropertiesMutex.RLock()
+	defer fake.updateNicPropertiesMutex.RUnlock()
+	argsForCall := fake.updateNicPropertiesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *ZhmcAPI) UpdateNicPropertiesReturns(result1 int, result2 *zhmcclient.HmcError) {
+	fake.updateNicPropertiesMutex.Lock()
+	defer fake.updateNicPropertiesMutex.Unlock()
+	fake.UpdateNicPropertiesStub = nil
+	fake.updateNicPropertiesReturns = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) UpdateNicPropertiesReturnsOnCall(i int, result1 int, result2 *zhmcclient.HmcError) {
+	fake.updateNicPropertiesMutex.Lock()
+	defer fake.updateNicPropertiesMutex.Unlock()
+	fake.UpdateNicPropertiesStub = nil
+	if fake.updateNicPropertiesReturnsOnCall == nil {
+		fake.updateNicPropertiesReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.updateNicPropertiesReturnsOnCall[i] = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
 func (fake *ZhmcAPI) UpdateStorageGroupProperties(arg1 string, arg2 *zhmcclient.StorageGroupProperties) (int, *zhmcclient.HmcError) {
 	fake.updateStorageGroupPropertiesMutex.Lock()
 	ret, specificReturn := fake.updateStorageGroupPropertiesReturnsOnCall[len(fake.updateStorageGroupPropertiesArgsForCall)]
@@ -2922,6 +3001,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.unmountIsoImageMutex.RUnlock()
 	fake.updateLparPropertiesMutex.RLock()
 	defer fake.updateLparPropertiesMutex.RUnlock()
+	fake.updateNicPropertiesMutex.RLock()
+	defer fake.updateNicPropertiesMutex.RUnlock()
 	fake.updateStorageGroupPropertiesMutex.RLock()
 	defer fake.updateStorageGroupPropertiesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

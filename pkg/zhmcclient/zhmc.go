@@ -176,6 +176,9 @@ func (m *ZhmcManager) DeleteNic(nicURI string) (int, *HmcError) {
 func (m *ZhmcManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 	return m.nicManager.GetNicProperties(nicURI)
 }
+func (m *ZhmcManager) UpdateNicProperties(nicURI string, props *NIC) (int, *HmcError) {
+	return m.nicManager.UpdateNicProperties(nicURI, props)
+}
 
 // JOB
 func (m *ZhmcManager) QueryJob(jobURI string) (*Job, int, *HmcError) {

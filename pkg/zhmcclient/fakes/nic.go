@@ -52,6 +52,20 @@ type NicAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
+	UpdateNicPropertiesStub        func(string, *zhmcclient.NIC) (int, *zhmcclient.HmcError)
+	updateNicPropertiesMutex       sync.RWMutex
+	updateNicPropertiesArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.NIC
+	}
+	updateNicPropertiesReturns struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
+	updateNicPropertiesReturnsOnCall map[int]struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -255,6 +269,71 @@ func (fake *NicAPI) GetNicPropertiesReturnsOnCall(i int, result1 *zhmcclient.NIC
 	}{result1, result2, result3}
 }
 
+func (fake *NicAPI) UpdateNicProperties(arg1 string, arg2 *zhmcclient.NIC) (int, *zhmcclient.HmcError) {
+	fake.updateNicPropertiesMutex.Lock()
+	ret, specificReturn := fake.updateNicPropertiesReturnsOnCall[len(fake.updateNicPropertiesArgsForCall)]
+	fake.updateNicPropertiesArgsForCall = append(fake.updateNicPropertiesArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.NIC
+	}{arg1, arg2})
+	stub := fake.UpdateNicPropertiesStub
+	fakeReturns := fake.updateNicPropertiesReturns
+	fake.recordInvocation("UpdateNicProperties", []interface{}{arg1, arg2})
+	fake.updateNicPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *NicAPI) UpdateNicPropertiesCallCount() int {
+	fake.updateNicPropertiesMutex.RLock()
+	defer fake.updateNicPropertiesMutex.RUnlock()
+	return len(fake.updateNicPropertiesArgsForCall)
+}
+
+func (fake *NicAPI) UpdateNicPropertiesCalls(stub func(string, *zhmcclient.NIC) (int, *zhmcclient.HmcError)) {
+	fake.updateNicPropertiesMutex.Lock()
+	defer fake.updateNicPropertiesMutex.Unlock()
+	fake.UpdateNicPropertiesStub = stub
+}
+
+func (fake *NicAPI) UpdateNicPropertiesArgsForCall(i int) (string, *zhmcclient.NIC) {
+	fake.updateNicPropertiesMutex.RLock()
+	defer fake.updateNicPropertiesMutex.RUnlock()
+	argsForCall := fake.updateNicPropertiesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *NicAPI) UpdateNicPropertiesReturns(result1 int, result2 *zhmcclient.HmcError) {
+	fake.updateNicPropertiesMutex.Lock()
+	defer fake.updateNicPropertiesMutex.Unlock()
+	fake.UpdateNicPropertiesStub = nil
+	fake.updateNicPropertiesReturns = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *NicAPI) UpdateNicPropertiesReturnsOnCall(i int, result1 int, result2 *zhmcclient.HmcError) {
+	fake.updateNicPropertiesMutex.Lock()
+	defer fake.updateNicPropertiesMutex.Unlock()
+	fake.UpdateNicPropertiesStub = nil
+	if fake.updateNicPropertiesReturnsOnCall == nil {
+		fake.updateNicPropertiesReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.updateNicPropertiesReturnsOnCall[i] = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
 func (fake *NicAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -264,6 +343,8 @@ func (fake *NicAPI) Invocations() map[string][][]interface{} {
 	defer fake.deleteNicMutex.RUnlock()
 	fake.getNicPropertiesMutex.RLock()
 	defer fake.getNicPropertiesMutex.RUnlock()
+	fake.updateNicPropertiesMutex.RLock()
+	defer fake.updateNicPropertiesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

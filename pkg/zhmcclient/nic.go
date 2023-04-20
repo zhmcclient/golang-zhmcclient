@@ -27,6 +27,7 @@ type NicAPI interface {
 	CreateNic(lparURI string, nic *NIC) (string, int, *HmcError)
 	DeleteNic(nicURI string) (int, *HmcError)
 	GetNicProperties(nicURI string) (*NIC, int, *HmcError)
+	UpdateNicProperties(nicURI string, props *NIC) (int, *HmcError)
 }
 
 type NicManager struct {
@@ -119,7 +120,7 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 
 /**
 * GET /api/partitions/{partition-id}/nics/{nic-id}
-* Return: 200 and LparProperties
+* Return: 200 and NIC
 *     or: 400, 404,
  */
 func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
@@ -157,4 +158,37 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 		genlog.String("status: ", fmt.Sprint(status)),
 		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
+}
+
+/**
+* POST /api/partitions/{partition-id}/nics/{nic-id}
+* Return: 204
+*     or: 400, 404,
+ */
+func (m *NicManager) UpdateNicProperties(nicURI string, props *NIC) (int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, nicURI)
+
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
+	if err != nil {
+		logger.Error("error on update nic properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodPost),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
+		return status, err
+	}
+
+	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v", requestUrl, http.MethodGet, status))
+		return status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error on update nic properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return status, errorResponseBody
 }

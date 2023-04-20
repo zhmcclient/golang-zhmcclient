@@ -233,4 +233,66 @@ var _ = Describe("Nic", func() {
 		})
 
 	})
+
+	Describe("UpdateNicProperties", func() {
+		var (
+			response      *NIC
+			bytesResponse []byte
+			updateProps   *NIC
+		)
+
+		BeforeEach(func() {
+			updateProps = &NIC{
+				DeviceNumber: "device_number_updated",
+			}
+			response = &NIC{
+				ID:                    "id",
+				URI:                   "uri",
+				Parent:                "parent_uri",
+				Class:                 "nic",
+				Name:                  "name",
+				Description:           "description",
+				DeviceNumber:          "device_number",
+				NetworkAdapterPortURI: "adapter_uri",
+				VirtualSwitchUriType:  "",
+				VirtualSwitchURI:      "",
+				Type:                  NIC_TYPE_ROCE,
+				SscManagmentNIC:       false,
+				SscIpAddressType:      SSC_IP_TYPE_IPV4,
+				SscIpAddress:          "",
+				VlanID:                1024,
+				MacAddress:            "",
+				SscMaskPrefix:         "",
+				VlanType:              VLAN_TYPE_ENFORCED,
+			}
+			bytesResponse, _ = json.Marshal(response)
+		})
+		Context("When UpdateNicProperties returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
+				_, err := manager.UpdateNicProperties(nicid, updateProps)
+
+				Expect(err).To(BeNil())
+			})
+		})
+		Context("When UpdateNicProperties returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				_, err := manager.UpdateNicProperties(nicid, updateProps)
+				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+		Context("When UpdateNicProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				_, err := manager.UpdateNicProperties(nicid, updateProps)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
+
+	})
 })

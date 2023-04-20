@@ -202,6 +202,12 @@ func main() {
 					GetAdapterPropsforCPC(hmcManager)
 				case "ListAdaptersofCPC":
 					ListAdaptersofCPC(hmcManager)
+				case "ListAll":
+					ListAll(hmcManager)
+				case "ListPartitionDetails":
+					ListPartitionDetails(hmcManager)
+				case "UpdateNicProperties":
+					UpdateNicProperties(hmcManager)
 				case "FetchASCIIConsoleURI":
 					FetchASCIIConsoleURI(hmcManager)
 				case "CreateStorageGroupsforCPC":
@@ -621,34 +627,94 @@ func ListAll(hmcManager zhmcclient.ZhmcAPI) {
 			} else {
 				logger.Info("-----------------------")
 				for _, lpar := range lpars {
-					logger.Info("++++++++++++++++++++++++")
-					logger.Info("lpar name: " + lpar.Name)
-					logger.Info("lpar uri: " + lpar.URI)
-
-					props, _, err := hmcManager.GetLparProperties(lpar.URI)
-					if err != nil {
-						logger.Error("Error getting lpart properties", genlog.Error(errors.New(err.Message)))
-					} else {
-						logger.Info("", genlog.Any("lpar properties", props))
-					}
-
-					logger.Info("++++++++++++++++++++++++")
-					nics, _, err := hmcManager.ListNics(lpar.URI)
-					if err != nil {
-						logger.Error("Error listing nics ", genlog.Error(errors.New(err.Message)))
-					} else {
-						logger.Info("", genlog.Any("nics list", nics))
-						for _, nicURI := range nics {
-							nic, _, err := hmcManager.GetNicProperties(nicURI)
-							if err != nil {
-								logger.Error("Error getting nic properties", genlog.Error(errors.New(err.Message)))
-							} else {
-								logger.Info("", genlog.Any("nic properties", nic))
-							}
-						}
-					}
+					ListLPARDetails(hmcManager, lpar)
 				}
 			}
+		}
+	}
+}
+
+func ListPartitionDetails(hmcManager zhmcclient.ZhmcAPI) {
+	query := map[string]string{}
+	cpcID := os.Getenv("CPC_ID")
+	cpcURI := "/api/cpcs/" + cpcID
+	lparName := os.Getenv("PAR_NAME")
+	lpars, _, err := hmcManager.ListLPARs(cpcURI, query)
+	if err != nil {
+		logger.Error("Error: " + err.Message)
+	} else {
+		for _, lpar := range lpars {
+			if lpar.Name == lparName {
+				ListLPARDetails(hmcManager, lpar)
+				return
+			}
+		}
+	}
+}
+
+func ListLPARDetails(hmcManager zhmcclient.ZhmcAPI, lpar zhmcclient.LPAR) {
+	logger.Info("++++++++++++++++++++++++")
+	logger.Info("lpar name: " + lpar.Name)
+	logger.Info("lpar uri: " + lpar.URI)
+
+	props, _, err := hmcManager.GetLparProperties(lpar.URI)
+	if err != nil {
+		logger.Error("Error getting lpar properties", genlog.Error(errors.New(err.Message)))
+	} else {
+		logger.Info("", genlog.Any("lpar properties", props))
+	}
+
+	logger.Info("++++++++++++++++++++++++")
+	nics, _, err := hmcManager.ListNics(lpar.URI)
+	if err != nil {
+		logger.Error("Error listing nics ", genlog.Error(errors.New(err.Message)))
+	} else {
+		logger.Info("", genlog.Any("nics list", nics))
+		for _, nicURI := range nics {
+			nic, _, err := hmcManager.GetNicProperties(nicURI)
+			if err != nil {
+				logger.Error("Error getting nic properties", genlog.Error(errors.New(err.Message)))
+			} else {
+				logger.Info("", genlog.Any("nic properties", nic))
+			}
+		}
+	}
+
+}
+
+func ListPartitionsforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	query := map[string]string{}
+	cpcID := os.Getenv("CPC_ID")
+	cpcURI := "/api/cpcs/" + cpcID
+	lpars, _, err := hmcManager.ListLPARs(cpcURI, query)
+	if err != nil {
+		logger.Error("Error: " + err.Message)
+	} else {
+		logger.Info("-----------------------")
+		for _, lpar := range lpars {
+			ListLPARDetails(hmcManager, lpar)
+		}
+	}
+}
+
+func UpdateNicProperties(hmcManager zhmcclient.ZhmcAPI) {
+
+	lparID := os.Getenv("PAR_ID")
+	nicID := os.Getenv("NIC_ID")
+	nicDeviceNumber := os.Getenv("NIC_DEVICE_NUMBER")
+	nicURI := "/api/partitions/" + lparID + "/nics/" + nicID
+	props := zhmcclient.NIC{
+		DeviceNumber: nicDeviceNumber,
+	}
+	_, err := hmcManager.UpdateNicProperties(nicURI, &props)
+	if err != nil {
+		logger.Error("Error: " + err.Message)
+	} else {
+		nic, _, err := hmcManager.GetNicProperties(nicURI)
+		if err != nil {
+			logger.Error("Error getting NIC properties: " + err.Message)
+		} else {
+			logger.Info(fmt.Sprintf("Updated NIC properties: %v", nic))
 		}
 	}
 }
