@@ -14,8 +14,16 @@ jobs:
       os: linux
       language: go
       go:
-        - 1.18.x
-      script: bash go-test.sh pkg/zhmcclient
-
+        - 1.20.x
+      script: bash go-test.sh -p pkg/zhmcclient
+    
+    - stage: vulnerbility_check
+      os: linux
+      language: go
+      go:
+        - 1.20.x
+      script:
+        - bash go-test.sh -v pkg/zhmcclient
 stages:
 - unit_tests
+- vulnerbility_check
