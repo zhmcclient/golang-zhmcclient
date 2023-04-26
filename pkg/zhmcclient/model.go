@@ -566,7 +566,7 @@ type StorageGroupProperties struct {
 	Shared                     bool              `json:"shared,omitempty"`
 	StorageVolumes             []StorageVolume   `json:"storage-volumes,omitempty"`
 	StorageVolumesURIs         []string          `json:"storage-volume-uris,omitempty"`
-	UnAssignedWWPNs            []WWPN            `json:"unassigned-world- wide-port-names,omitempty"`
+	UnAssignedWWPNs            []WWPN            `json:"unassigned-world-wide-port-names,omitempty"`
 	VirtualStorageResourceURIs []string          `json:"virtual-storage-resource-uris,omitempty"`
 	Type                       string            `json:"type,omitempty"`
 }
