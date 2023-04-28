@@ -530,6 +530,15 @@ const (
 	STORAGE_GROUP_CONFIGURATION_ERROR                       = "configuration-error"
 )
 
+type WWPNStatus string
+
+const (
+	WWPN_STATUS_VALIDATED     WWPNStatus = "validated"
+	WWPN_STATUS_NOT_VALIDATED            = "not-validated"
+	WWPN_STATUS_UNKNOWN                  = "unknown"
+	WWPN_STATUS_INCOMPLETE               = "incomplete"
+)
+
 type StorageGroupArray struct {
 	STORAGEGROUPS []StorageGroup `json:"storage-groups"`
 }
@@ -553,7 +562,7 @@ type StorageGroupProperties struct {
 	Connectivity               int               `json:"connectivity,omitempty"`
 	ActiveConnectivity         int               `json:"active-connectivity,omitempty"`
 	CpcURI                     string            `json:"cpc-uri,omitempty"`
-	CandidatePortURIs          []string          `json:"candidate-port-uris,omitempty"`
+	CandidatePortURIs          []string          `json:"candidate-adapter-port-uris,omitempty"`
 	Description                string            `json:"description,omitempty"`
 	DirectConnectionCount      int               `json:"direct-connection-count,omitempty"`
 	FulfillmentState           StorageGroupState `json:"fulfillment-state,omitempty"`
@@ -588,8 +597,8 @@ type CreateStorageGroupProperties struct {
 }
 
 type WWPN struct {
-	Name          string    `json:"world-wide-port,omitempty"`
-	ZonedAdapters []Adapter `json:"zoned-adapters,omitempty"`
+	Name   string     `json:"world-wide-port-name,omitempty"`
+	Status WWPNStatus `json:"status,omitempty"`
 }
 
 // Storage group object
