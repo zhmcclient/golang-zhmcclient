@@ -703,6 +703,6 @@ type DomainInfo struct {
 
 // SSC crypto-configuration object properties added to Support Crypto Card working
 type CryptoConfig struct {
-	CryptoAdapterUris          []string     `json:"crypto-adapter-uris"`
+	CryptoAdapterUris          []string     `json:"crypto-adapter-uris,omitempty"`
 	CryptoDomainConfigurations []DomainInfo `json:"crypto-domain-configurations,omitempty"`
 }
