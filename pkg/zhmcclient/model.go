@@ -437,7 +437,7 @@ type LparProperties struct {
 	NicUris                          []string                      `json:"nic-uris,omitempty"`
 	HbaUris                          []string                      `json:"hba-uris,omitempty"`
 	StorageGroupURIs                 []string                      `json:"storage-group-uris,omitempty"`
-	CryptoConfiguration              []byte                        `json:"crypto-configuration,omitempty"`
+	CryptoConfiguration              CryptoConfig                  `json:"crypto-configuration,omitempty"`
 	SscHostName                      string                        `json:"ssc-host-name,omitempty"`
 	SscBootSelection                 SscBootSelection              `json:"ssc-boot-selection,omitempty"`
 	SscIpv4Gateway                   string                        `json:"ssc-ipv4-gateway,omitempty"`
@@ -693,4 +693,16 @@ type AsciiConsoleURIPayload struct {
 type AsciiConsoleURIResponse struct {
 	URI       string `json:"websocket-uri"`
 	SessionID string `json:"session-id"`
+}
+
+// SSC crypto DomainInfo added as a substructure of CryptoConfig structure
+type DomainInfo struct {
+	DomainIdx  int    `json:"domain-index"`
+	AccessMode string `json:"access-mode"`
+}
+
+// SSC crypto-configuration object properties added to Support Crypto Card working
+type CryptoConfig struct {
+	CryptoAdapterUris          []string     `json:"crypto-adapter-uris"`
+	CryptoDomainConfigurations []DomainInfo `json:"crypto-domain-configurations,omitempty"`
 }
