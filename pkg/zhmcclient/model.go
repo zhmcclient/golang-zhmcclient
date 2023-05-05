@@ -697,8 +697,8 @@ type AsciiConsoleURIResponse struct {
 
 // SSC crypto DomainInfo added as a substructure of CryptoConfig structure
 type DomainInfo struct {
-	DomainIdx  int    `json:"domain-index"`
-	AccessMode string `json:"access-mode"`
+	DomainIdx  int    `json:"domain-index,omitempty"`
+	AccessMode string `json:"access-mode,omitempty"`
 }
 
 // SSC crypto-configuration object properties added to Support Crypto Card working
