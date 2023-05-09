@@ -52,6 +52,21 @@ type AdapterAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
+	GetNetworkAdapterPortPropertiesStub        func(string) (*zhmcclient.NetworkAdapterPort, int, *zhmcclient.HmcError)
+	getNetworkAdapterPortPropertiesMutex       sync.RWMutex
+	getNetworkAdapterPortPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getNetworkAdapterPortPropertiesReturns struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	getNetworkAdapterPortPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	ListAdaptersStub        func(string, map[string]string) ([]zhmcclient.Adapter, int, *zhmcclient.HmcError)
 	listAdaptersMutex       sync.RWMutex
 	listAdaptersArgsForCall []struct {
@@ -271,6 +286,73 @@ func (fake *AdapterAPI) GetAdapterPropertiesReturnsOnCall(i int, result1 *zhmccl
 	}{result1, result2, result3}
 }
 
+func (fake *AdapterAPI) GetNetworkAdapterPortProperties(arg1 string) (*zhmcclient.NetworkAdapterPort, int, *zhmcclient.HmcError) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	ret, specificReturn := fake.getNetworkAdapterPortPropertiesReturnsOnCall[len(fake.getNetworkAdapterPortPropertiesArgsForCall)]
+	fake.getNetworkAdapterPortPropertiesArgsForCall = append(fake.getNetworkAdapterPortPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetNetworkAdapterPortPropertiesStub
+	fakeReturns := fake.getNetworkAdapterPortPropertiesReturns
+	fake.recordInvocation("GetNetworkAdapterPortProperties", []interface{}{arg1})
+	fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *AdapterAPI) GetNetworkAdapterPortPropertiesCallCount() int {
+	fake.getNetworkAdapterPortPropertiesMutex.RLock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
+	return len(fake.getNetworkAdapterPortPropertiesArgsForCall)
+}
+
+func (fake *AdapterAPI) GetNetworkAdapterPortPropertiesCalls(stub func(string) (*zhmcclient.NetworkAdapterPort, int, *zhmcclient.HmcError)) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	fake.GetNetworkAdapterPortPropertiesStub = stub
+}
+
+func (fake *AdapterAPI) GetNetworkAdapterPortPropertiesArgsForCall(i int) string {
+	fake.getNetworkAdapterPortPropertiesMutex.RLock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
+	argsForCall := fake.getNetworkAdapterPortPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *AdapterAPI) GetNetworkAdapterPortPropertiesReturns(result1 *zhmcclient.NetworkAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	fake.GetNetworkAdapterPortPropertiesStub = nil
+	fake.getNetworkAdapterPortPropertiesReturns = struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *AdapterAPI) GetNetworkAdapterPortPropertiesReturnsOnCall(i int, result1 *zhmcclient.NetworkAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	fake.GetNetworkAdapterPortPropertiesStub = nil
+	if fake.getNetworkAdapterPortPropertiesReturnsOnCall == nil {
+		fake.getNetworkAdapterPortPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.NetworkAdapterPort
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.getNetworkAdapterPortPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
 func (fake *AdapterAPI) ListAdapters(arg1 string, arg2 map[string]string) ([]zhmcclient.Adapter, int, *zhmcclient.HmcError) {
 	fake.listAdaptersMutex.Lock()
 	ret, specificReturn := fake.listAdaptersReturnsOnCall[len(fake.listAdaptersArgsForCall)]
@@ -348,6 +430,8 @@ func (fake *AdapterAPI) Invocations() map[string][][]interface{} {
 	defer fake.deleteHipersocketMutex.RUnlock()
 	fake.getAdapterPropertiesMutex.RLock()
 	defer fake.getAdapterPropertiesMutex.RUnlock()
+	fake.getNetworkAdapterPortPropertiesMutex.RLock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

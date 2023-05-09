@@ -238,6 +238,21 @@ type ZhmcAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
+	GetNetworkAdapterPortPropertiesStub        func(string) (*zhmcclient.NetworkAdapterPort, int, *zhmcclient.HmcError)
+	getNetworkAdapterPortPropertiesMutex       sync.RWMutex
+	getNetworkAdapterPortPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getNetworkAdapterPortPropertiesReturns struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	getNetworkAdapterPortPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	GetNicPropertiesStub        func(string) (*zhmcclient.NIC, int, *zhmcclient.HmcError)
 	getNicPropertiesMutex       sync.RWMutex
 	getNicPropertiesArgsForCall []struct {
@@ -1590,6 +1605,73 @@ func (fake *ZhmcAPI) GetLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.L
 	}
 	fake.getLparPropertiesReturnsOnCall[i] = struct {
 		result1 *zhmcclient.LparProperties
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *ZhmcAPI) GetNetworkAdapterPortProperties(arg1 string) (*zhmcclient.NetworkAdapterPort, int, *zhmcclient.HmcError) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	ret, specificReturn := fake.getNetworkAdapterPortPropertiesReturnsOnCall[len(fake.getNetworkAdapterPortPropertiesArgsForCall)]
+	fake.getNetworkAdapterPortPropertiesArgsForCall = append(fake.getNetworkAdapterPortPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetNetworkAdapterPortPropertiesStub
+	fakeReturns := fake.getNetworkAdapterPortPropertiesReturns
+	fake.recordInvocation("GetNetworkAdapterPortProperties", []interface{}{arg1})
+	fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *ZhmcAPI) GetNetworkAdapterPortPropertiesCallCount() int {
+	fake.getNetworkAdapterPortPropertiesMutex.RLock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
+	return len(fake.getNetworkAdapterPortPropertiesArgsForCall)
+}
+
+func (fake *ZhmcAPI) GetNetworkAdapterPortPropertiesCalls(stub func(string) (*zhmcclient.NetworkAdapterPort, int, *zhmcclient.HmcError)) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	fake.GetNetworkAdapterPortPropertiesStub = stub
+}
+
+func (fake *ZhmcAPI) GetNetworkAdapterPortPropertiesArgsForCall(i int) string {
+	fake.getNetworkAdapterPortPropertiesMutex.RLock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
+	argsForCall := fake.getNetworkAdapterPortPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) GetNetworkAdapterPortPropertiesReturns(result1 *zhmcclient.NetworkAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	fake.GetNetworkAdapterPortPropertiesStub = nil
+	fake.getNetworkAdapterPortPropertiesReturns = struct {
+		result1 *zhmcclient.NetworkAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *ZhmcAPI) GetNetworkAdapterPortPropertiesReturnsOnCall(i int, result1 *zhmcclient.NetworkAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getNetworkAdapterPortPropertiesMutex.Lock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.Unlock()
+	fake.GetNetworkAdapterPortPropertiesStub = nil
+	if fake.getNetworkAdapterPortPropertiesReturnsOnCall == nil {
+		fake.getNetworkAdapterPortPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.NetworkAdapterPort
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.getNetworkAdapterPortPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.NetworkAdapterPort
 		result2 int
 		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
@@ -2965,6 +3047,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.getAdapterPropertiesMutex.RUnlock()
 	fake.getLparPropertiesMutex.RLock()
 	defer fake.getLparPropertiesMutex.RUnlock()
+	fake.getNetworkAdapterPortPropertiesMutex.RLock()
+	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
 	fake.getNicPropertiesMutex.RLock()
 	defer fake.getNicPropertiesMutex.RUnlock()
 	fake.getStorageGroupPartitionsMutex.RLock()

@@ -111,6 +111,9 @@ func (m *ZhmcManager) ListAdapters(cpcURI string, query map[string]string) ([]Ad
 func (m *ZhmcManager) GetAdapterProperties(adapterURI string) (*AdapterProperties, int, *HmcError) {
 	return m.adapterManager.GetAdapterProperties(adapterURI)
 }
+func (m *ZhmcManager) GetNetworkAdapterPortProperties(adapterURI string) (*NetworkAdapterPort, int, *HmcError) {
+	return m.adapterManager.GetNetworkAdapterPortProperties(adapterURI)
+}
 func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, int, *HmcError) {
 	return m.adapterManager.CreateHipersocket(cpcURI, adaptor)
 }

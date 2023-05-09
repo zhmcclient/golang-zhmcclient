@@ -97,6 +97,13 @@ const (
 	ADAPTER_TRANSMISSION_UNIT_56                         = 56
 )
 
+type AdapterConnectionClass string
+
+const (
+	ADAPTER_CONNECTION_STORAGE_SUBSYSTEM AdapterConnectionClass = "storage-subsystem"
+	ADAPTER_CONNECTION_STORAGE_SWITCH    AdapterConnectionClass = "storage-switch"
+)
+
 // Physical adapter channel connection status
 type AdapterChannelStatus string
 
@@ -162,6 +169,29 @@ type AdapterProperties struct {
 	ALLOWED_CAPACITY           int                     `json:"allowed-capacity,omitempty"`
 	MAXIMUM_TOTAL_CAPACITY     int                     `json:"maximum-total-capacity,omitempty"`
 	CHANNEL_PATH_ID            string                  `json:"channel-path-id,omitempty"`
+}
+
+type NetworkAdapterPort struct {
+	URI         string `json:"element-uri,omitempty"`
+	Name        string `json:"name,omitempty"`
+	ID          string `json:"element-id,omitempty"`
+	Parent      string `json:"parent,omitempty"`
+	Class       string `json:"class,omitempty"`
+	Description string `json:"description,omitempty"`
+	Index       int    `json:"index"`
+}
+
+type StorageAdapterPort struct {
+	URI                     string                 `json:"element-uri,omitempty"`
+	Name                    string                 `json:"name,omitempty"`
+	ID                      string                 `json:"element-id,omitempty"`
+	Parent                  string                 `json:"parent,omitempty"`
+	Class                   string                 `json:"class,omitempty"`
+	Description             string                 `json:"description,omitempty"`
+	FabricID                string                 `json:"fabric-id,omitempty"`
+	ConnectionEndpointURI   string                 `json:"connection-endpoint-uri,omitempty"`
+	ConnectionEndpointClass AdapterConnectionClass `json:"connection-endpoint-class,omitempty"`
+	Index                   int                    `json:"index"`
 }
 
 /**

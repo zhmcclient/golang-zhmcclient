@@ -200,6 +200,8 @@ func main() {
 					AttachStorageGroupToPartitionofCPC(hmcManager)
 				case "GetAdapterPropsforCPC":
 					GetAdapterPropsforCPC(hmcManager)
+				case "GetNetworkAdapterPortforCPC":
+					GetNetworkAdapterPortforCPC(hmcManager)
 				case "ListAdaptersofCPC":
 					ListAdaptersofCPC(hmcManager)
 				case "ListAll":
@@ -288,6 +290,20 @@ func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
 		}
 		logger.Info("\n-----------------------")
 	}
+}
+
+// GetNetworkAdapterPortforCPC
+
+func GetNetworkAdapterPortforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	portURI := os.Getenv("PORT_URI")
+
+	port, _, hmcerr := hmcManager.GetNetworkAdapterPortProperties(portURI)
+
+	if hmcerr != nil {
+		logger.Fatal("", genlog.Any("Get Adapter properties error", hmcerr))
+	}
+
+	logger.Info(fmt.Sprintf("Port properties: %v", port))
 }
 
 func GetAdapterPropsforCPC(hmcManager zhmcclient.ZhmcAPI) {
