@@ -350,4 +350,68 @@ var _ = Describe("Adapter", func() {
 
 	})
 
+	Describe("GetStorageAdapterPort", func() {
+		var (
+			response      *StorageAdapterPort
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			response = &StorageAdapterPort{
+				URI:                     "uri",
+				Name:                    "adapter",
+				ID:                      "id",
+				Parent:                  "parent",
+				Description:             "description",
+				Class:                   "class",
+				Index:                   1,
+				FabricID:                "fabricID",
+				ConnectionEndpointURI:   "connection-uri",
+				ConnectionEndpointClass: ADAPTER_CONNECTION_STORAGE_SUBSYSTEM,
+			}
+			bytesResponse, _ = json.Marshal(response)
+		})
+		Context("When GetStorageAdapterPortProperties returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytesResponse, nil)
+				rets, _, err := manager.GetStorageAdapterPortProperties(adapterid)
+				Expect(err).To(BeNil())
+				Expect(rets).ToNot(BeNil())
+				Expect(rets.URI).To(Equal(response.URI))
+			})
+		})
+		Context("When GetStorageAdapterPortProperties returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				rets, _, err := manager.GetStorageAdapterPortProperties(adapterid)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When GetStorageAdapterPortProperties returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, []byte("incorrect json bytes"), nil)
+				rets, _, err := manager.GetStorageAdapterPortProperties(adapterid)
+
+				Expect(*err).To(Equal(*unmarshalErr))
+				Expect(rets).To(BeNil())
+			})
+		})
+		Context("When GetStorageAdapterPortProperties returns incorrect status", func() {
+			It("check the results is empty", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusForbidden, bytesResponse, nil)
+				rets, _, err := manager.GetStorageAdapterPortProperties(adapterid)
+
+				Expect(err).ToNot(BeNil())
+				Expect(rets).To(BeNil())
+			})
+		})
+
+	})
+
 })

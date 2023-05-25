@@ -21,11 +21,13 @@ import (
 )
 
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
+//
 //go:generate counterfeiter -o fakes/adapter.go --fake-name AdapterAPI . AdapterAPI
 type AdapterAPI interface {
 	ListAdapters(cpcURI string, query map[string]string) ([]Adapter, int, *HmcError)
 	GetAdapterProperties(adapterURI string) (*AdapterProperties, int, *HmcError)
 	GetNetworkAdapterPortProperties(networkAdapterPortURI string) (*NetworkAdapterPort, int, *HmcError)
+	GetStorageAdapterPortProperties(storageAdapterPortURI string) (*StorageAdapterPort, int, *HmcError)
 	CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, int, *HmcError)
 	DeleteHipersocket(adapterURI string) (int, *HmcError)
 }
@@ -137,6 +139,50 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 }
 
 /**
+* GET /api/adapters/{adapter-id}/storage-ports/{storage-port-id}
+* @adapterURI the adapter ID, storage-port-id for which properties need to be fetched
+* @return storage port properties
+* Return: 200 and StorageAdapterPort
+*     or: 400, 404, 409
+ */
+func (m *AdapterManager) GetStorageAdapterPortProperties(storageAdapterPortURI string) (*StorageAdapterPort, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, storageAdapterPortURI)
+
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
+	if err != nil {
+		logger.Error("error on getting storage port properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodGet),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
+		return nil, status, err
+	}
+
+	if status == http.StatusOK {
+		portProps := &StorageAdapterPort{}
+		err := json.Unmarshal(responseBody, portProps)
+		if err != nil {
+			logger.Error("error on unmarshalling storage port",
+				genlog.String("request url", fmt.Sprint(requestUrl)),
+				genlog.String("method", http.MethodGet),
+				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, storage port properties: %v", requestUrl, http.MethodGet, status, portProps))
+		return portProps, status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error getting storage port properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+	return nil, status, errorResponseBody
+}
+
+/**
 * GET /api/adapters/{adapter-id}/network-ports/{network-port-id}
 * @adapterURI the adapter ID, network-port-id for which properties need to be fetched
 * @return network port properties
@@ -150,7 +196,7 @@ func (m *AdapterManager) GetNetworkAdapterPortProperties(networkAdapterPortURI s
 	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
-		logger.Error("error on getting adapter properties",
+		logger.Error("error on getting network port properties",
 			genlog.String("request url", fmt.Sprint(requestUrl)),
 			genlog.String("method", http.MethodGet),
 			genlog.String("status", fmt.Sprint(status)),
@@ -162,17 +208,17 @@ func (m *AdapterManager) GetNetworkAdapterPortProperties(networkAdapterPortURI s
 		portProps := &NetworkAdapterPort{}
 		err := json.Unmarshal(responseBody, portProps)
 		if err != nil {
-			logger.Error("error on unmarshalling adapters",
+			logger.Error("error on unmarshalling network port",
 				genlog.String("request url", fmt.Sprint(requestUrl)),
 				genlog.String("method", http.MethodGet),
 				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
-		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, adapters: %v", requestUrl, http.MethodGet, status, portProps))
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, network port properties: %v", requestUrl, http.MethodGet, status, portProps))
 		return portProps, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
-	logger.Error("error getting network adapter port properties",
+	logger.Error("error getting network port properties",
 		genlog.String("request url", fmt.Sprint(requestUrl)),
 		genlog.String("method", http.MethodGet),
 		genlog.String("status: ", fmt.Sprint(status)),

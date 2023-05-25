@@ -202,6 +202,8 @@ func main() {
 					GetAdapterPropsforCPC(hmcManager)
 				case "GetNetworkAdapterPortforCPC":
 					GetNetworkAdapterPortforCPC(hmcManager)
+				case "GetStorageAdapterPortforCPC":
+					GetStorageAdapterPortforCPC(hmcManager)
 				case "ListAdaptersofCPC":
 					ListAdaptersofCPC(hmcManager)
 				case "ListAll":
@@ -292,18 +294,28 @@ func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
 	}
 }
 
-// GetNetworkAdapterPortforCPC
+func GetStorageAdapterPortforCPC(hmcManager zhmcclient.ZhmcAPI) {
+	portURI := os.Getenv("STORAGE_PORT_URI")
+
+	port, _, hmcerr := hmcManager.GetStorageAdapterPortProperties(portURI)
+
+	if hmcerr != nil {
+		logger.Fatal("", genlog.Any("Get storage port properties error", hmcerr))
+	}
+
+	logger.Info(fmt.Sprintf("Storage port properties: %#v", port))
+}
 
 func GetNetworkAdapterPortforCPC(hmcManager zhmcclient.ZhmcAPI) {
-	portURI := os.Getenv("PORT_URI")
+	portURI := os.Getenv("NETWORK_PORT_URI")
 
 	port, _, hmcerr := hmcManager.GetNetworkAdapterPortProperties(portURI)
 
 	if hmcerr != nil {
-		logger.Fatal("", genlog.Any("Get Adapter properties error", hmcerr))
+		logger.Fatal("", genlog.Any("Get network adapter port properties error", hmcerr))
 	}
 
-	logger.Info(fmt.Sprintf("Port properties: %v", port))
+	logger.Info(fmt.Sprintf("Network port properties: %#v", port))
 }
 
 func GetAdapterPropsforCPC(hmcManager zhmcclient.ZhmcAPI) {

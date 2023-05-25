@@ -268,6 +268,21 @@ type ZhmcAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
+	GetStorageAdapterPortPropertiesStub        func(string) (*zhmcclient.StorageAdapterPort, int, *zhmcclient.HmcError)
+	getStorageAdapterPortPropertiesMutex       sync.RWMutex
+	getStorageAdapterPortPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getStorageAdapterPortPropertiesReturns struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	getStorageAdapterPortPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	GetStorageGroupPartitionsStub        func(string, map[string]string) (*zhmcclient.StorageGroupPartitions, int, *zhmcclient.HmcError)
 	getStorageGroupPartitionsMutex       sync.RWMutex
 	getStorageGroupPartitionsArgsForCall []struct {
@@ -1744,6 +1759,73 @@ func (fake *ZhmcAPI) GetNicPropertiesReturnsOnCall(i int, result1 *zhmcclient.NI
 	}{result1, result2, result3}
 }
 
+func (fake *ZhmcAPI) GetStorageAdapterPortProperties(arg1 string) (*zhmcclient.StorageAdapterPort, int, *zhmcclient.HmcError) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	ret, specificReturn := fake.getStorageAdapterPortPropertiesReturnsOnCall[len(fake.getStorageAdapterPortPropertiesArgsForCall)]
+	fake.getStorageAdapterPortPropertiesArgsForCall = append(fake.getStorageAdapterPortPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetStorageAdapterPortPropertiesStub
+	fakeReturns := fake.getStorageAdapterPortPropertiesReturns
+	fake.recordInvocation("GetStorageAdapterPortProperties", []interface{}{arg1})
+	fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *ZhmcAPI) GetStorageAdapterPortPropertiesCallCount() int {
+	fake.getStorageAdapterPortPropertiesMutex.RLock()
+	defer fake.getStorageAdapterPortPropertiesMutex.RUnlock()
+	return len(fake.getStorageAdapterPortPropertiesArgsForCall)
+}
+
+func (fake *ZhmcAPI) GetStorageAdapterPortPropertiesCalls(stub func(string) (*zhmcclient.StorageAdapterPort, int, *zhmcclient.HmcError)) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	defer fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	fake.GetStorageAdapterPortPropertiesStub = stub
+}
+
+func (fake *ZhmcAPI) GetStorageAdapterPortPropertiesArgsForCall(i int) string {
+	fake.getStorageAdapterPortPropertiesMutex.RLock()
+	defer fake.getStorageAdapterPortPropertiesMutex.RUnlock()
+	argsForCall := fake.getStorageAdapterPortPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ZhmcAPI) GetStorageAdapterPortPropertiesReturns(result1 *zhmcclient.StorageAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	defer fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	fake.GetStorageAdapterPortPropertiesStub = nil
+	fake.getStorageAdapterPortPropertiesReturns = struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *ZhmcAPI) GetStorageAdapterPortPropertiesReturnsOnCall(i int, result1 *zhmcclient.StorageAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	defer fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	fake.GetStorageAdapterPortPropertiesStub = nil
+	if fake.getStorageAdapterPortPropertiesReturnsOnCall == nil {
+		fake.getStorageAdapterPortPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.StorageAdapterPort
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.getStorageAdapterPortPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
 func (fake *ZhmcAPI) GetStorageGroupPartitions(arg1 string, arg2 map[string]string) (*zhmcclient.StorageGroupPartitions, int, *zhmcclient.HmcError) {
 	fake.getStorageGroupPartitionsMutex.Lock()
 	ret, specificReturn := fake.getStorageGroupPartitionsReturnsOnCall[len(fake.getStorageGroupPartitionsArgsForCall)]
@@ -3051,6 +3133,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
 	fake.getNicPropertiesMutex.RLock()
 	defer fake.getNicPropertiesMutex.RUnlock()
+	fake.getStorageAdapterPortPropertiesMutex.RLock()
+	defer fake.getStorageAdapterPortPropertiesMutex.RUnlock()
 	fake.getStorageGroupPartitionsMutex.RLock()
 	defer fake.getStorageGroupPartitionsMutex.RUnlock()
 	fake.getStorageGroupPropertiesMutex.RLock()

@@ -165,6 +165,7 @@ type AdapterProperties struct {
 	State                      AdapterState            `json:"state,omitempty"`
 	MAX_TRANSMISSION_UNIT_SIZE AdapterTransmissionUnit `json:"maximum-transmission-unit-size,omitempty"`
 	PHYSICALCHANNELSTATUS      AdapterChannelStatus    `json:"physical-channel-status,omitempty"`
+	CONFIGURED_CAPACITY        int                     `json:"configured-capacity,omitempty"`
 	USED_CAPACITY              int                     `json:"used-capacity,omitempty"`
 	ALLOWED_CAPACITY           int                     `json:"allowed-capacity,omitempty"`
 	MAXIMUM_TOTAL_CAPACITY     int                     `json:"maximum-total-capacity,omitempty"`

@@ -67,6 +67,21 @@ type AdapterAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
+	GetStorageAdapterPortPropertiesStub        func(string) (*zhmcclient.StorageAdapterPort, int, *zhmcclient.HmcError)
+	getStorageAdapterPortPropertiesMutex       sync.RWMutex
+	getStorageAdapterPortPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getStorageAdapterPortPropertiesReturns struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	getStorageAdapterPortPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	ListAdaptersStub        func(string, map[string]string) ([]zhmcclient.Adapter, int, *zhmcclient.HmcError)
 	listAdaptersMutex       sync.RWMutex
 	listAdaptersArgsForCall []struct {
@@ -353,6 +368,73 @@ func (fake *AdapterAPI) GetNetworkAdapterPortPropertiesReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
+func (fake *AdapterAPI) GetStorageAdapterPortProperties(arg1 string) (*zhmcclient.StorageAdapterPort, int, *zhmcclient.HmcError) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	ret, specificReturn := fake.getStorageAdapterPortPropertiesReturnsOnCall[len(fake.getStorageAdapterPortPropertiesArgsForCall)]
+	fake.getStorageAdapterPortPropertiesArgsForCall = append(fake.getStorageAdapterPortPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetStorageAdapterPortPropertiesStub
+	fakeReturns := fake.getStorageAdapterPortPropertiesReturns
+	fake.recordInvocation("GetStorageAdapterPortProperties", []interface{}{arg1})
+	fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *AdapterAPI) GetStorageAdapterPortPropertiesCallCount() int {
+	fake.getStorageAdapterPortPropertiesMutex.RLock()
+	defer fake.getStorageAdapterPortPropertiesMutex.RUnlock()
+	return len(fake.getStorageAdapterPortPropertiesArgsForCall)
+}
+
+func (fake *AdapterAPI) GetStorageAdapterPortPropertiesCalls(stub func(string) (*zhmcclient.StorageAdapterPort, int, *zhmcclient.HmcError)) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	defer fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	fake.GetStorageAdapterPortPropertiesStub = stub
+}
+
+func (fake *AdapterAPI) GetStorageAdapterPortPropertiesArgsForCall(i int) string {
+	fake.getStorageAdapterPortPropertiesMutex.RLock()
+	defer fake.getStorageAdapterPortPropertiesMutex.RUnlock()
+	argsForCall := fake.getStorageAdapterPortPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *AdapterAPI) GetStorageAdapterPortPropertiesReturns(result1 *zhmcclient.StorageAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	defer fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	fake.GetStorageAdapterPortPropertiesStub = nil
+	fake.getStorageAdapterPortPropertiesReturns = struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *AdapterAPI) GetStorageAdapterPortPropertiesReturnsOnCall(i int, result1 *zhmcclient.StorageAdapterPort, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getStorageAdapterPortPropertiesMutex.Lock()
+	defer fake.getStorageAdapterPortPropertiesMutex.Unlock()
+	fake.GetStorageAdapterPortPropertiesStub = nil
+	if fake.getStorageAdapterPortPropertiesReturnsOnCall == nil {
+		fake.getStorageAdapterPortPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.StorageAdapterPort
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.getStorageAdapterPortPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.StorageAdapterPort
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
 func (fake *AdapterAPI) ListAdapters(arg1 string, arg2 map[string]string) ([]zhmcclient.Adapter, int, *zhmcclient.HmcError) {
 	fake.listAdaptersMutex.Lock()
 	ret, specificReturn := fake.listAdaptersReturnsOnCall[len(fake.listAdaptersArgsForCall)]
@@ -432,6 +514,8 @@ func (fake *AdapterAPI) Invocations() map[string][][]interface{} {
 	defer fake.getAdapterPropertiesMutex.RUnlock()
 	fake.getNetworkAdapterPortPropertiesMutex.RLock()
 	defer fake.getNetworkAdapterPortPropertiesMutex.RUnlock()
+	fake.getStorageAdapterPortPropertiesMutex.RLock()
+	defer fake.getStorageAdapterPortPropertiesMutex.RUnlock()
 	fake.listAdaptersMutex.RLock()
 	defer fake.listAdaptersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

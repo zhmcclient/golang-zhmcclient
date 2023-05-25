@@ -12,6 +12,7 @@
 package zhmcclient
 
 // ZhmcAPI defines an interface for issuing requests to ZHMC
+//
 //go:generate counterfeiter -o fakes/zhmc.go --fake-name ZhmcAPI . ZhmcAPI
 type ZhmcAPI interface {
 	CpcAPI
@@ -113,6 +114,9 @@ func (m *ZhmcManager) GetAdapterProperties(adapterURI string) (*AdapterPropertie
 }
 func (m *ZhmcManager) GetNetworkAdapterPortProperties(adapterURI string) (*NetworkAdapterPort, int, *HmcError) {
 	return m.adapterManager.GetNetworkAdapterPortProperties(adapterURI)
+}
+func (m *ZhmcManager) GetStorageAdapterPortProperties(adapterURI string) (*StorageAdapterPort, int, *HmcError) {
+	return m.adapterManager.GetStorageAdapterPortProperties(adapterURI)
 }
 func (m *ZhmcManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPayload) (string, int, *HmcError) {
 	return m.adapterManager.CreateHipersocket(cpcURI, adaptor)
