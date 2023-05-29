@@ -28,3 +28,6 @@ sample-build-mac: clean
 sample-build-docker:
 	docker build $(BUILD_ROOT) -t zhmcclient-sample:dev
 
+.PHONY: doc-build
+doc-build:
+	go doc zhmcclient
