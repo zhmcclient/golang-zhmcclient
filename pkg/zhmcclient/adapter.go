@@ -17,7 +17,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.ibm.com/genctl/shared-logger/genlog"
+	"go.uber.org/zap"
 )
 
 // AdapterAPI defines an interface for issuing Adapter requests to ZHMC
@@ -63,10 +63,10 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on listing adapters",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 	logger.Info(fmt.Sprintf("Response: listing adapters, request url: %v, method: %v, status: %v", requestUrl, http.MethodGet, status))
@@ -76,19 +76,19 @@ func (m *AdapterManager) ListAdapters(cpcURI string, query map[string]string) ([
 		err := json.Unmarshal(responseBody, adapters)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		return adapters.ADAPTERS, status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error listing adapters",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 
 	return nil, status, errorResponseBody
 }
@@ -109,10 +109,10 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on getting adapter properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -121,9 +121,9 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 		err := json.Unmarshal(responseBody, adapterProps)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, adapters: %v", requestUrl, http.MethodGet, status, adapterProps))
@@ -131,10 +131,10 @@ func (m *AdapterManager) GetAdapterProperties(adapterURI string) (*AdapterProper
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error getting adapter properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -153,10 +153,10 @@ func (m *AdapterManager) GetStorageAdapterPortProperties(storageAdapterPortURI s
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on getting storage port properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -165,9 +165,9 @@ func (m *AdapterManager) GetStorageAdapterPortProperties(storageAdapterPortURI s
 		err := json.Unmarshal(responseBody, portProps)
 		if err != nil {
 			logger.Error("error on unmarshalling storage port",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, storage port properties: %v", requestUrl, http.MethodGet, status, portProps))
@@ -175,10 +175,10 @@ func (m *AdapterManager) GetStorageAdapterPortProperties(storageAdapterPortURI s
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error getting storage port properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -197,10 +197,10 @@ func (m *AdapterManager) GetNetworkAdapterPortProperties(networkAdapterPortURI s
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on getting network port properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -209,9 +209,9 @@ func (m *AdapterManager) GetNetworkAdapterPortProperties(networkAdapterPortURI s
 		err := json.Unmarshal(responseBody, portProps)
 		if err != nil {
 			logger.Error("error on unmarshalling network port",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, network port properties: %v", requestUrl, http.MethodGet, status, portProps))
@@ -219,10 +219,10 @@ func (m *AdapterManager) GetNetworkAdapterPortProperties(networkAdapterPortURI s
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error getting network port properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -241,10 +241,10 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adaptor, "")
 	if err != nil {
 		logger.Error("error creating hipersocket",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return "", status, err
 	}
 
@@ -253,9 +253,9 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 		err := json.Unmarshal(responseBody, &uriObj)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodPost),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodPost),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: hiper socket created, request url: %v, method: %v, status: %v, hipersocket uri: %v", requestUrl, http.MethodPost, status, uriObj.URI))
@@ -265,10 +265,10 @@ func (m *AdapterManager) CreateHipersocket(cpcURI string, adaptor *HipersocketPa
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error creating hipersocket",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return "", status, errorResponseBody
 }
 
@@ -286,10 +286,10 @@ func (m *AdapterManager) DeleteHipersocket(adapterURI string) (int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error deleting hipersocket",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodDelete),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodDelete),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -299,9 +299,9 @@ func (m *AdapterManager) DeleteHipersocket(adapterURI string) (int, *HmcError) {
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error deleting hipersocket",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodDelete),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodDelete),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }

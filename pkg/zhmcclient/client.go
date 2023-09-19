@@ -31,7 +31,16 @@ import (
 	"net/http/httputil"
 
 	"net/url"
+
+	"go.uber.org/zap"
 )
+
+func NewZapLogger() Logger {
+    zapLogger, _ := zap.NewProduction()
+    return zapLogger
+}
+
+var logger = NewZapLogger()
 
 /*
 	ClientAPI defines an interface for issuing client requests to ZHMC
@@ -95,7 +104,11 @@ type Client struct {
 	traceOutput    io.Writer
 }
 
-func NewClient(endpoint string, opts *Options) (ClientAPI, *HmcError) {
+func NewClient(endpoint string, opts *Options, l Logger) (ClientAPI, *HmcError) {
+
+	if l != nil {
+        logger = l
+    }
 
 	tslConfig, err := SetCertificate(opts, &tls.Config{})
 	if err != nil {

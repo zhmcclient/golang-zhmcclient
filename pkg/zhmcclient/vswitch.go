@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.ibm.com/genctl/shared-logger/genlog"
+	"go.uber.org/zap"
 )
 
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
@@ -58,10 +58,10 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error listing virtual switches",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -70,9 +70,9 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 		err := json.Unmarshal(responseBody, virtualSwitches)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, virtual switches: %v", requestUrl, http.MethodGet, status, virtualSwitches.VIRTUALSWITCHES))
@@ -80,10 +80,10 @@ func (m *VirtualSwitchManager) ListVirtualSwitches(cpcURI string, query map[stri
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on listing virtual switches",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(errors.New(errorResponseBody.Message)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(errors.New(errorResponseBody.Message)))
 	return nil, status, errorResponseBody
 }
 
@@ -102,10 +102,10 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error getting virtual switch properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -114,9 +114,9 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 		err := json.Unmarshal(responseBody, virtualSwitch)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, virtual switch properties: %v", requestUrl, http.MethodGet, status, virtualSwitch))
@@ -124,9 +124,9 @@ func (m *VirtualSwitchManager) GetVirtualSwitchProperties(vSwitchURI string) (*V
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on getting switch properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(errors.New(errorResponseBody.Message)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(errors.New(errorResponseBody.Message)))
 	return nil, status, errorResponseBody
 }

@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.ibm.com/genctl/shared-logger/genlog"
+	"go.uber.org/zap"
 )
 
 // NicAPI defines an interface for issuing NIC requests to ZHMC
@@ -57,10 +57,10 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nic, "")
 	if err != nil {
 		logger.Error("error on create nic",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return "", status, err
 	}
 
@@ -69,9 +69,9 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 		err := json.Unmarshal(responseBody, &uriObj)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodPost),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodPost),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: nic created, request url: %v, method: %v, status: %v, nic uri: %v", requestUrl, http.MethodPost, status, uriObj.URI))
@@ -79,10 +79,10 @@ func (m *NicManager) CreateNic(lparURI string, nic *NIC) (string, int, *HmcError
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on create nic",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(errors.New(errorResponseBody.Message)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(errors.New(errorResponseBody.Message)))
 	return "", status, errorResponseBody
 
 }
@@ -100,10 +100,10 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on delete nic",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodDelete),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodDelete),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -114,10 +114,10 @@ func (m *NicManager) DeleteNic(nicURI string) (int, *HmcError) {
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on delete nic",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodDelete),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodDelete),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -134,10 +134,10 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on get nic properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -146,9 +146,9 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 		err := json.Unmarshal(responseBody, &nic)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, nic propeties: %v", requestUrl, http.MethodGet, status, &nic))
@@ -156,10 +156,10 @@ func (m *NicManager) GetNicProperties(nicURI string) (*NIC, int, *HmcError) {
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on get nic properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -176,10 +176,10 @@ func (m *NicManager) UpdateNicProperties(nicURI string, props *NIC) (int, *HmcEr
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 	if err != nil {
 		logger.Error("error on update nic properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -189,9 +189,9 @@ func (m *NicManager) UpdateNicProperties(nicURI string, props *NIC) (int, *HmcEr
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on update nic properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }

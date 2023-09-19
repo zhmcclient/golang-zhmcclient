@@ -177,7 +177,8 @@ var _ = Describe("client", func() {
 					Username: "",
 					Password: "",
 				}
-				client, err := NewClient(endpoint, opts)
+				var logger Logger
+				client, err := NewClient(endpoint, opts, logger)
 				Expect(client).To(BeNil())
 				Expect(err.Error()).ToNot(BeNil())
 			})

@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"path"
 
-	"github.ibm.com/genctl/shared-logger/genlog"
+	"go.uber.org/zap"
 )
 
 // LparAPI defines an interface for issuing LPAR requests to ZHMC
@@ -73,10 +73,10 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on getting lpar's",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -85,9 +85,9 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 		err := json.Unmarshal(responseBody, lpars)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: get on lpars successfull, status: %v", status))
@@ -95,10 +95,10 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error listing lpar's",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -116,10 +116,10 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on getting lpar properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -137,10 +137,10 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error getting lpar properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
 
@@ -160,10 +160,10 @@ func (m *LparManager) CreateLPAR(cpcURI string, props *LparProperties) (string, 
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 	if err != nil {
 		logger.Error("error on getting lpar's",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return "", status, err
 	}
 
@@ -178,18 +178,18 @@ func (m *LparManager) CreateLPAR(cpcURI string, props *LparProperties) (string, 
 			return responseObj.URI, status, nil
 		}
 		logger.Error("error on starting lpar",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(errors.New("empty job uri")))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(errors.New("empty job uri")))
 		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error listing lpar's",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return "", status, errorResponseBody
 }
 
@@ -207,10 +207,10 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 	if err != nil {
 		logger.Error("error on getting lpar properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -220,10 +220,10 @@ func (m *LparManager) UpdateLparProperties(lparURI string, props *LparProperties
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error updating lpar properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -242,10 +242,10 @@ func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on starting lpar",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return "", status, err
 	}
 
@@ -260,19 +260,19 @@ func (m *LparManager) StartLPAR(lparURI string) (string, int, *HmcError) {
 			return responseObj.URI, status, nil
 		}
 		logger.Error("error on starting lpar",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(errors.New("empty job uri")))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(errors.New("empty job uri")))
 		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error starting lpar",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return "", status, errorResponseBody
 }
 
@@ -291,10 +291,10 @@ func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on stopping lpar",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return "", status, err
 	}
 
@@ -303,9 +303,9 @@ func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 		err := json.Unmarshal(responseBody, &responseObj)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return "", status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
@@ -313,18 +313,18 @@ func (m *LparManager) StopLPAR(lparURI string) (string, int, *HmcError) {
 			return responseObj.URI, status, nil
 		}
 		logger.Error("error on stopping lpar",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(errors.New("empty job uri")))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(errors.New("empty job uri")))
 		return "", status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error stopping lpar",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return "", status, errorResponseBody
 }
 
@@ -342,10 +342,10 @@ func (m *LparManager) DeleteLPAR(lparURI string) (int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodDelete, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error deleting partition",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodDelete),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodDelete),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -355,10 +355,10 @@ func (m *LparManager) DeleteLPAR(lparURI string) (int, *HmcError) {
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error deleting partition",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodDelete),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodDelete),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -377,7 +377,7 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	}
 	imageData, byteErr := RetrieveBytes(isoFile)
 	if byteErr != nil {
-		logger.Error("error on retrieving iso file", genlog.Error(byteErr))
+		logger.Error("error on retrieving iso file", zap.Error(byteErr))
 	}
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/mount-iso-image")
@@ -388,10 +388,10 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	status, responseBody, err := m.client.UploadRequest(http.MethodPost, requestUrl, imageData)
 	if err != nil {
 		logger.Error("error mounting iso image",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -401,10 +401,10 @@ func (m *LparManager) MountIsoImage(lparURI string, isoFile string, insFile stri
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error mounting iso image",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -422,10 +422,10 @@ func (m *LparManager) UnmountIsoImage(lparURI string) (int, *HmcError) {
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error unmounting iso image",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -436,10 +436,10 @@ func (m *LparManager) UnmountIsoImage(lparURI string) (int, *HmcError) {
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error unmounting iso image",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -450,10 +450,10 @@ func (m *LparManager) ListNics(lparURI string) ([]string, int, *HmcError) {
 	props, status, err := m.GetLparProperties(lparURI)
 	if err != nil {
 		logger.Error("error listing nics",
-			genlog.String("request url", fmt.Sprint(lparURI)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(lparURI)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 	logger.Info(fmt.Sprintf("request url: %v, method: %v, status: %v, nic uri's: %v", lparURI, status, http.MethodGet, props.NicUris))
@@ -477,10 +477,10 @@ func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *Sto
 
 	if err != nil {
 		logger.Error("error on attach storage group to partition",
-			genlog.String("request url", fmt.Sprint(lparURI)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(lparURI)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -491,10 +491,10 @@ func (m *LparManager) AttachStorageGroupToPartition(lparURI string, request *Sto
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error attaching storage group to partition",
-		genlog.String("request url", fmt.Sprint(lparURI)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(lparURI)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -513,10 +513,10 @@ func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 
 	if err != nil {
 		logger.Error("error on detach storage group to partition",
-			genlog.String("request url", fmt.Sprint(lparURI)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(lparURI)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return status, err
 	}
 
@@ -527,10 +527,10 @@ func (m *LparManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error detaching storage group to partition",
-		genlog.String("request url", fmt.Sprint(lparURI)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(lparURI)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }
 
@@ -554,10 +554,10 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 
 	if err != nil {
 		logger.Error("error on fetch ascii console uri",
-			genlog.String("request url", fmt.Sprint(lparURI)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(lparURI)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -567,9 +567,9 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 		err := json.Unmarshal(responseBody, &responseObj)
 		if err != nil {
 			logger.Error("error on unmarshalling adapters",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		if responseObj.URI != "" {
@@ -582,18 +582,18 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 			return newResponseObj, status, nil
 		}
 		logger.Error("error on fetch ascii console uri",
-			genlog.String("request url", fmt.Sprint(lparURI)),
-			genlog.String("method", http.MethodPost),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(errors.New("empty job uri")))
+			zap.String("request url", fmt.Sprint(lparURI)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(errors.New("empty job uri")))
 		return responseObj, status, getHmcErrorFromMsg(ERR_CODE_EMPTY_JOB_URI, ERR_MSG_EMPTY_JOB_URI)
 	}
 
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error on fetch ascii console uri",
-		genlog.String("request url", fmt.Sprint(lparURI)),
-		genlog.String("method", http.MethodPost),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(lparURI)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }

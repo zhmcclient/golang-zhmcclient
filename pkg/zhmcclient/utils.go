@@ -20,13 +20,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-
-	"github.ibm.com/genctl/shared-logger/genlog"
 )
 
 type HmcErrorCode int
-
-var logger = genlog.New()
 
 const (
 	ERR_CODE_HMC_INVALID_URL HmcErrorCode = iota + 1000

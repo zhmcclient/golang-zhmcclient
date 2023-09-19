@@ -38,8 +38,8 @@ type ZhmcManager struct {
 	jobManager           JobAPI
 }
 
-func NewManagerFromOptions(endpoint string, creds *Options) ZhmcAPI {
-	client, _ := NewClient(endpoint, creds)
+func NewManagerFromOptions(endpoint string, creds *Options, logger Logger) ZhmcAPI {
+	client, _ := NewClient(endpoint, creds, logger)
 	if client != nil {
 		return NewManagerFromClient(client)
 	}
