@@ -36,6 +36,21 @@ type CpcAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
+	GetCPCPropertiesStub        func(string) (*zhmcclient.CPCProperties, int, *zhmcclient.HmcError)
+	getCPCPropertiesMutex       sync.RWMutex
+	getCPCPropertiesArgsForCall []struct {
+		arg1 string
+	}
+	getCPCPropertiesReturns struct {
+		result1 *zhmcclient.CPCProperties
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
+	getCPCPropertiesReturnsOnCall map[int]struct {
+		result1 *zhmcclient.CPCProperties
+		result2 int
+		result3 *zhmcclient.HmcError
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -102,6 +117,73 @@ func (fake *CpcAPI) ListCPCsReturnsOnCall(i int, result1 []zhmcclient.CPC, resul
 	}
 	fake.listCPCsReturnsOnCall[i] = struct {
 		result1 []zhmcclient.CPC
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *CpcAPI) GetCPCProperties(arg1 string) (*zhmcclient.CPCProperties, int, *zhmcclient.HmcError) {
+	fake.getCPCPropertiesMutex.Lock()
+	ret, specificReturn := fake.getCPCPropertiesReturnsOnCall[len(fake.getCPCPropertiesArgsForCall)]
+	fake.getCPCPropertiesArgsForCall = append(fake.getCPCPropertiesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetCPCPropertiesStub
+	fakeReturns := fake.getCPCPropertiesReturns
+	fake.recordInvocation("GetCPCProperties", []interface{}{arg1})
+	fake.getCPCPropertiesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *CpcAPI) GetCPCPropertiesCallCount() int {
+	fake.getCPCPropertiesMutex.RLock()
+	defer fake.getCPCPropertiesMutex.RUnlock()
+	return len(fake.getCPCPropertiesArgsForCall)
+}
+
+func (fake *CpcAPI) GetCPCPropertiesCalls(stub func(string) (*zhmcclient.CPCProperties, int, *zhmcclient.HmcError)) {
+	fake.getCPCPropertiesMutex.Lock()
+	defer fake.getCPCPropertiesMutex.Unlock()
+	fake.GetCPCPropertiesStub = stub
+}
+
+func (fake *CpcAPI) GetCPCPropertiesArgsForCall(i int) string {
+	fake.getCPCPropertiesMutex.RLock()
+	defer fake.getCPCPropertiesMutex.RUnlock()
+	argsForCall := fake.getCPCPropertiesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *CpcAPI) GetCPCPropertiesReturns(result1 *zhmcclient.CPCProperties, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getCPCPropertiesMutex.Lock()
+	defer fake.getCPCPropertiesMutex.Unlock()
+	fake.GetCPCPropertiesStub = nil
+	fake.getCPCPropertiesReturns = struct {
+		result1 *zhmcclient.CPCProperties
+		result2 int
+		result3 *zhmcclient.HmcError
+	}{result1, result2, result3}
+}
+
+func (fake *CpcAPI) GetCPCPropertiesReturnsOnCall(i int, result1 *zhmcclient.CPCProperties, result2 int, result3 *zhmcclient.HmcError) {
+	fake.getCPCPropertiesMutex.Lock()
+	defer fake.getCPCPropertiesMutex.Unlock()
+	fake.GetCPCPropertiesStub = nil
+	if fake.getCPCPropertiesReturnsOnCall == nil {
+		fake.getCPCPropertiesReturnsOnCall = make(map[int]struct {
+			result1 *zhmcclient.CPCProperties
+			result2 int
+			result3 *zhmcclient.HmcError
+		})
+	}
+	fake.getCPCPropertiesReturnsOnCall[i] = struct {
+		result1 *zhmcclient.CPCProperties
 		result2 int
 		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}

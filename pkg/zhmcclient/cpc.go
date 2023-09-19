@@ -28,6 +28,7 @@ import (
 //go:generate counterfeiter -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
 	ListCPCs(query map[string]string) ([]CPC, int, *HmcError)
+	GetCPCProperties(cpcURI string) (*CPCProperties, int, *HmcError)
 }
 
 type CpcManager struct {
@@ -81,5 +82,48 @@ func (m *CpcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 		zap.String("status: ", fmt.Sprint(status)),
 		zap.Error(errors.New(errorResponseBody.Message)))
 
+	return nil, status, errorResponseBody
+}
+
+/**
+* GET /api/cpcs/{cpc-id}
+* @return cpc properties
+* Return: 200 and Cpcs properties
+*     or: 400, 404, 409
+ */
+func (m *CpcManager) GetCPCProperties(cpcURI string) (*CPCProperties, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, cpcURI)
+
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodGet))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
+	if err != nil {
+		logger.Error("error on getting cpc properties",
+			genlog.String("request url", fmt.Sprint(requestUrl)),
+			genlog.String("method", http.MethodGet),
+			genlog.String("status", fmt.Sprint(status)),
+			genlog.Error(fmt.Errorf("%v", err)))
+		return nil, status, err
+	}
+
+	if status == http.StatusOK {
+		cpcProps := &CPCProperties{}
+		err := json.Unmarshal(responseBody, cpcProps)
+		if err != nil {
+			logger.Error("error on unmarshalling cpcs",
+				genlog.String("request url", fmt.Sprint(requestUrl)),
+				genlog.String("method", http.MethodGet),
+				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, cpcs: %v", requestUrl, http.MethodGet, status, cpcProps))
+		return cpcProps, status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error getting cpc properties",
+		genlog.String("request url", fmt.Sprint(requestUrl)),
+		genlog.String("method", http.MethodGet),
+		genlog.String("status: ", fmt.Sprint(status)),
+		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }

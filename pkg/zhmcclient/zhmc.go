@@ -63,6 +63,9 @@ func NewManagerFromClient(client ClientAPI) ZhmcAPI {
 func (m *ZhmcManager) ListCPCs(query map[string]string) ([]CPC, int, *HmcError) {
 	return m.cpcManager.ListCPCs(query)
 }
+func (m *ZhmcManager) GetCPCProperties(cpcURI string) (*CPCProperties, int, *HmcError) {
+	return m.cpcManager.GetCPCProperties(cpcURI)
+}
 
 // LPAR
 func (m *ZhmcManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError) {

@@ -207,6 +207,8 @@ func main() {
 					DetachStorageGroupToPartitionofCPC(hmcManager)
 				case "AttachStorageGroupToPartitionofCPC":
 					AttachStorageGroupToPartitionofCPC(hmcManager)
+				case "GetCPCProps":
+					GetCPCProps(hmcManager)
 				case "GetAdapterPropsforCPC":
 					GetAdapterPropsforCPC(hmcManager)
 				case "GetNetworkAdapterPortforCPC":
@@ -251,8 +253,13 @@ func GetCpcURL(hmcManager zhmcclient.ZhmcAPI) (cpcuri string) {
 }
 
 func GetCPCURI(hmcManager zhmcclient.ZhmcAPI) string {
+	cpcURI := ""
+	cpcID := os.Getenv("CPC_ID")
+	if cpcID != "" {
+		cpcURI = "api/cpcs/" + cpcID
+		return cpcURI
+	}
 	query := map[string]string{}
-	cpcID := ""
 	cpcName := os.Getenv("CPC_NAME")
 	cpcs, _, err := hmcManager.ListCPCs(query)
 	if err != nil {
@@ -264,11 +271,11 @@ func GetCPCURI(hmcManager zhmcclient.ZhmcAPI) string {
 			logger.Info("cpc name: " + cpc.Name)
 			logger.Info("cpc uri: " + cpc.URI)
 			if cpc.Name == cpcName {
-				cpcID = cpc.URI
+				cpcURI = cpc.URI
 			}
 		}
 	}
-	return cpcID
+	return cpcURI
 }
 
 func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
@@ -301,6 +308,33 @@ func ListAdaptersofCPC(hmcManager zhmcclient.ZhmcAPI) {
 		}
 		logger.Info("\n-----------------------")
 	}
+}
+
+func GetCPCProps(hmcManager zhmcclient.ZhmcAPI) {
+	cpcURI := GetCPCURI(hmcManager)
+	cpc, _, err := hmcManager.GetCPCProperties(cpcURI)
+	if err != nil {
+		logger.Fatal("", genlog.Any("Get CPC properties error", err))
+	}
+	logger.Info("Get properties operation successfull")
+	logger.Info("********* CPC properties **************")
+	logger.Info("\n- URLandID: " + cpc.ObjectURI)
+	logger.Info("\n- MachineModel: " + cpc.MachineModel)
+	logger.Info("\n- MachineType: " + cpc.MachineType)
+	logger.Info("\n- MachineSN: " + cpc.MachineSerialNumber)
+	logger.Info("\n- CpcSN: " + cpc.CpcSerialNumber)
+	logger.Info("\n- EcMCL-BundleLevel: " + cpc.EcMclDescription.BundleLevel)
+	logger.Info("\n- EcMCL-DriverLevel: " + cpc.EcMclDescription.DriverLevel)
+	logger.Info("\n- Status: " + string(cpc.Status))
+	logger.Info("\n- DpmEnabled: " + fmt.Sprint(cpc.DpmEnabled))
+	logger.Info("\n- MaxHipersockets: " + fmt.Sprint(cpc.MaximumHipersockets))
+	logger.Info("\n- MaxPartitions: " + fmt.Sprint(cpc.MaximumPartitions))
+	logger.Info("\n- ProcessorCountIfl: " + fmt.Sprint(cpc.ProcessorCountIfl))
+	logger.Info("\n- Storage-TotalInstalled: " + fmt.Sprint(cpc.StorageTotalInstalled))
+	logger.Info("\n- Storage-Customer: " + fmt.Sprint(cpc.StorageCustomer))
+	logger.Info("\n- Storage-CustomerAvailable: " + fmt.Sprint(cpc.StorageCustomerAvailable))
+	logger.Info("*********************************************")
+
 }
 
 func GetStorageAdapterPortforCPC(hmcManager zhmcclient.ZhmcAPI) {

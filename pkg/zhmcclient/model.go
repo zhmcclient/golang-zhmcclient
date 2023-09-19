@@ -272,6 +272,109 @@ const (
 	CPC_STATUS_DEGRADED                   = "degraded"
 )
 
+type CpcImlMode string
+
+const (
+	CPC_IML_MODE_NOT_SET    CpcImlMode = "not-set"
+	CPC_IML_MODE_ESA390                = "esa390"
+	CPC_IML_MODE_LPAR                  = "lpar"
+	CPC_IML_MODE_ESA390_TPF            = "esa390-tpf"
+	CPC_IML_MODE_DPM                   = "dpm"
+)
+
+type CpcDegradedStatus string
+
+const (
+	CPC_DEGRADED_MEMORY       CpcDegradedStatus = "memory"
+	CPC_DEGRADED_IO                             = "io"
+	CPC_DEGRADED_NODE                           = "node"
+	CPC_DEGRADED_RING                           = "ring"
+	CPC_DEGRADED_CBU                            = "cbu"
+	CPC_DEGRADED_MRU                            = "mru"
+	CPC_DEGRADED_AMBIENT_TEMP                   = "ambient-temp"
+	CPC_DEGRADED_IML                            = "iml"
+)
+
+type CpcProcessorRunningTime string
+
+const (
+	PROCESSOR_RUNNING_TIME_SYSTEM_DETERMINED CpcProcessorRunningTime = "system-determined"
+	PROCESSOR_RUNNING_TIME_USER_DETERMINED                           = "user-determined"
+)
+
+type CpcLanInterfaceType string
+
+const (
+	CPC_LAN_INTERFACE_ETHERNET   CpcLanInterfaceType = "ethernet"
+	CPC_LAN_INTERFACE_TOKEN_RING                     = "token-ring"
+	CPC_LAN_INTERFACE_UNKNOWN                        = "unknown"
+)
+
+type IPv6Type string
+
+const (
+	IPV6_TYPE_LINK_LOCAL IPv6Type = "link-local"
+	IPV6_TYPE_STATIC              = "static"
+	IPV6_TYPE_AUTO                = "auto"
+)
+
+type CPCFeatureName string
+
+const (
+	CPC_FEATURE_DPM_STORAGE_MANAGEMENT             CPCFeatureName = "dpm-storage-management"
+	CPC_FEATURE_DPM_FCP_TAPE_MANAGEMENT                           = "dpm-fcp-tape-management"
+	CPC_FEATURE_DPM_SMCD_PARTITION_LINK_MANAGEMENT                = "dpm-smcd-partition-link-management"
+)
+
+type AutoStartEntryType string
+
+const (
+	AUTO_START_ENTRY_PARTITION       AutoStartEntryType = "partition"
+	AUTO_START_ENTRY_PARTITION_GROUP                    = "partition-group"
+)
+
+type PowerSave string
+
+const (
+	POWER_SAVE_HIGHT_PERFORMANCE PowerSave = "high-performance"
+	POWER_SAVE_LOW_POWER                   = "low-power"
+	POWER_SAVE_CUSTOM                      = "custom"
+	POWER_SAVE_NOT_SUPPORTED               = "not-supported"
+	POWER_SAVE_NOT_AVAILABLE               = "not-available"
+	POWER_SAVE_NOT_ENTITLED                = "not-entitled"
+)
+
+type PowerSaveState string
+
+const (
+	POWER_SAVE_STATE_HIGHT_PERFORMANCE PowerSaveState = "high-performance"
+	POWER_SAVE_STATE_LOW_POWER                        = "low-power"
+	POWER_SAVE_STATE_CUSTOM                           = "custom"
+	POWER_SAVE_STATE_NOT_SUPPORTED                    = "not-supported"
+	POWER_SAVE_STATE_NOT_ENTITLED                     = "not-entitled"
+)
+
+type PowerAllowed string
+
+const (
+	POWER_ALLOWED                     PowerAllowed = "allowed"
+	POWER_ALLOWED_UNKNOWN                          = "unknown"
+	POWER_ALLOWED_NOT_SUPPORTED                    = "not-supported"
+	POWER_ALLOWED_NOT_ENTITLED                     = "not-entitled"
+	POWER_ALLOWED_UNDER_GROUP_CONTROL              = "under-group-control"
+	POWER_ALLOWED_ONCE_A_DAY_EXCEEDED              = "once-a-day-exceeded"
+)
+
+type PowerCapState string
+
+const (
+	POWER_CAP_STATE_DISABLED      PowerCapState = "disabled"
+	POWER_CAP_STATE_ENABLED                     = "enabled"
+	POWER_CAP_STATE_NOT_CUSTOM                  = "custom"
+	POWER_CAP_STATE_NOT_SUPPORTED               = "not-supported"
+	POWER_CAP_STATE_NOT_ENTITLED                = "not-entitled"
+)
+
 /**
 * Sample:
 * {
@@ -294,6 +397,190 @@ type CPC struct {
 
 type CpcsArray struct {
 	CPCS []CPC `json:"cpcs"`
+}
+
+type CPCProperties struct {
+	ObjectURI                             string                  `json:"object-uri,omitempty"`
+	Parent                                string                  `json:"parent,omitempty"`
+	Class                                 string                  `json:"class,omitempty"`
+	Name                                  string                  `json:"name,omitempty"`
+	Description                           string                  `json:"description,omitempty"`
+	Status                                CpcStatus               `json:"status,omitempty"`
+	AcceptableStatus                      []CpcStatus             `json:"acceptable-status,omitempty"`
+	SeVersion                             string                  `json:"se-version,omitempty"`
+	HasHardwareMessages                   bool                    `json:"has-hardware-messages,omitempty"`
+	ImlMode                               CpcImlMode              `json:"iml-mode,omitempty"`
+	DpmEnabled                            bool                    `json:"dpm-enabled,omitempty"`
+	AutoStartList                         []AutoStartEntry        `json:"auto-start-list,omitempty"`
+	IsCpacfEnabled                        bool                    `json:"is-cpacf-enabled,omitempty"`
+	NextActivationProfileName             string                  `json:"next-activation-profile-name,omitempty"`
+	LastUsedActivationProfile             string                  `json:"last-used-activation-profile,omitempty"`
+	LastUsedIocds                         string                  `json:"last-used-iocds,omitempty"`
+	MachineModel                          string                  `json:"machine-model,omitempty"`
+	MachineType                           string                  `json:"machine-type,omitempty"`
+	MachineSerialNumber                   string                  `json:"machine-serial-number,omitempty"`
+	CpcSerialNumber                       string                  `json:"cpc-serial-number,omitempty"`
+	CpcNodeDescriptor                     string                  `json:"cpc-node-descriptor,omitempty"`
+	IsCbuInstalled                        bool                    `json:"is-cbu-installed,omitempty"`
+	IsCbuEnabled                          bool                    `json:"is-cbu-enabled,omitempty"`
+	IsCbuActivated                        bool                    `json:"is-cbu-activated,omitempty"`
+	IsRealCbuAvailable                    bool                    `json:"is-real-cbu-available,omitempty"`
+	CbuActivationDate                     int64                   `json:"cbu-activation-date,omitempty"`
+	CbuExpirationDate                     int64                   `json:"cbu-expiration-date,omitempty"`
+	CbuNumberOfTestsLeft                  int                     `json:"cbu-number-of-tests-left,omitempty"`
+	IsSecureExecutionEnabled              bool                    `json:"is-secure-execution-enabled,omitempty"`
+	IsGlobalKeyInstalled                  bool                    `json:"is-global-key-installed,omitempty"`
+	IsHostKeyInstalled                    bool                    `json:"is-host-key-installed,omitempty"`
+	GlobalPrimaryKeyHash                  string                  `json:"global-primary-key-hash,omitempty"`
+	GlobalSecondaryKeyHash                string                  `json:"global-secondary-key-hash,omitempty"`
+	HostPrimaryKeyHash                    string                  `json:"host-primary-key-hash,omitempty"`
+	HostSecondaryKeyHash                  string                  `json:"host-secondary-key-hash,omitempty"`
+	IsServiceRequired                     bool                    `json:"is-service-required,omitempty"`
+	DegradedStatus                        []CpcDegradedStatus     `json:"degraded-status,omitempty"`
+	ProcessorRunningTimeType              CpcProcessorRunningTime `json:"processor-running-time-type,omitempty"`
+	ProcessorRunningTime                  int                     `json:"processor-running-time,omitempty"`
+	DoesWaitStateEndTimeSlice             bool                    `json:"does-wait-state-end-time-slice,omitempty"`
+	IsOnOffCodInstalled                   bool                    `json:"is-on-off-cod-installed,omitempty"`
+	IsOnOffCodEnabled                     bool                    `json:"is-on-off-cod-enabled,omitempty"`
+	IsOnOffCodActivated                   bool                    `json:"is-on-off-cod-activated,omitempty"`
+	OnOffCodActivationDate                int64                   `json:"on-off-cod-activation-date,omitempty"`
+	SoftwareModelPermanent                string                  `json:"software-model-permanent,omitempty"`
+	SoftwareModelPermanentPlusBillable    string                  `json:"software-model-permanent-plus-billable,omitempty"`
+	SoftwareModelPermanentPlusTemporary   string                  `json:"software-model-permanent-plus-temporary,omitempty"`
+	SoftwareModelPurchased                string                  `json:"software-model-purchased,omitempty"`
+	MsuPermanent                          int                     `json:"msu-permanent,omitempty"`
+	MsuPermanentPlusBillable              int                     `json:"msu-permanent-plus-billable,omitempty"`
+	MsuPermanentPlusTemporary             int                     `json:"msu-permanent-plus-temporary,omitempty"`
+	MsuPurchased                          int                     `json:"msu-purchased,omitempty"`
+	ProcessorCountGeneralPurpose          int                     `json:"processor-count-general-purpose,omitempty"`
+	ProcessorCountServiceAssist           int                     `json:"processor-count-service-assist,omitempty"`
+	ProcessorCountAap                     int                     `json:"processor-count-aap,omitempty"`
+	ProcessorCountIfl                     int                     `json:"processor-count-ifl,omitempty"`
+	ProcessorCountIcf                     int                     `json:"processor-count-icf,omitempty"`
+	ProcessorCountIip                     int                     `json:"processor-count-iip,omitempty"`
+	ProcessorCountDefective               int                     `json:"processor-count-defective,omitempty"`
+	ProcessorCountSpare                   int                     `json:"processor-count-spare,omitempty"`
+	ProcessorCountPending                 int                     `json:"processor-count-pending,omitempty"`
+	ProcessorCountPendingGeneralPurpose   int                     `json:"processor-count-pending-general-purpose,omitempty"`
+	ProcessorCountPendingServiceAssist    int                     `json:"processor-count-pending-service-assist,omitempty"`
+	ProcessorCountPendingAap              int                     `json:"processor-count-pending-aap,omitempty"`
+	ProcessorCountPendingIfl              int                     `json:"processor-count-pending-ifl,omitempty"`
+	ProcessorCountPendingIcf              int                     `json:"processor-count-pending-icf,omitempty"`
+	ProcessorCountPendingIip              int                     `json:"processor-count-pending-iip,omitempty"`
+	ProcessorCountPermanentServiceAssist  int                     `json:"processor-count-permanent-service-assist,omitempty"`
+	ProcessorCountPermanentIfl            int                     `json:"processor-count-permanent-ifl,omitempty"`
+	ProcessorCountPermanentIcf            int                     `json:"processor-count-permanent-icf,omitempty"`
+	ProcessorCountPermanentIip            int                     `json:"processor-count-permanent-iip,omitempty"`
+	ProcessorCountUnassignedServiceAssist int                     `json:"processor-count-unassigned-service-assist,omitempty"`
+	ProcessorCountUnassignedIfl           int                     `json:"processor-count-unassigned-ifl,omitempty"`
+	ProcessorCountUnassignedIcf           int                     `json:"processor-count-unassigned-icf,omitempty"`
+	ProcessorCountUnassignedIip           int                     `json:"processor-count-unassigned-iip,omitempty"`
+	HasTemporaryCapacityChangeAllowed     bool                    `json:"has-temporary-capacity-change-allowed,omitempty"`
+	EcMclDescription                      EcMcl                   `json:"ec-mcl-description,omitempty"`
+	HasAutomaticSeSwitchEnabled           bool                    `json:"has-automatic-se-switch-enabled,omitempty"`
+	LanInterface1Address                  string                  `json:"lan-interface1-address,omitempty"`
+	LanInterface1Type                     CpcLanInterfaceType     `json:"lan-interface1-type,omitempty"`
+	LanInterface2Address                  string                  `json:"lan-interface2-address,omitempty"`
+	LanInterface2Type                     CpcLanInterfaceType     `json:"lan-interface2-type,omitempty"`
+	Network1Ipv4Mask                      string                  `json:"network1-ipv4-mask,omitempty"`
+	Network1Ipv4PriIpaddr                 string                  `json:"network1-ipv4-pri-ipaddr,omitempty"`
+	Network1Ipv4AltIpaddr                 string                  `json:"network1-ipv4-alt-ipaddr,omitempty"`
+	Network1Ipv6Info                      []Ipv6Info              `json:"network1-ipv6-info,omitempty"`
+	Network2Ipv4Mask                      string                  `json:"network2-ipv4-mask,omitempty"`
+	Network2Ipv4PriIpaddr                 string                  `json:"network2-ipv4-pri-ipaddr,omitempty"`
+	Network2Ipv4AltIpaddr                 string                  `json:"network2-ipv4-alt-ipaddr,omitempty"`
+	Network2Ipv6Info                      []Ipv6Info              `json:"network2-ipv6-info,omitempty"`
+	HardwareMessages                      []HardwareMessage       `json:"hardware-messages,omitempty"`
+	StorageTotalInstalled                 int64                   `json:"storage-total-installed,omitempty"`
+	StorageHardwareSystemArea             int64                   `json:"storage-hardware-system-area,omitempty"`
+	StorageCustomer                       int64                   `json:"storage-customer,omitempty"`
+	StorageCustomerCentral                int64                   `json:"storage-customer-central,omitempty"`
+	StorageCustomerExpanded               int64                   `json:"storage-customer-expanded,omitempty"`
+	StorageCustomerAvailable              int64                   `json:"storage-customer-available,omitempty"`
+	StorageVfmIncrementSize               int64                   `json:"storage-vfm-increment-size,omitempty"`
+	StorageVfmTotal                       int64                   `json:"storage-vfm-total,omitempty"`
+	MaximumHipersockets                   int                     `json:"maximum-hipersockets,omitempty"`
+	MaximumAlternateStorageSites          int                     `json:"maximum-alternate-storage-sites,omitempty"`
+	AvailableFeaturesList                 []CPCFeatureInfo        `json:"available-features-list,omitempty"`
+	MaximumPartitions                     int                     `json:"maximum-partitions,omitempty"`
+	ManagementWorldWidePortName           string                  `json:"management-world-wide-port-name,omitempty"`
+	SnaName                               string                  `json:"sna-name,omitempty"`
+	TargetName                            string                  `json:"target-name,omitempty"`
+	MaximumIsmVchids                      int                     `json:"maximum-ism-vchids,omitempty"`
+	MinimumFidNumber                      int                     `json:"minimum-fid-number,omitempty"`
+	MaximumFidNumber                      int                     `json:"maximum-fid-number,omitempty"`
+	CPCPowerRating                        int                     `json:"cpc-power-rating,omitempty"`
+	CPCPowerConsumption                   int                     `json:"cpc-power-consumption,omitempty"`
+	CPCPowerSaving                        PowerSave               `json:"cpc-power-saving,omitempty"`
+	CPCPowerSavingState                   PowerSaveState          `json:"cpc-power-saving-state,omitempty"`
+	CPCPowerSaveAllowed                   PowerAllowed            `json:"cpc-power-save-allowed,omitempty"`
+	CPCPowerCappingState                  PowerCapState           `json:"cpc-power-capping-state,omitempty"`
+	CPCPowerCapMinimum                    int                     `json:"cpc-power-cap-minimum,omitempty"`
+	CPCPowerCapMaximum                    int                     `json:"cpc-power-cap-maximum,omitempty"`
+	CPCPowerCapCurrent                    int                     `json:"cpc-power-cap-current,omitempty"`
+	CPCPowerCapAllowed                    PowerAllowed            `json:"cpc-power-cap-allowed,omitempty"`
+	ZCPCPowerRating                       int                     `json:"zcpc-power-rating,omitempty"`
+	ZCPCPowerConsumption                  int                     `json:"zcpc-power-consumption,omitempty"`
+	ZCPCPowerSaving                       PowerSave               `json:"zcpc-power-saving,omitempty"`
+	ZCPCPowerSavingState                  PowerSaveState          `json:"zcpc-power-saving-state,omitempty"`
+	ZCPCPowerSaveAllowed                  PowerAllowed            `json:"zcpc-power-save-allowed,omitempty"`
+	ZCPCPowerCappingState                 PowerCapState           `json:"zcpc-power-capping-state,omitempty"`
+	ZCPCPowerCapMinimum                   int                     `json:"zcpc-power-cap-minimum,omitempty"`
+	ZCPCPowerCapMaximum                   int                     `json:"zcpc-power-cap-maximum,omitempty"`
+	ZCPCPowerCapCurrent                   int                     `json:"zcpc-power-cap-current,omitempty"`
+	ZCPCPowerCapAllowed                   PowerAllowed            `json:"zcpc-power-cap-allowed,omitempty"`
+	ZCPCAmbientTemperature                float64                 `json:"zcpc-ambient-temperature,omitempty"`
+	ZCPCExhaustTemperature                float64                 `json:"zcpc-exhaust-temperature,omitempty"`
+	ZCPCHumidity                          int                     `json:"zcpc-humidity,omitempty"`
+	ZCPCDewPoint                          float64                 `json:"zcpc-dew-point,omitempty"`
+	ZCPCHeatLoad                          int                     `json:"zcpc-heat-load,omitempty"`
+	ZCPCHeatLoadForcedAir                 int                     `json:"zcpc-heat-load-forced-air,omitempty"`
+	ZCPCHeatLoadWater                     int                     `json:"zcpc-heat-load-water,omitempty"`
+	ZCPCMaximumPotentialPower             int                     `json:"zcpc-maximum-potential-power,omitempty"`
+	ZCPCMaximumPotentialHeatLoad          int                     `json:"zcpc-maximum-potential-heat-load,omitempty"`
+	LastEnergyAdviceTime                  int64                   `json:"last-energy-advice-time,omitempty"`
+	ZCPCMinimumInletAirTemperature        float64                 `json:"zcpc-minimum-inlet-air-temperature,omitempty"`
+	ZCPCMaximumInletAirTemperature        float64                 `json:"zcpc-maximum-inlet-air-temperature,omitempty"`
+	ZCPCMaximumInletLiquidTemperature     float64                 `json:"zcpc-maximum-inlet-liquid-temperature,omitempty"`
+	ZCPCEnvironmentalClass                string                  `json:"zcpc-environmental-class,omitempty"`
+}
+
+type AutoStartEntry struct {
+	PostStartDelay int                `json:"post-start-delay,omitempty"`
+	Type           AutoStartEntryType `json:"type,omitempty"`
+	PartitionURI   string             `json:"partition-uri,omitempty"`
+	Name           string             `json:"name,omitempty"`
+	Description    string             `json:"description,omitempty"`
+	PartitionURIs  []string           `json:"partition-uris,omitempty"`
+}
+
+type CPCFeatureInfo struct {
+	Name        CPCFeatureName `json:"name,omitempty"`
+	Description string         `json:"description,omitempty"`
+	State       bool           `json:"state,omitempty"`
+}
+
+type EcMcl struct {
+	LicControlLevel string `json:"lic-control-level,omitempty"`
+	DriverLevel     string `json:"driver-level,omitempty"`
+	BundleLevel     string `json:"bundle-level,omitempty"`
+}
+
+type HardwareMessage struct {
+	ElementURL       string `json:"element-uri,omitempty"`
+	ElementID        string `json:"element-id,omitempty"`
+	Parent           string `json:"parent,omitempty"`
+	Class            string `json:"class,omitempty"`
+	Timestamp        int64  `json:"timestamp,omitempty"`
+	ServiceSupported bool   `json:"service-supported,omitempty"`
+	Text             string `json:"text,omitempty"`
+}
+
+type Ipv6Info struct {
+	Type         IPv6Type `json:"type,omitempty"`
+	Prefix       int      `json:"prefix,omitempty"`
+	PriIpAddress string   `json:"pri-ip-address,omitempty"`
+	AltIpAddress string   `json:"alt-ip-address,omitempty"`
 }
 
 //////////////////////////////////////////////////
