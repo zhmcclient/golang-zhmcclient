@@ -26,8 +26,8 @@ import (
 )
 
 func NewZapLogger() zhmcclient.Logger {
-    zapLogger, _ := zap.NewProduction()
-    return zapLogger
+	zapLogger, _ := zap.NewProduction()
+	return zapLogger
 }
 
 var logger = NewZapLogger()
@@ -314,7 +314,7 @@ func GetCPCProps(hmcManager zhmcclient.ZhmcAPI) {
 	cpcURI := GetCPCURI(hmcManager)
 	cpc, _, err := hmcManager.GetCPCProperties(cpcURI)
 	if err != nil {
-		logger.Fatal("", genlog.Any("Get CPC properties error", err))
+		logger.Fatal("", zap.Any("Get CPC properties error", err))
 	}
 	logger.Info("Get properties operation successfull")
 	logger.Info("********* CPC properties **************")

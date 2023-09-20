@@ -99,10 +99,10 @@ func (m *CpcManager) GetCPCProperties(cpcURI string) (*CPCProperties, int, *HmcE
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodGet, requestUrl, nil, "")
 	if err != nil {
 		logger.Error("error on getting cpc properties",
-			genlog.String("request url", fmt.Sprint(requestUrl)),
-			genlog.String("method", http.MethodGet),
-			genlog.String("status", fmt.Sprint(status)),
-			genlog.Error(fmt.Errorf("%v", err)))
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
 		return nil, status, err
 	}
 
@@ -111,9 +111,9 @@ func (m *CpcManager) GetCPCProperties(cpcURI string) (*CPCProperties, int, *HmcE
 		err := json.Unmarshal(responseBody, cpcProps)
 		if err != nil {
 			logger.Error("error on unmarshalling cpcs",
-				genlog.String("request url", fmt.Sprint(requestUrl)),
-				genlog.String("method", http.MethodGet),
-				genlog.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
+				zap.String("request url", fmt.Sprint(requestUrl)),
+				zap.String("method", http.MethodGet),
+				zap.Error(fmt.Errorf("%v", getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err))))
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		logger.Info(fmt.Sprintf("Response: request url: %v, method: %v, status: %v, cpcs: %v", requestUrl, http.MethodGet, status, cpcProps))
@@ -121,9 +121,9 @@ func (m *CpcManager) GetCPCProperties(cpcURI string) (*CPCProperties, int, *HmcE
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	logger.Error("error getting cpc properties",
-		genlog.String("request url", fmt.Sprint(requestUrl)),
-		genlog.String("method", http.MethodGet),
-		genlog.String("status: ", fmt.Sprint(status)),
-		genlog.Error(fmt.Errorf("%v", errorResponseBody)))
+		zap.String("request url", fmt.Sprint(requestUrl)),
+		zap.String("method", http.MethodGet),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
 }
