@@ -19,7 +19,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
+	"github.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
 )
 
 type ClientAPI struct {

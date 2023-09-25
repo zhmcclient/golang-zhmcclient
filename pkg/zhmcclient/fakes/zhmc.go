@@ -17,7 +17,7 @@ package fakes
 import (
 	"sync"
 
-	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
+	"github.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
 )
 
 type ZhmcAPI struct {

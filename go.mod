@@ -1,4 +1,4 @@
-module github.ibm.com/zhmcclient/golang-zhmcclient
+module github.com/zhmcclient/golang-zhmcclient
 
 go 1.20
 

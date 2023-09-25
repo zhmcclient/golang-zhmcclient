@@ -21,8 +21,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
-	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient/fakes"
+	. "github.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
+	"github.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient/fakes"
 )
 
 var _ = Describe("Nic", func() {

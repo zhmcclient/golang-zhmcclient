@@ -26,30 +26,6 @@ done
 coveroutput="cover.out"
 tmpfile="tmp.out"
 
-
-function check_env() {
-
-  if [ "$TRAVIS" = true ]; then
-   if [ -z "$GH_USERNAME" ]; then
-         echo "github.ibm.com username missing, cannot pull private dependencies. Exiting ..."
-         exit 1
-    fi
-    if [ -z "$GH_POA" ]; then
-         echo "github.ibm.com token missing, cannot pull private dependencies. Exiting ..."
-         exit 1
-    fi
-    set_env
-  fi
-}
-
-# setup git credentials for github.ibm.com so we can pull private go modules
-function set_env() {
-  echo "Setting up git credentials for github.ibm.com..."
-  GIT_CRED_FILE="$(pwd)/.git-credentials"
-  echo "https://${GH_USERNAME}:${GH_POA}@github.ibm.com" > $GIT_CRED_FILE
-  git config --global credential.helper "store --file=${GIT_CRED_FILE}"
-}
-
 function run_vul_check() {
   package=${args[1]}
   go install golang.org/x/vuln/cmd/govulncheck@latest
@@ -106,8 +82,6 @@ function run_unit_tests() {
     exit 1
   fi
 }
-
-check_env
 
 if [[  $f_flag == 'true'  ]]; then
   run_unit_tests $package $file

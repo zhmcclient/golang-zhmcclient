@@ -22,7 +22,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
+	"github.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
 )
 
 func NewZapLogger() zhmcclient.Logger {

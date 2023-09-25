@@ -79,4 +79,4 @@ For further discussion of good and bad practices regarding commits, see:
 
 ## License
 
-The zhmcclient package is licensed under the [Apache 2.0 License](https://github.ibm.com/zhmcclient/golang-zhmcclient/blob/master/LICENSE).
+The zhmcclient package is licensed under the [Apache 2.0 License](https://github.com/zhmcclient/golang-zhmcclient/blob/master/LICENSE).

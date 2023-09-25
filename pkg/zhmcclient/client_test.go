@@ -21,7 +21,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.ibm.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
+	. "github.com/zhmcclient/golang-zhmcclient/pkg/zhmcclient"
 )
 
 var (
