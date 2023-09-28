@@ -10,6 +10,9 @@ permissions:
   # Optional: allow read access to pull request. Use with `only-new-issues` option.
   # pull-requests: read
 
+# run it locally
+# GO111MODULE=off golangci-lint run -v
+
 jobs:
   golangci:
     name: lint
