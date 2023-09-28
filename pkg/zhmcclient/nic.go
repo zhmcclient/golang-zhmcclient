@@ -25,6 +25,7 @@ import (
 )
 
 // NicAPI defines an interface for issuing NIC requests to ZHMC
+//
 //go:generate counterfeiter -o fakes/nic.go --fake-name NicAPI . NicAPI
 type NicAPI interface {
 	CreateNic(lparURI string, nic *NIC) (string, int, *HmcError)

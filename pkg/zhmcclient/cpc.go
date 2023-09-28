@@ -25,6 +25,7 @@ import (
 )
 
 // CpcAPI defines an interface for issuing CPC requests to ZHMC
+//
 //go:generate counterfeiter -o fakes/cpc.go --fake-name CpcAPI . CpcAPI
 type CpcAPI interface {
 	ListCPCs(query map[string]string) ([]CPC, int, *HmcError)

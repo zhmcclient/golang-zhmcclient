@@ -266,11 +266,12 @@ func (m *StorageGroupManager) UpdateStorageGroupProperties(storageGroupURI strin
 	return status, nil
 }
 
-/**
-* POST /api/storage-groups/{storage-group-id}/operations/accept-mismatched-
-  storage-volumes
-* Return: 200
-*     or: 400, 404, 409
+/*
+*
+  - POST /api/storage-groups/{storage-group-id}/operations/accept-mismatched-
+    storage-volumes
+  - Return: 200
+  - or: 400, 404, 409
 */
 func (m *StorageGroupManager) FulfillStorageGroup(storageGroupURI string, request *StorageGroupProperties) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()

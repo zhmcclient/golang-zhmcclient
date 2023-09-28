@@ -4,7 +4,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-
 type Logger interface {
 	Debug(msg string, fields ...zapcore.Field)
 	Info(msg string, fields ...zapcore.Field)

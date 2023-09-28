@@ -25,6 +25,7 @@ import (
 )
 
 // VirtualSwitchAPI defines an interface for issuing VirtualSwitch requests to ZHMC
+//
 //go:generate counterfeiter -o fakes/vswitch.go --fake-name VirtualSwitchAPI . VirtualSwitchAPI
 type VirtualSwitchAPI interface {
 	ListVirtualSwitches(cpcURI string, query map[string]string) ([]VirtualSwitch, int, *HmcError)
