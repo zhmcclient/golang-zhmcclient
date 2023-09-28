@@ -1,3 +1,4 @@
+
 // Copyright 2021-2023 IBM Corp. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +37,8 @@ import (
 )
 
 func NewZapLogger() Logger {
-    zapLogger, _ := zap.NewProduction()
-    return zapLogger
+	zapLogger, _ := zap.NewProduction()
+	return zapLogger
 }
 
 var logger = NewZapLogger()
@@ -107,8 +108,8 @@ type Client struct {
 func NewClient(endpoint string, opts *Options, l Logger) (ClientAPI, *HmcError) {
 
 	if l != nil {
-        logger = l
-    }
+		logger = l
+	}
 
 	tslConfig, err := SetCertificate(opts, &tls.Config{})
 	if err != nil {
