@@ -55,6 +55,7 @@ type ClientAPI interface {
 	SetSkipCertVerify(isSkipCert bool)
 	Logon() *HmcError
 	Logoff() *HmcError
+	GetMetricsContext() *MetricsContextDef
 	LogonConsole() (string, int, *HmcError)
 	LogoffConsole(sessionID string) *HmcError
 	IsLogon(verify bool) bool
@@ -69,6 +70,8 @@ type HTTPClient interface {
 
 const (
 	SESSION_HEADER_NAME = "X-API-Session"
+	minHMCMetricsSampleInterval = 15 //seconds
+	metricsContextCreationURI = "/api/services/metrics/context"
 )
 
 type Options struct {
@@ -100,6 +103,7 @@ type Client struct {
 	httpClient     *http.Client
 	logondata      *LogonData
 	session        *Session
+	metricsContext *MetricsContextDef
 	isSkipCert     bool
 	isTraceEnabled bool
 	traceOutput    io.Writer
@@ -250,6 +254,12 @@ func (c *Client) Logon() *HmcError {
 			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
 		}
 		c.session = session
+		metricsGroupList := []string{
+			"logical-partition-usage",
+		}
+		if err = c.createMetricsContext(metricsGroupList); err != nil {
+			return getHmcErrorFromErr(ERR_CODE_HMC_CREATE_METRICS_CTX_FAIL, err)
+		}
 		return nil
 	}
 
@@ -540,4 +550,30 @@ func (c *Client) traceHTTP(req *http.Request, resp *http.Response) error {
 	}
 
 	return nil
+}
+
+// createMetricsContext creates a "Metrics Context" resource in the HMC.
+// Metrics context is defintion of a set of metrics that will be collected.
+func (c *Client) createMetricsContext(metricsGroups []string) error {
+
+	reqBody := make(map[string]interface{})
+	reqBody["anticipated-frequency-seconds"] = minHMCMetricsSampleInterval
+	reqBody["metric-groups"] = metricsGroups
+
+	requestUrl := c.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, metricsContextCreationURI)
+	_, mcResp, err := c.ExecuteRequest(http.MethodPost, requestUrl, reqBody, "")
+
+	if err != nil {
+		return err
+	}
+
+	c.metricsContext, _ = newMetricsContext(mcResp)
+	logger.Info("Create 'MetricsContext'")
+	
+	return nil
+}
+
+func (c *Client) GetMetricsContext() *MetricsContextDef {
+	return c.metricsContext
 }

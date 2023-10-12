@@ -1027,3 +1027,10 @@ type CryptoConfig struct {
 	CryptoAdapterUris          []string     `json:"crypto-adapter-uris,omitempty"`
 	CryptoDomainConfigurations []DomainInfo `json:"crypto-domain-configurations,omitempty"`
 }
+
+type EnergyRequestPayload struct {
+	Timescale   string `json:"timescale,omitempty"`
+	Type        string `json:"type,omitempty"`
+	Range       string `json:"range,omitempty"`
+	Resolution  string `json:"resolution,omitempty"`
+}

@@ -129,6 +129,49 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
+	Describe("GetEnergyDetailsforLPAR", func() {
+		var (
+			bytes      []byte
+		)
+
+		BeforeEach(func() {
+			jsonString := `{
+				"wattage": [
+					{"data": 53, "timestamp": 1680394193292},
+					{"data": 52, "timestamp": 1680408593302}
+				]
+			}`
+			bytes = []byte(jsonString)
+		})
+
+		Context("When GetEnergyDetailsforLPAR returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, nil)
+				props := &EnergyRequestPayload{
+					Range:     "last-day",
+					Resolution: "fifteen-minutes",
+				}
+				rets, _, err := manager.GetEnergyDetailsforLPAR(lparid, props)
+
+				Expect(err).To(BeNil())
+				Expect(rets).To(Equal(uint64(52)))
+			})
+		})
+
+		Context("When GetEnergyDetailsforLPAR returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, bytes, hmcErr)
+				rets, _, err := manager.GetEnergyDetailsforLPAR(lparid, nil)
+
+				Expect(*err).To(Equal(*hmcErr))
+				Expect(rets).To(Equal(uint64(0)))
+
+			})
+		})
+	})
+
 	Describe("GetLparProperties", func() {
 		var (
 			response      *LparProperties

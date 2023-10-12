@@ -25,6 +25,7 @@ type ZhmcAPI interface {
 	StorageGroupAPI
 	VirtualSwitchAPI
 	JobAPI
+	MetricsAPI
 }
 
 type ZhmcManager struct {
@@ -36,6 +37,7 @@ type ZhmcManager struct {
 	virtualSwitchManager VirtualSwitchAPI
 	nicManager           NicAPI
 	jobManager           JobAPI
+	metricsManager       MetricsAPI
 }
 
 func NewManagerFromOptions(endpoint string, creds *Options, logger Logger) ZhmcAPI {
@@ -56,6 +58,7 @@ func NewManagerFromClient(client ClientAPI) ZhmcAPI {
 		virtualSwitchManager: NewVirtualSwitchManager(client),
 		nicManager:           NewNicManager(client),
 		jobManager:           NewJobManager(client),
+		metricsManager:       NewMetricsManager(client),
 	}
 }
 
@@ -109,6 +112,14 @@ func (m *ZhmcManager) DetachStorageGroupToPartition(lparURI string, request *Sto
 
 func (m *ZhmcManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError) {
 	return m.lparManager.FetchAsciiConsoleURI(lparURI, request)
+}
+
+func (m *ZhmcManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError) {
+	return m.lparManager.GetEnergyDetailsforLPAR(lparURI, props)
+}
+
+func (m *ZhmcManager) GetLiveEnergyDetailsforLPAR(lparURI string) (uint64, int, *HmcError) {
+	 return m.metricsManager.GetLiveEnergyDetailsforLPAR(lparURI)
 }
 
 // Adapter
