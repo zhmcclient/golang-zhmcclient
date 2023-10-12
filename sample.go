@@ -105,8 +105,11 @@ func main() {
 				"DeleteStorageGroupforCPC":	
 				    - Delete storage group operation deletes a storage group
 
-				"GetStorageGroupPropertiesforCPC":
-					- Get storage groups operation retrieves the properties of a single storage group object
+				"GetEnergyFromLpar":
+					- Get energy consumption for the specified LPAR from historical data
+
+				"GetLiveEnergyFromLpar":
+					- Get live energy consumption for the specified LPAR
 	
 					
 
@@ -233,7 +236,10 @@ func main() {
 					DeleteStorageGroupforCPC(hmcManager)
 				case "GetStorageGroupPropertiesforCPC":
 					GetStorageGroupPropertiesforCPC(hmcManager)
-
+				case "GetEnergyFromLpar":
+					GetEnergyFromLpar(hmcManager)
+				case "GetLiveEnergyFromLpar":
+					GetLiveEnergyFromLpar(hmcManager)
 				}
 
 			}
@@ -787,5 +793,33 @@ func UpdateNicProperties(hmcManager zhmcclient.ZhmcAPI) {
 		} else {
 			logger.Info(fmt.Sprintf("Updated NIC properties: %v", nic))
 		}
+	}
+}
+
+func GetEnergyFromLpar(hmcManager zhmcclient.ZhmcAPI) {
+
+	lparID := os.Getenv("PAR_ID")
+	lparURI := "/api/logical-partitions/" + lparID
+	props := &zhmcclient.EnergyRequestPayload{
+		Range:     "last-day",
+		Resolution: "fifteen-minutes",
+	}
+	energy, _, err := hmcManager.GetEnergyDetailsforLPAR(lparURI, props)
+	if err != nil {
+		logger.Error("Error getting energy error: " + err.Message)
+
+	}
+	logger.Info("Get energy data successfully with " + fmt.Sprint(energy))
+}
+
+func GetLiveEnergyFromLpar(hmcManager zhmcclient.ZhmcAPI) {
+
+	lparID := os.Getenv("PAR_ID")
+	lparURI := "/api/logical-partitions/" + lparID
+	energy, _, err := hmcManager.GetLiveEnergyDetailsforLPAR(lparURI)
+	if err != nil {
+		logger.Error("Error getting energy error: " + err.Message)
+	} else {
+		logger.Info("Get energy data successfully with power: " + fmt.Sprint(energy))
 	}
 }

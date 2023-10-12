@@ -42,10 +42,21 @@ type LparAPI interface {
 
 	ListNics(lparURI string) ([]string, int, *HmcError)
 	FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError)
+
+	GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError)
 }
 
 type LparManager struct {
 	client ClientAPI
+}
+
+type Wattage struct {
+	Data      int `json:"data"`
+	Timestamp int `json:"timestamp"`
+}
+
+type WattageData struct {
+	Wattage []Wattage `json:"wattage"`
 }
 
 func NewLparManager(client ClientAPI) *LparManager {
@@ -597,4 +608,52 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 		zap.String("status: ", fmt.Sprint(status)),
 		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return nil, status, errorResponseBody
+}
+
+// GetEnergyDetailsforLPAR
+/**
+* POST https://{hmc_addr}:{port}/api/logical-partitions/{logical-partition-id}/operations/get-historical-sustainability-data
+* Return: 200
+*     or: 400, 404, 409
+* sample response:
+	{
+		"wattage": [{
+			"data": 53,
+			"timestamp": 1680394193292
+		}, {
+			"data": 52,
+			"timestamp": 1680408593302
+		}]
+	}
+	
+ */
+func (m *LparManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations", "/get-historical-sustainability-data")
+	logger.Info("Request URL:" + string(requestUrl.Path) +  " Method:" +  http.MethodPost + " props" + fmt.Sprint(props))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
+
+	if err != nil {
+		logger.Error("error on getting lpar's energy",
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
+		return 0, status, err
+	}
+
+	logger.Info("Response : " + string(responseBody))
+
+	if status == http.StatusOK {
+		var wd WattageData
+		err := json.Unmarshal(responseBody, &wd)
+		if err != nil {
+			return 0, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		logger.Info("Response: get on lpars successfully, status:" + fmt.Sprint(status))
+		return uint64(wd.Wattage[len(wd.Wattage)-1].Data), status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	return 0, status, errorResponseBody
 }
