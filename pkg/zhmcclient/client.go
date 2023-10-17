@@ -1,4 +1,3 @@
-
 // Copyright 2021-2023 IBM Corp. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,6 +86,12 @@ type LogonData struct {
 	Password string `json:"password"`
 }
 
+type ChangePasswordData struct {
+	Userid      string `json:"userid"`
+	Password    string `json:"password"`
+	NewPassword string `json:"new-password"`
+}
+
 // TODO, Use cache and use JobTopic, ObjectTopic to update cache
 type Session struct {
 	MajorVersion int    `json:"api-major-version,omitempty"`
@@ -109,12 +114,7 @@ type Client struct {
 	traceOutput    io.Writer
 }
 
-func NewClient(endpoint string, opts *Options, l Logger) (ClientAPI, *HmcError) {
-
-	if l != nil {
-		logger = l
-	}
-
+func newClientStruct(endpoint string, opts *Options) (*Client, *HmcError) {
 	tslConfig, err := SetCertificate(opts, &tls.Config{})
 	if err != nil {
 		return nil, err
@@ -145,6 +145,19 @@ func NewClient(endpoint string, opts *Options, l Logger) (ClientAPI, *HmcError) 
 			Userid:   opts.Username,
 			Password: opts.Password,
 		},
+	}
+	return client, nil
+}
+
+func NewClient(endpoint string, opts *Options, l Logger) (ClientAPI, *HmcError) {
+
+	if l != nil {
+		logger = l
+	}
+
+	client, err := newClientStruct(endpoint, opts)
+	if err != nil {
+		return nil, err
 	}
 
 	err = client.Logon()
@@ -260,6 +273,47 @@ func (c *Client) Logon() *HmcError {
 		if err = c.createMetricsContext(metricsGroupList); err != nil {
 			return getHmcErrorFromErr(ERR_CODE_HMC_CREATE_METRICS_CTX_FAIL, err)
 		}
+		return nil
+	}
+
+	return GenerateErrorFromResponse(responseBody)
+}
+
+// login and change password, then end session
+func ChangePassword(endpoint string, opts *Options, newPassword string) *HmcError {
+	c, err := newClientStruct(endpoint, opts)
+	if err != nil {
+		return err
+	}
+
+	c.clearSession()
+	url := c.CloneEndpointURL()
+	if url == nil {
+		return &HmcError{Reason: int(ERR_CODE_HMC_INVALID_URL), Message: ERR_MSG_EMPTY_JOB_URI}
+	}
+	url.Path = path.Join(url.Path, "/api/sessions")
+
+	changePasswordData := ChangePasswordData{
+		Userid:      c.logondata.Userid,
+		Password:    c.logondata.Password,
+		NewPassword: newPassword,
+	}
+
+	status, responseBody, hmcErr := c.executeMethod(http.MethodPost, url.String(), changePasswordData, "")
+
+	defer c.Logoff()
+
+	if hmcErr != nil {
+		return hmcErr
+	}
+
+	if status == http.StatusOK || status == http.StatusCreated {
+		session := &Session{}
+		err := json.Unmarshal(responseBody, session)
+		if err != nil {
+			return getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		c.session = session
 		return nil
 	}
 
