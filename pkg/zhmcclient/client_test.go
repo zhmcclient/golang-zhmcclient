@@ -185,6 +185,27 @@ var _ = Describe("client", func() {
 		})
 	})
 
+	Describe("ChangePassword", func() {
+		BeforeEach(func() {
+			hmcErr = &HmcError{
+				Reason:  int(ERR_CODE_HMC_BAD_REQUEST),
+				Message: "error message",
+			}
+		})
+		Context("When ChangePassword is Executed", func() {
+			It("Check the result of ChangePassword", func() {
+				var endpoint string
+				opts := &Options{
+					SkipCert: false,
+					Username: "",
+					Password: "",
+				}
+				err := ChangePassword(endpoint, opts, "")
+				Expect(err.Error()).ToNot(BeNil())
+			})
+		})
+	})
+
 	Describe("SetCertificate", func() {
 		Context("When skipcert is false", func() {
 			It("returns tls config without CaCert", func() {
