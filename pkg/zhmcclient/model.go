@@ -22,25 +22,25 @@ type AdapterFamily string
 
 const (
 	ADAPTER_FAMILY_HIPERSOCKET AdapterFamily = "hipersockets"
-	ADAPTER_FAMILY_OSA                       = "osa"
-	ADAPTER_FAMILY_FICON                     = "ficon"
-	ADAPTER_FAMILY_ROCE                      = "roce"
-	ADAPTER_FAMILY_CRYPTO                    = "crypto"
-	ADAPTER_FAMILY_ACCELERATOR               = "accelerator"
+	ADAPTER_FAMILY_OSA         AdapterFamily = "osa"
+	ADAPTER_FAMILY_FICON       AdapterFamily = "ficon"
+	ADAPTER_FAMILY_ROCE        AdapterFamily = "roce"
+	ADAPTER_FAMILY_CRYPTO      AdapterFamily = "crypto"
+	ADAPTER_FAMILY_ACCELERATOR AdapterFamily = "accelerator"
 )
 
 type AdapterType string
 
 const (
 	ADAPTER_TYPE_CRYPTO      AdapterType = "crypto"
-	ADAPTER_TYPE_FCP                     = "fcp"
-	ADAPTER_TYPE_HIPERSOCKET             = "hipersockets"
-	ADAPTER_TYPE_OSD                     = "osd"
-	ADAPTER_TYPE_OSM                     = "osm"
-	ADAPTER_TYPE_ROCE                    = "roce"
-	ADAPTER_TYPE_ZEDC                    = "zedc"
-	ADAPTER_TYPE_FC                      = "fc"
-	ADAPTER_TYPE_NOT_CFG                 = "not-configured"
+	ADAPTER_TYPE_FCP         AdapterType = "fcp"
+	ADAPTER_TYPE_HIPERSOCKET AdapterType = "hipersockets"
+	ADAPTER_TYPE_OSD         AdapterType = "osd"
+	ADAPTER_TYPE_OSM         AdapterType = "osm"
+	ADAPTER_TYPE_ROCE        AdapterType = "roce"
+	ADAPTER_TYPE_ZEDC        AdapterType = "zedc"
+	ADAPTER_TYPE_FC          AdapterType = "fc"
+	ADAPTER_TYPE_NOT_CFG     AdapterType = "not-configured"
 )
 
 type AdapterStatus string
@@ -299,80 +299,80 @@ type CpcProcessorRunningTime string
 
 const (
 	PROCESSOR_RUNNING_TIME_SYSTEM_DETERMINED CpcProcessorRunningTime = "system-determined"
-	PROCESSOR_RUNNING_TIME_USER_DETERMINED                           = "user-determined"
+	PROCESSOR_RUNNING_TIME_USER_DETERMINED   CpcProcessorRunningTime = "user-determined"
 )
 
 type CpcLanInterfaceType string
 
 const (
 	CPC_LAN_INTERFACE_ETHERNET   CpcLanInterfaceType = "ethernet"
-	CPC_LAN_INTERFACE_TOKEN_RING                     = "token-ring"
-	CPC_LAN_INTERFACE_UNKNOWN                        = "unknown"
+	CPC_LAN_INTERFACE_TOKEN_RING CpcLanInterfaceType = "token-ring"
+	CPC_LAN_INTERFACE_UNKNOWN    CpcLanInterfaceType = "unknown"
 )
 
 type IPv6Type string
 
 const (
 	IPV6_TYPE_LINK_LOCAL IPv6Type = "link-local"
-	IPV6_TYPE_STATIC              = "static"
-	IPV6_TYPE_AUTO                = "auto"
+	IPV6_TYPE_STATIC     IPv6Type = "static"
+	IPV6_TYPE_AUTO       IPv6Type = "auto"
 )
 
 type CPCFeatureName string
 
 const (
 	CPC_FEATURE_DPM_STORAGE_MANAGEMENT             CPCFeatureName = "dpm-storage-management"
-	CPC_FEATURE_DPM_FCP_TAPE_MANAGEMENT                           = "dpm-fcp-tape-management"
-	CPC_FEATURE_DPM_SMCD_PARTITION_LINK_MANAGEMENT                = "dpm-smcd-partition-link-management"
+	CPC_FEATURE_DPM_FCP_TAPE_MANAGEMENT            CPCFeatureName = "dpm-fcp-tape-management"
+	CPC_FEATURE_DPM_SMCD_PARTITION_LINK_MANAGEMENT CPCFeatureName = "dpm-smcd-partition-link-management"
 )
 
 type AutoStartEntryType string
 
 const (
 	AUTO_START_ENTRY_PARTITION       AutoStartEntryType = "partition"
-	AUTO_START_ENTRY_PARTITION_GROUP                    = "partition-group"
+	AUTO_START_ENTRY_PARTITION_GROUP AutoStartEntryType = "partition-group"
 )
 
 type PowerSave string
 
 const (
 	POWER_SAVE_HIGHT_PERFORMANCE PowerSave = "high-performance"
-	POWER_SAVE_LOW_POWER                   = "low-power"
-	POWER_SAVE_CUSTOM                      = "custom"
-	POWER_SAVE_NOT_SUPPORTED               = "not-supported"
-	POWER_SAVE_NOT_AVAILABLE               = "not-available"
-	POWER_SAVE_NOT_ENTITLED                = "not-entitled"
+	POWER_SAVE_LOW_POWER         PowerSave = "low-power"
+	POWER_SAVE_CUSTOM            PowerSave = "custom"
+	POWER_SAVE_NOT_SUPPORTED     PowerSave = "not-supported"
+	POWER_SAVE_NOT_AVAILABLE     PowerSave = "not-available"
+	POWER_SAVE_NOT_ENTITLED      PowerSave = "not-entitled"
 )
 
 type PowerSaveState string
 
 const (
 	POWER_SAVE_STATE_HIGHT_PERFORMANCE PowerSaveState = "high-performance"
-	POWER_SAVE_STATE_LOW_POWER                        = "low-power"
-	POWER_SAVE_STATE_CUSTOM                           = "custom"
-	POWER_SAVE_STATE_NOT_SUPPORTED                    = "not-supported"
-	POWER_SAVE_STATE_NOT_ENTITLED                     = "not-entitled"
+	POWER_SAVE_STATE_LOW_POWER         PowerSaveState = "low-power"
+	POWER_SAVE_STATE_CUSTOM            PowerSaveState = "custom"
+	POWER_SAVE_STATE_NOT_SUPPORTED     PowerSaveState = "not-supported"
+	POWER_SAVE_STATE_NOT_ENTITLED      PowerSaveState = "not-entitled"
 )
 
 type PowerAllowed string
 
 const (
 	POWER_ALLOWED                     PowerAllowed = "allowed"
-	POWER_ALLOWED_UNKNOWN                          = "unknown"
-	POWER_ALLOWED_NOT_SUPPORTED                    = "not-supported"
-	POWER_ALLOWED_NOT_ENTITLED                     = "not-entitled"
-	POWER_ALLOWED_UNDER_GROUP_CONTROL              = "under-group-control"
-	POWER_ALLOWED_ONCE_A_DAY_EXCEEDED              = "once-a-day-exceeded"
+	POWER_ALLOWED_UNKNOWN             PowerAllowed = "unknown"
+	POWER_ALLOWED_NOT_SUPPORTED       PowerAllowed = "not-supported"
+	POWER_ALLOWED_NOT_ENTITLED        PowerAllowed = "not-entitled"
+	POWER_ALLOWED_UNDER_GROUP_CONTROL PowerAllowed = "under-group-control"
+	POWER_ALLOWED_ONCE_A_DAY_EXCEEDED PowerAllowed = "once-a-day-exceeded"
 )
 
 type PowerCapState string
 
 const (
 	POWER_CAP_STATE_DISABLED      PowerCapState = "disabled"
-	POWER_CAP_STATE_ENABLED                     = "enabled"
-	POWER_CAP_STATE_NOT_CUSTOM                  = "custom"
-	POWER_CAP_STATE_NOT_SUPPORTED               = "not-supported"
-	POWER_CAP_STATE_NOT_ENTITLED                = "not-entitled"
+	POWER_CAP_STATE_ENABLED       PowerCapState = "enabled"
+	POWER_CAP_STATE_NOT_CUSTOM    PowerCapState = "custom"
+	POWER_CAP_STATE_NOT_SUPPORTED PowerCapState = "not-supported"
+	POWER_CAP_STATE_NOT_ENTITLED  PowerCapState = "not-entitled"
 )
 
 /**
@@ -591,9 +591,9 @@ type JobStatus string
 
 const (
 	JOB_STATUS_RUNNING        JobStatus = "running"
-	JOB_STATUS_CANCEL_PENDING           = "cancel-pending"
-	JOB_STATUS_CANCELED                 = "canceled"
-	JOB_STATUS_COMPLETE                 = "complete"
+	JOB_STATUS_CANCEL_PENDING JobStatus = "cancel-pending"
+	JOB_STATUS_CANCELED       JobStatus = "canceled"
+	JOB_STATUS_COMPLETE       JobStatus = "complete"
 )
 
 type JobResults struct {
@@ -616,56 +616,56 @@ type PartitionType string
 
 const (
 	PARTITION_TYPE_SSC   PartitionType = "ssc"
-	PARTITION_TYPE_LINUX               = "linux"
-	PARTITION_TYPE_ZVM                 = "zvm"
+	PARTITION_TYPE_LINUX PartitionType = "linux"
+	PARTITION_TYPE_ZVM   PartitionType = "zvm"
 )
 
 type PartitionStatus string
 
 const (
 	PARTITION_STATUS_NOT_ACTIVE   PartitionStatus = "communications-not-active"
-	PARTITION_STATUS_STATUS_CHECK                 = "status-check"
-	PARTITION_STATUS_STOPPED                      = "stopped"
-	PARTITION_STATUS_TERMINATED                   = "terminated"
-	PARTITION_STATUS_STARTING                     = "starting"
-	PARTITION_STATUS_ACTIVE                       = "active"
-	PARTITION_STATUS_STOPPING                     = "stopping"
-	PARTITION_STATUS_DEGRADED                     = "degraded"
-	PARTITION_STATUS_REV_ERR                      = "reservation-error"
-	PARTITION_STATUS_PAUSED                       = "paused"
+	PARTITION_STATUS_STATUS_CHECK PartitionStatus = "status-check"
+	PARTITION_STATUS_STOPPED      PartitionStatus = "stopped"
+	PARTITION_STATUS_TERMINATED   PartitionStatus = "terminated"
+	PARTITION_STATUS_STARTING     PartitionStatus = "starting"
+	PARTITION_STATUS_ACTIVE       PartitionStatus = "active"
+	PARTITION_STATUS_STOPPING     PartitionStatus = "stopping"
+	PARTITION_STATUS_DEGRADED     PartitionStatus = "degraded"
+	PARTITION_STATUS_REV_ERR      PartitionStatus = "reservation-error"
+	PARTITION_STATUS_PAUSED       PartitionStatus = "paused"
 )
 
 type PartitionProcessorMode string
 
 const (
 	PROCESSOR_MODE_DEDICATED PartitionProcessorMode = "dedicated"
-	PROCESSOR_MODE_SHARED                           = "shared"
+	PROCESSOR_MODE_SHARED    PartitionProcessorMode = "shared"
 )
 
 type PartitionBootDevice string
 
 const (
 	BOOT_DEVICE_STORAGE_ADAPTER PartitionBootDevice = "storage-adapter"
-	BOOT_DEVICE_STORAGE_VOLUME                      = "storage-volume"
-	BOOT_DEVICE_NETWORK_ADAPTER                     = "network-adapter"
-	BOOT_DEVICE_FTP                                 = "ftp"
-	BOOT_DEVICE_REMOVABLE_MEDIA                     = "removable-media"
-	BOOT_DEVICE_ISO_IMAGE                           = "iso-image"
-	BOOT_DEVICE_NONE                                = "none" // default
+	BOOT_DEVICE_STORAGE_VOLUME  PartitionBootDevice = "storage-volume"
+	BOOT_DEVICE_NETWORK_ADAPTER PartitionBootDevice = "network-adapter"
+	BOOT_DEVICE_FTP             PartitionBootDevice = "ftp"
+	BOOT_DEVICE_REMOVABLE_MEDIA PartitionBootDevice = "removable-media"
+	BOOT_DEVICE_ISO_IMAGE       PartitionBootDevice = "iso-image"
+	BOOT_DEVICE_NONE            PartitionBootDevice = "none" // default
 )
 
 type PartionBootRemovableMediaType string
 
 const (
 	BOOT_REMOVABLE_MEDIA_CDROM PartionBootRemovableMediaType = "cdrom"
-	BOOT_REMOVABLE_MEDIA_USB                                 = "usb"
+	BOOT_REMOVABLE_MEDIA_USB   PartionBootRemovableMediaType = "usb"
 )
 
 type SscBootSelection string
 
 const (
 	SSC_BOOT_SELECTION_INSTALLER SscBootSelection = "installer"
-	SSC_BOOT_SELECTION_APPLIANCE                  = "appliance"
+	SSC_BOOT_SELECTION_APPLIANCE SscBootSelection = "appliance"
 )
 
 type LPAR struct {
@@ -783,17 +783,17 @@ type NicType string
 
 const (
 	NIC_TYPE_ROCE NicType = "roce"
-	NIC_TYPE_IQD          = "iqd"
-	NIC_TYPE_OSD          = "osd"
+	NIC_TYPE_IQD  NicType = "iqd"
+	NIC_TYPE_OSD  NicType = "osd"
 )
 
 type SscIpAddressType string
 
 const (
 	SSC_IP_TYPE_IPV4      SscIpAddressType = "ipv4"
-	SSC_IP_TYPE_IPV6                       = "ipv6"
-	SSC_IP_TYPE_LINKLOCAL                  = "linklocal"
-	SSC_IP_TYPE_DHCP                       = "dhcp"
+	SSC_IP_TYPE_IPV6      SscIpAddressType = "ipv6"
+	SSC_IP_TYPE_LINKLOCAL SscIpAddressType = "linklocal"
+	SSC_IP_TYPE_DHCP      SscIpAddressType = "dhcp"
 )
 
 type VlanType string
@@ -843,21 +843,21 @@ type StorageGroupState string
 
 const (
 	STORAGE_GROUP_COMPLETE                StorageGroupState = "complete"
-	STORAGE_GROUP_PENDING                                   = "pending"
-	STORAGE_GROUP_INCOMPLETE                                = "incomplete"
-	STORAGE_GROUP_PENDING_WITH_MISMATCHES                   = "pending-with-mismatches"
-	STORAGE_GROUP_OVERPROVISIONED                           = "overprovisioned"
-	STORAGE_GROUP_CHECKING_MIGRATION                        = "checking-migration"
-	STORAGE_GROUP_CONFIGURATION_ERROR                       = "configuration-error"
+	STORAGE_GROUP_PENDING                 StorageGroupState = "pending"
+	STORAGE_GROUP_INCOMPLETE              StorageGroupState = "incomplete"
+	STORAGE_GROUP_PENDING_WITH_MISMATCHES StorageGroupState = "pending-with-mismatches"
+	STORAGE_GROUP_OVERPROVISIONED         StorageGroupState = "overprovisioned"
+	STORAGE_GROUP_CHECKING_MIGRATION      StorageGroupState = "checking-migration"
+	STORAGE_GROUP_CONFIGURATION_ERROR     StorageGroupState = "configuration-error"
 )
 
 type WWPNStatus string
 
 const (
 	WWPN_STATUS_VALIDATED     WWPNStatus = "validated"
-	WWPN_STATUS_NOT_VALIDATED            = "not-validated"
-	WWPN_STATUS_UNKNOWN                  = "unknown"
-	WWPN_STATUS_INCOMPLETE               = "incomplete"
+	WWPN_STATUS_NOT_VALIDATED WWPNStatus = "not-validated"
+	WWPN_STATUS_UNKNOWN       WWPNStatus = "unknown"
+	WWPN_STATUS_INCOMPLETE    WWPNStatus = "incomplete"
 )
 
 type StorageGroupArray struct {
@@ -943,12 +943,12 @@ type StorageGroupModel string
 
 const (
 	STORAGE_GROUP_MODEL_1   StorageGroupModel = "1"
-	STORAGE_GROUP_MODEL_2                     = "2"
-	STORAGE_GROUP_MODEL_3                     = "3"
-	STORAGE_GROUP_MODEL_9                     = "9"
-	STORAGE_GROUP_MODEL_27                    = "27"
-	STORAGE_GROUP_MODEL_54                    = "54"
-	STORAGE_GROUP_MODEL_EAV                   = "EAV"
+	STORAGE_GROUP_MODEL_2   StorageGroupModel = "2"
+	STORAGE_GROUP_MODEL_3   StorageGroupModel = "3"
+	STORAGE_GROUP_MODEL_9   StorageGroupModel = "9"
+	STORAGE_GROUP_MODEL_27  StorageGroupModel = "27"
+	STORAGE_GROUP_MODEL_54  StorageGroupModel = "54"
+	STORAGE_GROUP_MODEL_EAV StorageGroupModel = "EAV"
 )
 
 type EckdVolumetype string

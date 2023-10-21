@@ -1,4 +1,3 @@
-
 // Copyright 2021-2023 IBM Corp. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -367,8 +366,14 @@ func (c *Client) UploadRequest(requestType string, url *url.URL, requestData []b
 	retries := DEFAULT_CONNECT_RETRIES
 	responseStatusCode, responseBodyStream, err = c.executeUpload(requestType, url.String(), requestData)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-		c.Logon()
-		c.executeUpload(requestType, url.String(), requestData)
+		err := c.Logon()
+		if err != nil {
+			return responseStatusCode, responseBodyStream, err
+		}
+		uploadStatus, uploadBody, errUpload := c.executeUpload(requestType, url.String(), requestData)
+		if errUpload != nil {
+			return uploadStatus, uploadBody, errUpload
+		}
 	}
 	if IsExpectedHttpStatus(responseStatusCode) {
 		return
@@ -400,7 +405,10 @@ func (c *Client) ExecuteRequest(requestType string, url *url.URL, requestData in
 
 	responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 	if NeedLogon(responseStatusCode, GenerateErrorFromResponse(responseBodyStream).Reason) {
-		c.Logon()
+		err := c.Logon()
+		if err != nil {
+			return responseStatusCode, responseBodyStream, err
+		}
 		responseStatusCode, responseBodyStream, err = c.executeMethod(requestType, url.String(), requestData, sessionID)
 	}
 	if IsExpectedHttpStatus(responseStatusCode) { // Known error, don't retry
