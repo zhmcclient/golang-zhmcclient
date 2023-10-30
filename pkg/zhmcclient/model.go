@@ -814,7 +814,7 @@ type LparProperties struct {
 	NicUris                          []string                      `json:"nic-uris,omitempty"`
 	HbaUris                          []string                      `json:"hba-uris,omitempty"`
 	StorageGroupURIs                 []string                      `json:"storage-group-uris,omitempty"`
-	CryptoConfiguration              CryptoConfig                  `json:"-"`
+	CryptoConfiguration              CryptoConfig                  `json:"crypto-configuration,omitempty"`
 	SscHostName                      string                        `json:"ssc-host-name,omitempty"`
 	SscBootSelection                 SscBootSelection              `json:"ssc-boot-selection,omitempty"`
 	SscIpv4Gateway                   string                        `json:"ssc-ipv4-gateway,omitempty"`
