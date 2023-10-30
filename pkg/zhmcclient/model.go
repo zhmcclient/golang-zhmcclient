@@ -375,6 +375,39 @@ const (
 	POWER_CAP_STATE_NOT_ENTITLED                = "not-entitled"
 )
 
+type Arom string
+
+const (
+	CONCURRENT_ENGINEERING_CHANGES_AROM Arom = "concurrent-engineering-changes-arom"
+	ENGINEERING_CHANGES_AROM                 = "cengineering-changes-arom"
+	AROM_NOT_AVAILABLE                       = "not-available"
+)
+
+type MclType string
+
+const (
+	MCL_TYPE_RETRIEVED              MclType = "retrieved"
+	MCL_TYPE_ACTIVATED                      = "activated"
+	MCL_TYPE_ACCEPTED                       = "accepted"
+	MCL_TYPE_INSTALLABLE_CONCURRENT         = "installable-concurrent"
+	MCL_TYPE_REMOVABLE_CONCURRENT           = "removable-concurrent"
+)
+
+type ActionType string
+
+const (
+	ACTION_CHANNEL_CONFIG                  ActionType = "channel-config"
+	ACTION_TCOUPLING_FACILITY_REACTIVATION            = "coupling-facility-reactivation"
+	ACTION_POWER_ON_RESET_TRACKING                    = "power-on-reset-tracking"
+)
+
+type ActionActivation string
+
+const (
+	ACTION_ACTIVATION_CURRENT ActionActivation = "current"
+	ACTION_ACTIVATION_NEXT                     = "next"
+)
+
 /**
 * Sample:
 * {
@@ -560,10 +593,33 @@ type CPCFeatureInfo struct {
 	State       bool           `json:"state,omitempty"`
 }
 
+type Mcl struct {
+	Type       MclType `json:"type,omitempty"`
+	Level      string  `json:"level,omitempty"`
+	LastUpdate int64   `json:"last-update,omitempty"`
+}
+
+type Action struct {
+	Type       ActionType       `json:"type,omitempty"`
+	Activation ActionActivation `json:"activation,omitempty"`
+	Pending    bool             `json:"pending,omitempty"`
+}
+
+type Ec struct {
+	Number      string `json:"number,omitempty"`
+	PartNumber  string `json:"part-number,omitempty"`
+	Type        string `json:"type,omitempty"`
+	Description string `json:"description,omitempty"`
+	Mcl         []Mcl  `json:"mcl,omitempty"`
+}
+
 type EcMcl struct {
-	LicControlLevel string `json:"lic-control-level,omitempty"`
-	DriverLevel     string `json:"driver-level,omitempty"`
-	BundleLevel     string `json:"bundle-level,omitempty"`
+	Actions         []Action `json:"actions,omitempty"`
+	Ec              []Ec     `json:"ec,omitempty"`
+	LicControlLevel string   `json:"lic-control-level,omitempty"`
+	DriverLevel     string   `json:"driver-level,omitempty"`
+	BundleLevel     string   `json:"bundle-level,omitempty"`
+	AromInfo        Arom     `json:"arom-info,omitempty"`
 }
 
 type HardwareMessage struct {
@@ -1029,8 +1085,8 @@ type CryptoConfig struct {
 }
 
 type EnergyRequestPayload struct {
-	Timescale   string `json:"timescale,omitempty"`
-	Type        string `json:"type,omitempty"`
-	Range       string `json:"range,omitempty"`
-	Resolution  string `json:"resolution,omitempty"`
+	Timescale  string `json:"timescale,omitempty"`
+	Type       string `json:"type,omitempty"`
+	Range      string `json:"range,omitempty"`
+	Resolution string `json:"resolution,omitempty"`
 }
