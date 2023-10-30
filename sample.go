@@ -110,7 +110,9 @@ func main() {
 
 				"GetLiveEnergyFromLpar":
 					- Get live energy consumption for the specified LPAR
-	
+
+				"AttachCryptoToPartitionofCPC":
+					- Attach crypto adapter and domain for the speified LPAR
 					
 
 
@@ -240,6 +242,8 @@ func main() {
 					GetEnergyFromLpar(hmcManager)
 				case "GetLiveEnergyFromLpar":
 					GetLiveEnergyFromLpar(hmcManager)
+				case "AttachCryptoToPartitionofCPC":
+					AttachCryptoToPartitionofCPC(hmcManager)
 				}
 
 			}
@@ -801,7 +805,7 @@ func GetEnergyFromLpar(hmcManager zhmcclient.ZhmcAPI) {
 	lparID := os.Getenv("PAR_ID")
 	lparURI := "/api/logical-partitions/" + lparID
 	props := &zhmcclient.EnergyRequestPayload{
-		Range:     "last-day",
+		Range:      "last-day",
 		Resolution: "fifteen-minutes",
 	}
 	energy, _, err := hmcManager.GetEnergyDetailsforLPAR(lparURI, props)
@@ -822,4 +826,14 @@ func GetLiveEnergyFromLpar(hmcManager zhmcclient.ZhmcAPI) {
 	} else {
 		logger.Info("Get energy data successfully with power: " + fmt.Sprint(energy))
 	}
+}
+
+func AttachCryptoToPartitionofCPC(hmcManager zhmcclient.ZhmcAPI) {
+	adapterUri := os.Getenv("ADAPTER_URI")
+	cc := zhmcclient.CryptoConfig{CryptoAdapterUris: []string{adapterUri}}
+	_, err := hmcManager.AttachCryptoToPartition(GetLPARURI(), &cc)
+	if err != nil {
+		logger.Fatal("", zap.Any("Attach adapter error", err))
+	}
+	logger.Info("Attach crypto adapter operation successful")
 }
