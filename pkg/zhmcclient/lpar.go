@@ -659,7 +659,6 @@ func (m *LparManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyReque
 	return 0, status, errorResponseBody
 }
 
-
 /**
 * POST /api/partitions/{partition-id}/operations/zeroize-crypto-domain
 *
@@ -684,17 +683,19 @@ func (m *LparManager) ZeroizeCryptoDomain(lparURI string, adapterDetails *Crypto
 	logger.Info("Response : " + string(responseBody))
 
 	if status == http.StatusNoContent {
-		var wd WattageData
-		err := json.Unmarshal(responseBody, &wd)
-		if err != nil {
-			return status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
-		}
-		logger.Info("Response: get on lpars successfully, status:" + fmt.Sprint(status))
+		logger.Info(fmt.Sprintf("Response: zeroize partition crypto domains successfull, request url: %v, method: %v, status: %v", lparURI, http.MethodPost, status))
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	return status, errorResponseBody
 }
+
+/**
+* POST /api/partitions/{partition-id}/operations/increase-crypto-configuration
+*
+* Return: 204 (No Content) is returned and no response body
+*    or: 400, 404, 409, 500, 503
+ */
 
 func (m *LparManager) AttachCryptoToPartition(lparURI string, request *CryptoConfig) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
