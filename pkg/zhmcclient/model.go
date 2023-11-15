@@ -1084,6 +1084,11 @@ type CryptoConfig struct {
 	CryptoDomainConfigurations []DomainInfo `json:"crypto-domain-configurations,omitempty"`
 }
 
+type CryptoAdapterDetails struct {
+	CryptoAdapterUri string `json:"crypto-adapter-uri,omitempty"`
+	DomainIdx        int    `json:"domain-index,omitempty"`
+}
+
 type EnergyRequestPayload struct {
 	Timescale  string `json:"timescale,omitempty"`
 	Type       string `json:"type,omitempty"`

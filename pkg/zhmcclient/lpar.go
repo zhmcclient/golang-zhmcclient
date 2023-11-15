@@ -39,10 +39,9 @@ type LparAPI interface {
 	DetachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) (int, *HmcError)
 	MountIsoImage(lparURI string, isoFile string, insFile string) (int, *HmcError)
 	UnmountIsoImage(lparURI string) (int, *HmcError)
-
 	ListNics(lparURI string) ([]string, int, *HmcError)
 	FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError)
-
+	ZeroizeCryptoDomain(lparURI string, adapterDetails *CryptoAdapterDetails) (int, *HmcError)
 	GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError)
 }
 
@@ -625,13 +624,13 @@ func (m *LparManager) FetchAsciiConsoleURI(lparURI string, request *AsciiConsole
 			"timestamp": 1680408593302
 		}]
 	}
-	
- */
+
+*/
 func (m *LparManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations", "/get-historical-sustainability-data")
-	logger.Info("Request URL:" + string(requestUrl.Path) +  " Method:" +  http.MethodPost + " props" + fmt.Sprint(props))
+	logger.Info("Request URL:" + string(requestUrl.Path) + " Method:" + http.MethodPost + " props" + fmt.Sprint(props))
 	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, props, "")
 
 	if err != nil {
@@ -656,4 +655,40 @@ func (m *LparManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyReque
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	return 0, status, errorResponseBody
+}
+
+/**
+* POST /api/partitions/{partition-id}/operations/zeroize-crypto-domain
+*
+* Return: 204 (No Content) is returned and no response body
+*    or: 400, 404, 409, 500, 503
+ */
+
+func (m *LparManager) ZeroizeCryptoDomain(lparURI string, adapterDetails *CryptoAdapterDetails) (int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+	logger.Info("Request URL:" + string(requestUrl.Path) + " Method:" + http.MethodPost + " adapterDetails" + fmt.Sprint(adapterDetails))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adapterDetails, "")
+	if err != nil {
+		logger.Error("error on getting lpar's energy",
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
+		return status, err
+	}
+
+	logger.Info("Response : " + string(responseBody))
+
+	if status == http.StatusNoContent {
+		var wd WattageData
+		err := json.Unmarshal(responseBody, &wd)
+		if err != nil {
+			return status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)
+		}
+		logger.Info("Response: get on lpars successfully, status:" + fmt.Sprint(status))
+		return status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	return status, errorResponseBody
 }
