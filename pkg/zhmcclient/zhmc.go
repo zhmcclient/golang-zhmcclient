@@ -121,6 +121,10 @@ func (m *ZhmcManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyReque
 	return m.lparManager.GetEnergyDetailsforLPAR(lparURI, props)
 }
 
+func (m *ZhmcManager) AttachCryptoToPartition(lparURI string, request *CryptoConfig) (int, *HmcError) {
+	return m.lparManager.AttachCryptoToPartition(lparURI, request)
+}
+
 func (m *ZhmcManager) GetLiveEnergyDetailsforLPAR(lparURI string) (uint64, int, *HmcError) {
 	return m.metricsManager.GetLiveEnergyDetailsforLPAR(lparURI)
 }

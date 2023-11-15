@@ -43,6 +43,8 @@ type LparAPI interface {
 	FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError)
 	ZeroizeCryptoDomain(lparURI string, adapterDetails *CryptoAdapterDetails) (int, *HmcError)
 	GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError)
+
+	AttachCryptoToPartition(lparURI string, request *CryptoConfig) (int, *HmcError)
 }
 
 type LparManager struct {
@@ -657,6 +659,7 @@ func (m *LparManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyReque
 	return 0, status, errorResponseBody
 }
 
+
 /**
 * POST /api/partitions/{partition-id}/operations/zeroize-crypto-domain
 *
@@ -690,5 +693,36 @@ func (m *LparManager) ZeroizeCryptoDomain(lparURI string, adapterDetails *Crypto
 		return status, nil
 	}
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	return status, errorResponseBody
+}
+
+func (m *LparManager) AttachCryptoToPartition(lparURI string, request *CryptoConfig) (int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI, "/operations/increase-crypto-configuration")
+
+	logger.Info(fmt.Sprintf("Request URL: %v, Method: %v", requestUrl, http.MethodPost))
+	logger.Info(fmt.Sprintf("request: %v", request))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, request, "")
+
+	if err != nil {
+		logger.Error("error on attach crypto adapters and domains to partition",
+			zap.String("request url", fmt.Sprint(lparURI)),
+			zap.String("method", http.MethodPost),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
+		return status, err
+	}
+
+	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Response: attach crypto adapters and domains to partition successfull, request url: %v, method: %v, status: %v", lparURI, http.MethodPost, status))
+		return status, nil
+	}
+
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	logger.Error("error attaching crypto adapters and domains to partition",
+		zap.String("request url", fmt.Sprint(lparURI)),
+		zap.String("method", http.MethodPost),
+		zap.String("status: ", fmt.Sprint(status)),
+		zap.Error(fmt.Errorf("%v", errorResponseBody)))
 	return status, errorResponseBody
 }

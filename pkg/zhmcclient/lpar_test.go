@@ -726,4 +726,46 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
+	Describe("AttachCryptoToPartition", func() {
+		var cryptoConfig *CryptoConfig
+		BeforeEach(func() {
+			cryptoConfig = &CryptoConfig{
+				CryptoAdapterUris: []string{"uri"},
+				CryptoDomainConfigurations: []DomainInfo{
+					{
+						DomainIdx:  1,
+						AccessMode: "control",
+					},
+				},
+			}
+		})
+		Context("When AttachCryptoToPartition returns correctly", func() {
+			It("Check the results Succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, nil)
+				rets, _ := manager.AttachCryptoToPartition(lparid, cryptoConfig)
+				Expect(rets).ToNot(BeNil())
+			})
+
+		})
+		Context("When AttachCryptoToPartition returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusOK, nil, hmcErr)
+				rets, err := manager.AttachCryptoToPartition(lparid, cryptoConfig)
+				Expect(rets).To(Equal(200))
+				Expect(err).To(Equal(hmcErr))
+			})
+		})
+		Context("When AttachCryptoToPartition returns correctly with status 204", func() {
+			It("check the response has no content", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, nil, nil)
+				rets, err := manager.AttachCryptoToPartition(lparid, cryptoConfig)
+				Expect(err).To(BeNil())
+				Expect(rets).To(Equal(204))
+			})
+		})
+	})
+
 })

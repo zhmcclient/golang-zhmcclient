@@ -8,6 +8,20 @@ import (
 )
 
 type LparAPI struct {
+	AttachCryptoToPartitionStub        func(string, *zhmcclient.CryptoConfig) (int, *zhmcclient.HmcError)
+	attachCryptoToPartitionMutex       sync.RWMutex
+	attachCryptoToPartitionArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.CryptoConfig
+	}
+	attachCryptoToPartitionReturns struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
+	attachCryptoToPartitionReturnsOnCall map[int]struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
 	AttachStorageGroupToPartitionStub        func(string, *zhmcclient.StorageGroupPayload) (int, *zhmcclient.HmcError)
 	attachStorageGroupToPartitionMutex       sync.RWMutex
 	attachStorageGroupToPartitionArgsForCall []struct {
@@ -231,6 +245,71 @@ type LparAPI struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *LparAPI) AttachCryptoToPartition(arg1 string, arg2 *zhmcclient.CryptoConfig) (int, *zhmcclient.HmcError) {
+	fake.attachCryptoToPartitionMutex.Lock()
+	ret, specificReturn := fake.attachCryptoToPartitionReturnsOnCall[len(fake.attachCryptoToPartitionArgsForCall)]
+	fake.attachCryptoToPartitionArgsForCall = append(fake.attachCryptoToPartitionArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.CryptoConfig
+	}{arg1, arg2})
+	stub := fake.AttachCryptoToPartitionStub
+	fakeReturns := fake.attachCryptoToPartitionReturns
+	fake.recordInvocation("AttachCryptoToPartition", []interface{}{arg1, arg2})
+	fake.attachCryptoToPartitionMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *LparAPI) AttachCryptoToPartitionCallCount() int {
+	fake.attachCryptoToPartitionMutex.RLock()
+	defer fake.attachCryptoToPartitionMutex.RUnlock()
+	return len(fake.attachCryptoToPartitionArgsForCall)
+}
+
+func (fake *LparAPI) AttachCryptoToPartitionCalls(stub func(string, *zhmcclient.CryptoConfig) (int, *zhmcclient.HmcError)) {
+	fake.attachCryptoToPartitionMutex.Lock()
+	defer fake.attachCryptoToPartitionMutex.Unlock()
+	fake.AttachCryptoToPartitionStub = stub
+}
+
+func (fake *LparAPI) AttachCryptoToPartitionArgsForCall(i int) (string, *zhmcclient.CryptoConfig) {
+	fake.attachCryptoToPartitionMutex.RLock()
+	defer fake.attachCryptoToPartitionMutex.RUnlock()
+	argsForCall := fake.attachCryptoToPartitionArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *LparAPI) AttachCryptoToPartitionReturns(result1 int, result2 *zhmcclient.HmcError) {
+	fake.attachCryptoToPartitionMutex.Lock()
+	defer fake.attachCryptoToPartitionMutex.Unlock()
+	fake.AttachCryptoToPartitionStub = nil
+	fake.attachCryptoToPartitionReturns = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *LparAPI) AttachCryptoToPartitionReturnsOnCall(i int, result1 int, result2 *zhmcclient.HmcError) {
+	fake.attachCryptoToPartitionMutex.Lock()
+	defer fake.attachCryptoToPartitionMutex.Unlock()
+	fake.AttachCryptoToPartitionStub = nil
+	if fake.attachCryptoToPartitionReturnsOnCall == nil {
+		fake.attachCryptoToPartitionReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.attachCryptoToPartitionReturnsOnCall[i] = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
 }
 
 func (fake *LparAPI) AttachStorageGroupToPartition(arg1 string, arg2 *zhmcclient.StorageGroupPayload) (int, *zhmcclient.HmcError) {
@@ -1230,6 +1309,8 @@ func (fake *LparAPI) ZeroizeCryptoDomainReturnsOnCall(i int, result1 int, result
 func (fake *LparAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.attachCryptoToPartitionMutex.RLock()
+	defer fake.attachCryptoToPartitionMutex.RUnlock()
 	fake.attachStorageGroupToPartitionMutex.RLock()
 	defer fake.attachStorageGroupToPartitionMutex.RUnlock()
 	fake.createLPARMutex.RLock()
