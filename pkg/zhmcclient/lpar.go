@@ -30,7 +30,7 @@ import (
 type LparAPI interface {
 	CreateLPAR(cpcURI string, props *LparProperties) (string, int, *HmcError)
 	ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError)
-	GetLparProperties(lparURI string) (*LparProperties, int, *HmcError)
+	GetLparProperties(lparURI string) (*LparObjectProperties, int, *HmcError)
 	UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError)
 	StartLPAR(lparURI string) (string, int, *HmcError)
 	StopLPAR(lparURI string) (string, int, *HmcError)
@@ -119,10 +119,10 @@ func (m *LparManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR,
 /**
 * GET /api/partitions/{partition-id}
 * @lparURI is the object-uri
-* Return: 200 and LparProperties
+* Return: 200 and LparObjectProperties
 *     or: 400, 404,
  */
-func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *HmcError) {
+func (m *LparManager) GetLparProperties(lparURI string) (*LparObjectProperties, int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
 	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
 
@@ -138,7 +138,7 @@ func (m *LparManager) GetLparProperties(lparURI string) (*LparProperties, int, *
 	}
 
 	if status == http.StatusOK {
-		lparProps := LparProperties{}
+		lparProps := LparObjectProperties{}
 		err := json.Unmarshal(responseBody, &lparProps)
 		if err != nil {
 			return nil, status, getHmcErrorFromErr(ERR_CODE_HMC_UNMARSHAL_FAIL, err)

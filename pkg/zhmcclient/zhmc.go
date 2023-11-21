@@ -74,7 +74,7 @@ func (m *ZhmcManager) GetCPCProperties(cpcURI string) (*CPCProperties, int, *Hmc
 func (m *ZhmcManager) ListLPARs(cpcURI string, query map[string]string) ([]LPAR, int, *HmcError) {
 	return m.lparManager.ListLPARs(cpcURI, query)
 }
-func (m *ZhmcManager) GetLparProperties(lparURI string) (*LparProperties, int, *HmcError) {
+func (m *ZhmcManager) GetLparProperties(lparURI string) (*LparObjectProperties, int, *HmcError) {
 	return m.lparManager.GetLparProperties(lparURI)
 }
 func (m *ZhmcManager) UpdateLparProperties(lparURI string, props *LparProperties) (int, *HmcError) {
