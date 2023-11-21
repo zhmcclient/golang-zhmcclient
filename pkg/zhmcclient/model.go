@@ -741,7 +741,7 @@ type PartitionFeatureInfo struct {
 	State       bool   `json:"state,omitempty"`
 }
 
-type LparProperties struct {
+type LparObjectProperties struct {
 	URI                              string                        `json:"object-uri,omitempty"`
 	CpcURI                           string                        `json:"parent,omitempty"`
 	Class                            string                        `json:"class,omitempty"`
@@ -815,6 +815,91 @@ type LparProperties struct {
 	HbaUris                          []string                      `json:"hba-uris,omitempty"`
 	StorageGroupURIs                 []string                      `json:"storage-group-uris,omitempty"`
 	CryptoConfiguration              CryptoConfig                  `json:"crypto-configuration,omitempty"`
+	SscHostName                      string                        `json:"ssc-host-name,omitempty"`
+	SscBootSelection                 SscBootSelection              `json:"ssc-boot-selection,omitempty"`
+	SscIpv4Gateway                   string                        `json:"ssc-ipv4-gateway,omitempty"`
+	SscIpv6Gateway                   string                        `json:"ssc-ipv6-gateway,omitempty"`
+	SscDnsServers                    []string                      `json:"ssc-dns-servers,omitempty"`
+	SscMasterUserid                  string                        `json:"ssc-master-userid,omitempty"`
+	SscMasterPw                      string                        `json:"ssc-master-pw,omitempty"`
+	AvailableFeaturesList            []PartitionFeatureInfo        `json:"available-features-list,omitempty"`
+	Secureboot                       bool                          `json:"secure-boot,omitempty"`
+}
+
+type LparProperties struct {
+	URI                              string                        `json:"object-uri,omitempty"`
+	CpcURI                           string                        `json:"parent,omitempty"`
+	Class                            string                        `json:"class,omitempty"`
+	Name                             string                        `json:"name,omitempty"`
+	Description                      string                        `json:"description,omitempty"`
+	Status                           PartitionStatus               `json:"status,omitempty"`
+	Type                             PartitionType                 `json:"type,omitempty"`
+	ShortName                        string                        `json:"short-name,omitempty"`
+	ID                               string                        `json:"partition-id,omitempty"`
+	AutoGenerateID                   bool                          `json:"autogenerate-partition-id,omitempty"`
+	OsName                           string                        `json:"os-name,omitempty"`
+	OsType                           string                        `json:"os-type,omitempty"`
+	OsVersion                        string                        `json:"os-version,omitempty"`
+	ReserveResources                 bool                          `json:"reserve-resources,omitempty"`
+	DegradedAdapters                 []string                      `json:"degraded-adapters,omitempty"`
+	ProcessorMode                    PartitionProcessorMode        `json:"processor-mode,omitempty"`
+	CpProcessors                     int                           `json:"cp-processors,omitempty"`
+	IflProcessors                    int                           `json:"ifl-processors,omitempty"`
+	IflAbsoluteProcessorCapping      bool                          `json:"ifl-absolute-processor-capping,omitempty"`
+	CpAbsoluteProcessorCapping       bool                          `json:"cp-absolute-processor-capping,omitempty"`
+	IflAbsoluteProcessorCappingValue float64                       `json:"ifl-absolute-processor-capping-value,omitempty"`
+	CpAbsoluteProcessorCappingValue  float64                       `json:"cp-absolute-processor-capping-value,omitempty"`
+	IflProcessingWeightCapped        bool                          `json:"ifl-processing-weight-capped,omitempty"`
+	CpProcessingWeightCapped         bool                          `json:"cp-processing-weight-capped,omitempty"`
+	MinimumIflProcessingWeight       int                           `json:"minimum-ifl-processing-weight,omitempty"`
+	MinimumCpProcessingWeight        int                           `json:"minimum-cp-processing-weight,omitempty"`
+	InitialIflProcessingWeight       int                           `json:"initial-ifl-processing-weight,omitempty"`
+	InitialCpProcessingWeight        int                           `json:"initial-cp-processing-weight,omitempty"`
+	CurrentIflProcessingWeight       int                           `json:"current-ifl-processing-weight,omitempty"`
+	CurrentCpProcessingWeight        int                           `json:"current-cp-processing-weight,omitempty"`
+	MaximumIflProcessingWeight       int                           `json:"maximum-ifl-processing-weight,omitempty"`
+	MaximumCpProcessingWeight        int                           `json:"maximum-cp-processing-weight,omitempty"`
+	ProcessorManagementEnabled       bool                          `json:"processor-management-enabled,omitempty"`
+	InitialMemory                    int                           `json:"initial-memory,omitempty"`
+	ReservedMemory                   int                           `json:"reserved-memory,omitempty"`
+	MaximumMemory                    int                           `json:"maximum-memory,omitempty"`
+	AutoStart                        bool                          `json:"auto-start,omitempty"`
+	BootDevice                       PartitionBootDevice           `json:"boot-device,omitempty"`
+	BootNetworkDevice                string                        `json:"boot-network-device,omitempty"`
+	BootFtpHost                      string                        `json:"boot-ftp-host,omitempty"`
+	BootFtpUsername                  string                        `json:"boot-ftp-username,omitempty"`
+	BootFtpPassword                  string                        `json:"boot-ftp-password,omitempty"`
+	BootFtpInsfile                   string                        `json:"boot-ftp-insfile,omitempty"`
+	BootRemovableMedia               string                        `json:"boot-removable-media,omitempty"`
+	BootRemovableMediaType           PartionBootRemovableMediaType `json:"boot-removable-media-type,omitempty"`
+	BootTimeout                      int                           `json:"boot-timeout,omitempty"`
+	BootStorageDevice                string                        `json:"boot-storage-device,omitempty"`
+	BootStorageVolume                string                        `json:"boot-storage-volume,omitempty"`
+	BootLogicalUnitNumber            string                        `json:"boot-logical-unit-number,omitempty"`
+	BootWorldWidePortName            string                        `json:"boot-world-wide-port-name,omitempty"`
+	BootConfigurationSelector        int                           `json:"boot-configuration-selector,omitempty"`
+	BootRecordLba                    string                        `json:"boot-record-lba,omitempty"`
+	BootLoadParameters               string                        `json:"boot-load-parameters,omitempty"`
+	BootOsSpecificParameters         string                        `json:"boot-os-specific-parameters,omitempty"`
+	BootIsoImageName                 string                        `json:"boot-iso-image-name,omitempty"`
+	BootIsoInsFile                   string                        `json:"boot-iso-ins-file,omitempty"`
+	AccessGlobalPerformanceData      bool                          `json:"access-global-performance-data,omitempty"`
+	PermitCrossPartitionCommands     bool                          `json:"permit-cross-partition-commands,omitempty"`
+	AccessBasicCounterSet            bool                          `json:"access-basic-counter-set,omitempty"`
+	AccessProblemStateCounterSet     bool                          `json:"access-problem-state-counter-set,omitempty"`
+	AccessCryptoActivityCounterSet   bool                          `json:"access-crypto-activity-counter-set,omitempty"`
+	AccessExtendedCounterSet         bool                          `json:"access-extended-counter-set,omitempty"`
+	AccessCoprocessorGroupSet        bool                          `json:"access-coprocessor-group-set,omitempty"`
+	AccessBasicSampling              bool                          `json:"access-basic-sampling,omitempty"`
+	AccessDiagnosticSampling         bool                          `json:"access-diagnostic-sampling,omitempty"`
+	PermitDesKeyImportFunctions      bool                          `json:"permit-des-key-import-functions,omitempty"`
+	PermitAesKeyImportFunctions      bool                          `json:"permit-aes-key-import-functions,omitempty"`
+	ThreadsPerProcessor              int                           `json:"threads-per-processor,omitempty"`
+	VirtualFunctionUris              []string                      `json:"virtual-function-uris,omitempty"`
+	NicUris                          []string                      `json:"nic-uris,omitempty"`
+	HbaUris                          []string                      `json:"hba-uris,omitempty"`
+	StorageGroupURIs                 []string                      `json:"storage-group-uris,omitempty"`
+	CryptoConfiguration              CryptoConfig                  `json:"-"`
 	SscHostName                      string                        `json:"ssc-host-name,omitempty"`
 	SscBootSelection                 SscBootSelection              `json:"ssc-boot-selection,omitempty"`
 	SscIpv4Gateway                   string                        `json:"ssc-ipv4-gateway,omitempty"`

@@ -111,18 +111,18 @@ type LparAPI struct {
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
-	GetLparPropertiesStub        func(string) (*zhmcclient.LparProperties, int, *zhmcclient.HmcError)
+	GetLparPropertiesStub        func(string) (*zhmcclient.LparObjectProperties, int, *zhmcclient.HmcError)
 	getLparPropertiesMutex       sync.RWMutex
 	getLparPropertiesArgsForCall []struct {
 		arg1 string
 	}
 	getLparPropertiesReturns struct {
-		result1 *zhmcclient.LparProperties
+		result1 *zhmcclient.LparObjectProperties
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
 	getLparPropertiesReturnsOnCall map[int]struct {
-		result1 *zhmcclient.LparProperties
+		result1 *zhmcclient.LparObjectProperties
 		result2 int
 		result3 *zhmcclient.HmcError
 	}
@@ -696,7 +696,7 @@ func (fake *LparAPI) GetEnergyDetailsforLPARReturnsOnCall(i int, result1 uint64,
 	}{result1, result2, result3}
 }
 
-func (fake *LparAPI) GetLparProperties(arg1 string) (*zhmcclient.LparProperties, int, *zhmcclient.HmcError) {
+func (fake *LparAPI) GetLparProperties(arg1 string) (*zhmcclient.LparObjectProperties, int, *zhmcclient.HmcError) {
 	fake.getLparPropertiesMutex.Lock()
 	ret, specificReturn := fake.getLparPropertiesReturnsOnCall[len(fake.getLparPropertiesArgsForCall)]
 	fake.getLparPropertiesArgsForCall = append(fake.getLparPropertiesArgsForCall, struct {
@@ -721,7 +721,7 @@ func (fake *LparAPI) GetLparPropertiesCallCount() int {
 	return len(fake.getLparPropertiesArgsForCall)
 }
 
-func (fake *LparAPI) GetLparPropertiesCalls(stub func(string) (*zhmcclient.LparProperties, int, *zhmcclient.HmcError)) {
+func (fake *LparAPI) GetLparPropertiesCalls(stub func(string) (*zhmcclient.LparObjectProperties, int, *zhmcclient.HmcError)) {
 	fake.getLparPropertiesMutex.Lock()
 	defer fake.getLparPropertiesMutex.Unlock()
 	fake.GetLparPropertiesStub = stub
@@ -734,30 +734,30 @@ func (fake *LparAPI) GetLparPropertiesArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *LparAPI) GetLparPropertiesReturns(result1 *zhmcclient.LparProperties, result2 int, result3 *zhmcclient.HmcError) {
+func (fake *LparAPI) GetLparPropertiesReturns(result1 *zhmcclient.LparObjectProperties, result2 int, result3 *zhmcclient.HmcError) {
 	fake.getLparPropertiesMutex.Lock()
 	defer fake.getLparPropertiesMutex.Unlock()
 	fake.GetLparPropertiesStub = nil
 	fake.getLparPropertiesReturns = struct {
-		result1 *zhmcclient.LparProperties
+		result1 *zhmcclient.LparObjectProperties
 		result2 int
 		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
 }
 
-func (fake *LparAPI) GetLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.LparProperties, result2 int, result3 *zhmcclient.HmcError) {
+func (fake *LparAPI) GetLparPropertiesReturnsOnCall(i int, result1 *zhmcclient.LparObjectProperties, result2 int, result3 *zhmcclient.HmcError) {
 	fake.getLparPropertiesMutex.Lock()
 	defer fake.getLparPropertiesMutex.Unlock()
 	fake.GetLparPropertiesStub = nil
 	if fake.getLparPropertiesReturnsOnCall == nil {
 		fake.getLparPropertiesReturnsOnCall = make(map[int]struct {
-			result1 *zhmcclient.LparProperties
+			result1 *zhmcclient.LparObjectProperties
 			result2 int
 			result3 *zhmcclient.HmcError
 		})
 	}
 	fake.getLparPropertiesReturnsOnCall[i] = struct {
-		result1 *zhmcclient.LparProperties
+		result1 *zhmcclient.LparObjectProperties
 		result2 int
 		result3 *zhmcclient.HmcError
 	}{result1, result2, result3}
