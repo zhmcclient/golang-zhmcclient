@@ -101,6 +101,9 @@ func (m *ZhmcManager) UnmountIsoImage(lparURI string) (int, *HmcError) {
 func (m *ZhmcManager) ListNics(lparURI string) ([]string, int, *HmcError) {
 	return m.lparManager.ListNics(lparURI)
 }
+func (m *ZhmcManager) ZeroizeCryptoDomain(lparURI string, adapterDetails *CryptoAdapterDetails) (int, *HmcError) {
+	return m.lparManager.ZeroizeCryptoDomain(lparURI, adapterDetails)
+}
 
 func (m *ZhmcManager) AttachStorageGroupToPartition(lparURI string, request *StorageGroupPayload) (int, *HmcError) {
 	return m.lparManager.AttachStorageGroupToPartition(lparURI, request)

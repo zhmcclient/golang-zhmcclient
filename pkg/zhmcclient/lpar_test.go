@@ -296,6 +296,52 @@ var _ = Describe("LPAR", func() {
 		})
 	})
 
+	Describe("Zeroize Crypto Domain", func() {
+		var (
+			payload       *CryptoAdapterDetails
+			bytesResponse []byte
+		)
+
+		BeforeEach(func() {
+			payload = &CryptoAdapterDetails{
+				CryptoAdapterUri: "/api/adapters/196a234",
+				DomainIdx:        0,
+			}
+
+			bytesResponse, _ = json.Marshal(payload)
+		})
+
+		Context("When ZeroizeCryptoDomain and returns correctly", func() {
+			It("check the results succeed", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusNoContent, bytesResponse, nil)
+				_, err := manager.ZeroizeCryptoDomain(lparid, payload)
+
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When ZeroizeCryptoDomain returns error due to unmarshalErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, []byte("incorrect json bytes"), hmcErr)
+				_, err := manager.ZeroizeCryptoDomain(lparid, payload)
+
+				Expect(err.Error()).ToNot(BeNil())
+			})
+		})
+
+		Context("When ZeroizeCryptoDomain returns error due to hmcErr", func() {
+			It("check the error happened", func() {
+				fakeClient.CloneEndpointURLReturns(url)
+				fakeClient.ExecuteRequestReturns(http.StatusBadRequest, bytesResponse, hmcErr)
+				_, err := manager.ZeroizeCryptoDomain(lparid, payload)
+
+				Expect(*err).To(Equal(*hmcErr))
+			})
+		})
+	})
+
 	Describe("UpdateLparProperties", func() {
 		var (
 			payload       *LparProperties

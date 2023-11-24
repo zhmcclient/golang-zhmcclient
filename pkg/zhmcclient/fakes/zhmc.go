@@ -628,6 +628,20 @@ type ZhmcAPI struct {
 		result1 int
 		result2 *zhmcclient.HmcError
 	}
+	ZeroizeCryptoDomainStub        func(string, *zhmcclient.CryptoAdapterDetails) (int, *zhmcclient.HmcError)
+	zeroizeCryptoDomainMutex       sync.RWMutex
+	zeroizeCryptoDomainArgsForCall []struct {
+		arg1 string
+		arg2 *zhmcclient.CryptoAdapterDetails
+	}
+	zeroizeCryptoDomainReturns struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
+	zeroizeCryptoDomainReturnsOnCall map[int]struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -3421,6 +3435,71 @@ func (fake *ZhmcAPI) UpdateStorageGroupPropertiesReturnsOnCall(i int, result1 in
 	}{result1, result2}
 }
 
+func (fake *ZhmcAPI) ZeroizeCryptoDomain(arg1 string, arg2 *zhmcclient.CryptoAdapterDetails) (int, *zhmcclient.HmcError) {
+	fake.zeroizeCryptoDomainMutex.Lock()
+	ret, specificReturn := fake.zeroizeCryptoDomainReturnsOnCall[len(fake.zeroizeCryptoDomainArgsForCall)]
+	fake.zeroizeCryptoDomainArgsForCall = append(fake.zeroizeCryptoDomainArgsForCall, struct {
+		arg1 string
+		arg2 *zhmcclient.CryptoAdapterDetails
+	}{arg1, arg2})
+	stub := fake.ZeroizeCryptoDomainStub
+	fakeReturns := fake.zeroizeCryptoDomainReturns
+	fake.recordInvocation("ZeroizeCryptoDomain", []interface{}{arg1, arg2})
+	fake.zeroizeCryptoDomainMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ZhmcAPI) ZeroizeCryptoDomainCallCount() int {
+	fake.zeroizeCryptoDomainMutex.RLock()
+	defer fake.zeroizeCryptoDomainMutex.RUnlock()
+	return len(fake.zeroizeCryptoDomainArgsForCall)
+}
+
+func (fake *ZhmcAPI) ZeroizeCryptoDomainCalls(stub func(string, *zhmcclient.CryptoAdapterDetails) (int, *zhmcclient.HmcError)) {
+	fake.zeroizeCryptoDomainMutex.Lock()
+	defer fake.zeroizeCryptoDomainMutex.Unlock()
+	fake.ZeroizeCryptoDomainStub = stub
+}
+
+func (fake *ZhmcAPI) ZeroizeCryptoDomainArgsForCall(i int) (string, *zhmcclient.CryptoAdapterDetails) {
+	fake.zeroizeCryptoDomainMutex.RLock()
+	defer fake.zeroizeCryptoDomainMutex.RUnlock()
+	argsForCall := fake.zeroizeCryptoDomainArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *ZhmcAPI) ZeroizeCryptoDomainReturns(result1 int, result2 *zhmcclient.HmcError) {
+	fake.zeroizeCryptoDomainMutex.Lock()
+	defer fake.zeroizeCryptoDomainMutex.Unlock()
+	fake.ZeroizeCryptoDomainStub = nil
+	fake.zeroizeCryptoDomainReturns = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
+func (fake *ZhmcAPI) ZeroizeCryptoDomainReturnsOnCall(i int, result1 int, result2 *zhmcclient.HmcError) {
+	fake.zeroizeCryptoDomainMutex.Lock()
+	defer fake.zeroizeCryptoDomainMutex.Unlock()
+	fake.ZeroizeCryptoDomainStub = nil
+	if fake.zeroizeCryptoDomainReturnsOnCall == nil {
+		fake.zeroizeCryptoDomainReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 *zhmcclient.HmcError
+		})
+	}
+	fake.zeroizeCryptoDomainReturnsOnCall[i] = struct {
+		result1 int
+		result2 *zhmcclient.HmcError
+	}{result1, result2}
+}
+
 func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -3508,6 +3587,8 @@ func (fake *ZhmcAPI) Invocations() map[string][][]interface{} {
 	defer fake.updateNicPropertiesMutex.RUnlock()
 	fake.updateStorageGroupPropertiesMutex.RLock()
 	defer fake.updateStorageGroupPropertiesMutex.RUnlock()
+	fake.zeroizeCryptoDomainMutex.RLock()
+	defer fake.zeroizeCryptoDomainMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

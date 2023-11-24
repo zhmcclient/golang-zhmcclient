@@ -39,10 +39,9 @@ type LparAPI interface {
 	DetachStorageGroupToPartition(storageGroupURI string, request *StorageGroupPayload) (int, *HmcError)
 	MountIsoImage(lparURI string, isoFile string, insFile string) (int, *HmcError)
 	UnmountIsoImage(lparURI string) (int, *HmcError)
-
 	ListNics(lparURI string) ([]string, int, *HmcError)
 	FetchAsciiConsoleURI(lparURI string, request *AsciiConsoleURIPayload) (*AsciiConsoleURIResponse, int, *HmcError)
-
+	ZeroizeCryptoDomain(lparURI string, adapterDetails *CryptoAdapterDetails) (int, *HmcError)
 	GetEnergyDetailsforLPAR(lparURI string, props *EnergyRequestPayload) (uint64, int, *HmcError)
 
 	AttachCryptoToPartition(lparURI string, request *CryptoConfig) (int, *HmcError)
@@ -659,6 +658,44 @@ func (m *LparManager) GetEnergyDetailsforLPAR(lparURI string, props *EnergyReque
 	errorResponseBody := GenerateErrorFromResponse(responseBody)
 	return 0, status, errorResponseBody
 }
+
+/**
+* POST /api/partitions/{partition-id}/operations/zeroize-crypto-domain
+*
+* Return: 204 (No Content) is returned and no response body
+*    or: 400, 404, 409, 500, 503
+ */
+
+func (m *LparManager) ZeroizeCryptoDomain(lparURI string, adapterDetails *CryptoAdapterDetails) (int, *HmcError) {
+	requestUrl := m.client.CloneEndpointURL()
+	requestUrl.Path = path.Join(requestUrl.Path, lparURI)
+	logger.Info("Request URL:" + string(requestUrl.Path) + " Method:" + http.MethodPost + " adapterDetails" + fmt.Sprint(adapterDetails))
+	status, responseBody, err := m.client.ExecuteRequest(http.MethodPost, requestUrl, adapterDetails, "")
+	if err != nil {
+		logger.Error("error on getting lpar's energy",
+			zap.String("request url", fmt.Sprint(requestUrl)),
+			zap.String("method", http.MethodGet),
+			zap.String("status", fmt.Sprint(status)),
+			zap.Error(fmt.Errorf("%v", err)))
+		return status, err
+	}
+
+	logger.Info("Response : " + string(responseBody))
+
+	if status == http.StatusNoContent {
+		logger.Info(fmt.Sprintf("Response: zeroize partition crypto domains successfull, request url: %v, method: %v, status: %v", lparURI, http.MethodPost, status))
+		return status, nil
+	}
+	errorResponseBody := GenerateErrorFromResponse(responseBody)
+	return status, errorResponseBody
+}
+
+/**
+* POST /api/partitions/{partition-id}/operations/increase-crypto-configuration
+*
+* Return: 204 (No Content) is returned and no response body
+*    or: 400, 404, 409, 500, 503
+ */
 
 func (m *LparManager) AttachCryptoToPartition(lparURI string, request *CryptoConfig) (int, *HmcError) {
 	requestUrl := m.client.CloneEndpointURL()
